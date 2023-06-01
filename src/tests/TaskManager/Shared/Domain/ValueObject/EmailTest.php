@@ -25,7 +25,7 @@ final class EmailTest extends TestCase
 
         $emailObject = new Email($email);
 
-        self::assertEquals($email, $emailObject->value);
+        $this->assertEquals($email, $emailObject->value);
     }
 
     public function testCreateWithInvalidValue(): void
@@ -42,6 +42,6 @@ final class EmailTest extends TestCase
 
         $emailObject = new Email($email);
 
-        self::assertEquals($email, (string) $emailObject);
+        $this->assertEquals($email, (string) $emailObject);
     }
 }
