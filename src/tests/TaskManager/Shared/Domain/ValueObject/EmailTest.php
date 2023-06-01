@@ -35,4 +35,13 @@ final class EmailTest extends TestCase
 
         new Email($this->faker->regexify('.{255}'));
     }
+
+    public function testToString(): void
+    {
+        $email = $this->faker->email();
+
+        $emailObject = new Email($email);
+
+        self::assertEquals($email, (string) $emailObject);
+    }
 }

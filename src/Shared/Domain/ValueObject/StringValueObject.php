@@ -4,13 +4,19 @@ declare(strict_types=1);
 
 namespace TaskManager\Shared\Domain\ValueObject;
 
+use Stringable;
 use TaskManager\Shared\Domain\Exception\InvalidArgumentException;
 
-abstract class StringValueObject
+abstract class StringValueObject implements Stringable
 {
     final public function __construct(public readonly string $value)
     {
         $this->ensureIsValid();
+    }
+
+    public function __toString(): string
+    {
+        return $this->value;
     }
 
     abstract protected function ensureIsValid(): void;
