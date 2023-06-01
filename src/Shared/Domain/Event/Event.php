@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace TaskManager\Shared\Domain\Event;
 
+use TaskManager\Shared\Domain\ValueObject\DateTime;
+
 abstract class Event
 {
     public string $occurredOn;
@@ -12,7 +14,7 @@ abstract class Event
         public string $aggregateId,
         string        $occurredOn = null
     ) {
-        $this->occurredOn = $occurredOn ?: (new \DateTime())->format('Y-m-d\TH:i:s.uP');
+        $this->occurredOn = $occurredOn ?: (new DateTime())->getValue();
     }
 
     abstract public static function getEventName(): string;
