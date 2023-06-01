@@ -1,0 +1,41 @@
+services:
+    rabbitmq:
+        container_name: ${RABBITMQ_HOST:-task_manager-rabbitmq}
+        image: rabbitmq:3.11.17-management-alpine
+        restart: unless-stopped
+        ports:
+            - 15673:15672
+    phpfpm:
+        container_name: task_manager-php
+        build:
+            context: ../
+            dockerfile: ./docker/images/php/Dockerfile
+            args:
+                RABBITMQ_QUEUE_NAME: ${RABBITMQ_QUEUE_NAME}
+        restart: unless-stopped
+        working_dir: /var/www
+        depends_on:
+            - db
+            - rabbitmq
+        volumes:
+            - ../symfony:/var/www/symfony
+            - ../src:/var/www/src
+            - ../logs/supervisor:/var/log/supervisor
+        ports:
+            - 8081:8080
+    db:
+        container_name: ${DATABASE_HOST:-task_manager-db}
+        image: postgres:${DATABASE_VERSION:-14}-alpine3.15
+        restart: always
+        environment:
+            POSTGRES_DB: ${DATABASE_NAME:-postgres}
+            POSTGRES_USER: ${DATABASE_USER:-root}
+            POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-}
+        volumes:
+            - ../data/db:/var/lib/postgresql/data
+    adminer:
+        container_name: task_manager-adminer
+        image: adminer:latest
+        restart: always
+        ports:
+            - 9080:8080

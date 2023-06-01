@@ -1,0 +1,32 @@
+framework:
+    messenger:
+        default_bus: command.bus
+        buses:
+            command.bus:
+                middleware:
+                    - doctrine_transaction
+            query.bus:
+            event.bus:
+                default_middleware: allow_no_handlers
+
+        transports:
+            async:
+                dsn: '%env(RABBITMQ_URL)%'
+                options:
+                    queues:
+                        '%env(RABBITMQ_QUEUE_NAME)%': ~
+            sync: 'sync://'
+
+#        routing:
+#            'TaskManager\Shared\Domain\Event\Event': async
+#            'TaskManager\Shared\Application\Bus\Command\CommandInterface': sync
+#            'TaskManager\Shared\Application\Bus\Query\QueryInterface': sync
+
+
+# when@test:
+#    framework:
+#        messenger:
+#            transports:
+#                # replace with your transport name here (e.g., my_transport: 'in-memory://')
+#                # For more Messenger testing tools, see https://github.com/zenstruck/messenger-test
+#                async: 'in-memory://'
