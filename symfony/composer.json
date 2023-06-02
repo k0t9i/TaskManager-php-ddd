@@ -39,7 +39,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "TaskManager\\Tests\\": "tests/"
+            "TaskManager\\Tests\\": "../src/tests/"
         }
     },
     "replace": {

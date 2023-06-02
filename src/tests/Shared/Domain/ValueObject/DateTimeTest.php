@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace TaskManager\Test\Shared\Domain\ValueObject;
 
+use PHPUnit\Framework\TestCase;
 use TaskManager\Shared\Domain\Exception\InvalidArgumentException;
 use TaskManager\Shared\Domain\ValueObject\DateTime;
-use PHPUnit\Framework\TestCase;
 
 class DateTimeTest extends TestCase
 {
