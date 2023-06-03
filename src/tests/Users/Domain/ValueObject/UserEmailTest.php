@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskManager\Test\Users\Domain\ValueObject;
+namespace TaskManager\Tests\Users\Domain\ValueObject;
 
 use Faker\Factory;
 use Faker\Generator;

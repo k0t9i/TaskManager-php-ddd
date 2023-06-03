@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskManager\Test\Shared\Domain\ValueObject;
+namespace TaskManager\Tests\Shared\Domain\ValueObject;
 
 use PHPUnit\Framework\TestCase;
 use TaskManager\Shared\Domain\Exception\InvalidArgumentException;

@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace TaskManager\Shared\Domain\ValueObject;
+namespace TaskManager\Tests\Shared\Domain\ValueObject;
 
 use Faker\Factory;
 use Faker\Generator;
 use PHPUnit\Framework\TestCase;
 use TaskManager\Shared\Domain\Exception\InvalidArgumentException;
+use TaskManager\Shared\Domain\ValueObject\Email;
 
 final class EmailTest extends TestCase
 {
