@@ -7,7 +7,6 @@ namespace TaskManager\Tests\Users\Domain\ValueObject;
 use Faker\Factory;
 use Faker\Generator;
 use PHPUnit\Framework\TestCase;
-use TaskManager\Shared\Domain\Exception\InvalidArgumentException;
 use TaskManager\Users\Domain\ValueObject\UserFirstname;
 use TaskManager\Users\Domain\ValueObject\UserLastname;
 use TaskManager\Users\Domain\ValueObject\UserPassword;

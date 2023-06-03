@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace TaskManager\Shared\Domain\ValueObject;
 
+use DateTimeImmutable;
 use Exception;
 use Stringable;
-use DateTimeImmutable;
 use TaskManager\Shared\Domain\Exception\InvalidArgumentException;
 
 class DateTime implements Stringable

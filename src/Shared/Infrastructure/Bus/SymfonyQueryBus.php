@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace TaskManager\Shared\Infrastructure\Bus;
 
+use Symfony\Component\Messenger\HandleTrait;
+use Symfony\Component\Messenger\MessageBusInterface;
 use TaskManager\Shared\Application\Bus\Query\QueryBusInterface;
 use TaskManager\Shared\Application\Bus\Query\QueryInterface;
 use TaskManager\Shared\Application\Bus\Query\QueryResponseInterface;
-use Symfony\Component\Messenger\HandleTrait;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 final class SymfonyQueryBus implements QueryBusInterface
 {

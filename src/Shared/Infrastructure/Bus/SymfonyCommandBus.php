@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace TaskManager\Shared\Infrastructure\Bus;
 
-use TaskManager\Shared\Application\Bus\Command\CommandBusInterface;
-use TaskManager\Shared\Application\Bus\Command\CommandInterface;
 use Symfony\Component\Messenger\HandleTrait;
 use Symfony\Component\Messenger\MessageBusInterface;
+use TaskManager\Shared\Application\Bus\Command\CommandBusInterface;
+use TaskManager\Shared\Application\Bus\Command\CommandInterface;
 
 final class SymfonyCommandBus implements CommandBusInterface
 {

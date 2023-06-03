@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace TaskManager\Shared\Infrastructure\Bus;
 
+use Symfony\Component\Messenger\MessageBusInterface;
 use TaskManager\Shared\Application\Bus\Event\EventBusInterface;
 use TaskManager\Shared\Domain\Event\Event;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 final readonly class SymfonyEventBus implements EventBusInterface
 {
