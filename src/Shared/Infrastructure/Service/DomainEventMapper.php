@@ -5,8 +5,7 @@ declare(strict_types=1);
 namespace TaskManager\Shared\Infrastructure\Service;
 
 use TaskManager\Shared\Application\Service\DomainEventMapperInterface;
-use TaskManager\Shared\Domain\Event\DomainEvent;
-use TaskManager\Shared\Domain\Event\UserWasCreatedDomainEvent;
+use TaskManager\Shared\Domain\Event\DomainEventInterface;
 use TaskManager\Shared\Domain\Exception\InvalidArgumentException;
 
 final class DomainEventMapper implements DomainEventMapperInterface
@@ -30,7 +29,7 @@ final class DomainEventMapper implements DomainEventMapperInterface
     {
         if (empty($this->map)) {
             foreach ($this->events as $eventClass) {
-                if (!is_subclass_of($eventClass, DomainEvent::class)) {
+                if (!is_subclass_of($eventClass, DomainEventInterface::class)) {
                     throw new InvalidArgumentException(
                         sprintf('"%s" must be instance of DomainEvent', $eventClass)
                     );

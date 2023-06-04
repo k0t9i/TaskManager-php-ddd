@@ -6,6 +6,10 @@ namespace TaskManager\Shared\Domain\Event;
 
 interface DomainEventInterface
 {
+    public function getAggregateId(): string;
+
+    public function getOccurredOn(): string;
+
     public static function getEventName(): string;
 
     public static function fromPrimitives(string $aggregateId, array $body, string $occurredOn): static;

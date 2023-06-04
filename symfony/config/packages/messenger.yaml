@@ -6,7 +6,9 @@ framework:
                 middleware:
                     - doctrine_transaction
             query.bus:
-            event.bus:
+            integrationEvent.bus:
+                default_middleware: allow_no_handlers
+            domainEvent.bus:
                 default_middleware: allow_no_handlers
 
         transports:
@@ -17,10 +19,11 @@ framework:
                         '%env(RABBITMQ_QUEUE_NAME)%': ~
             sync: 'sync://'
 
-#        routing:
-#            'TaskManager\Shared\Domain\Event\Event': async
-#            'TaskManager\Shared\Application\Bus\Command\CommandInterface': sync
-#            'TaskManager\Shared\Application\Bus\Query\QueryInterface': sync
+        routing:
+            'TaskManager\Shared\Domain\Event\DomainEventInterface': sync
+            'TaskManager\Shared\Application\Bus\Event\IntegrationEventInterface': async
+            'TaskManager\Shared\Application\Bus\Command\CommandInterface': sync
+            'TaskManager\Shared\Application\Bus\Query\QueryInterface': sync
 
 
 # when@test:
