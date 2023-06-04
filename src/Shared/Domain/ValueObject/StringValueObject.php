@@ -9,7 +9,7 @@ use TaskManager\Shared\Domain\Exception\InvalidArgumentException;
 
 abstract class StringValueObject implements Stringable
 {
-    final public function __construct(public readonly string $value)
+    public function __construct(public readonly string $value)
     {
         $this->ensureIsValid();
     }

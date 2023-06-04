@@ -7,6 +7,12 @@ doctrine:
         port: '%env(resolve:DATABASE_PORT)%'
         driver: '%env(resolve:DATABASE_DRIVER)%'
         server_version: '%env(resolve:DATABASE_VERSION)%'
+        types:
+            user_id: TaskManager\Users\Infrastructure\Persistence\Doctrine\UserIdType
+            user_email: TaskManager\Users\Infrastructure\Persistence\Doctrine\UserEmailType
+            user_firstname: TaskManager\Users\Infrastructure\Persistence\Doctrine\UserFirstnameType
+            user_lastname: TaskManager\Users\Infrastructure\Persistence\Doctrine\UserLastnameType
+            user_password: TaskManager\Users\Infrastructure\Persistence\Doctrine\UserPasswordType
     orm:
         auto_generate_proxy_classes: true
         enable_lazy_ghost_objects: true
@@ -23,7 +29,7 @@ doctrine:
                 type: xml
                 dir: '%kernel.project_dir%/../src/Users/Infrastructure/Persistence/Doctrine'
                 is_bundle: false
-                prefix: TaskManager\Users\Domain\Entity
+                prefix: TaskManager\Users\Domain
                 alias: TaskManagerUsers
 
 when@test:
