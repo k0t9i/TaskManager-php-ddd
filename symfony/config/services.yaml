@@ -31,3 +31,10 @@ services:
         TaskManager\Shared\Application\Bus\Event\EventSubscriberInterface:
             tags:
                 - { name: messenger.message_handler, bus: event.bus }
+        TaskManager\Shared\Domain\Event\DomainEvent:
+            tags: [ 'task_manager.domain_event' ]
+
+    # @see ArrayArgumentLoaderCompilerPass adds class names of all services, tagged with target value, as an argument
+    TaskManager\Shared\Application\Service\DomainEventMapperInterface:
+        tags:
+            - { name: task_manager.argument_loader, target_tag: task_manager.domain_event }
