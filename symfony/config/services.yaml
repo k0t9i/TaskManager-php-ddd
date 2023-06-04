@@ -43,3 +43,9 @@ services:
     TaskManager\Shared\Application\Service\DomainEventMapperInterface:
         tags:
             - { name: task_manager.argument_loader, target_tag: task_manager.domain_event }
+
+    Symfony\Component\PasswordHasher\Hasher\Pbkdf2PasswordHasher:
+        arguments:
+            $iterations: 100
+
+    Symfony\Component\PasswordHasher\PasswordHasherInterface: '@Symfony\Component\PasswordHasher\Hasher\Pbkdf2PasswordHasher'
