@@ -6,7 +6,7 @@ namespace TaskManager\Shared\Domain\Event;
 
 use TaskManager\Shared\Domain\ValueObject\DateTime;
 
-abstract class Event
+abstract class DomainEvent implements DomainEventInterface
 {
     public string $occurredOn;
 

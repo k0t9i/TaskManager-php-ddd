@@ -6,7 +6,7 @@ namespace TaskManager\Shared\Infrastructure\Bus;
 
 use Symfony\Component\Messenger\MessageBusInterface;
 use TaskManager\Shared\Application\Bus\Event\EventBusInterface;
-use TaskManager\Shared\Domain\Event\Event;
+use TaskManager\Shared\Domain\Event\DomainEvent;
 
 final readonly class SymfonyEventBus implements EventBusInterface
 {
@@ -14,7 +14,7 @@ final readonly class SymfonyEventBus implements EventBusInterface
     {
     }
 
-    public function dispatch(Event ...$events): void
+    public function dispatch(DomainEvent ...$events): void
     {
         foreach ($events as $event) {
             $this->eventBus->dispatch($event);
