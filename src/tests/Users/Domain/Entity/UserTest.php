@@ -9,6 +9,7 @@ use Faker\Generator;
 use PHPUnit\Framework\TestCase;
 use TaskManager\Shared\Domain\Event\DomainEventInterface;
 use TaskManager\Users\Domain\Entity\User;
+use TaskManager\Users\Domain\Event\UserProfileWasChangedEvent;
 use TaskManager\Users\Domain\Event\UserWasCreatedDomainEvent;
 use TaskManager\Users\Domain\ValueObject\UserEmail;
 use TaskManager\Users\Domain\ValueObject\UserFirstname;
@@ -73,5 +74,34 @@ class UserTest extends TestCase
         $this->assertCount(0, $user->releaseEvents());
         $this->assertInstanceOf($event::class, $events[0]);
         $this->assertSame($event, $events[0]);
+    }
+
+    public function testChangeProfile(): void
+    {
+        $id = new UserId($this->faker->uuid());
+        $email = new UserEmail($this->faker->email());
+        $profile = new UserProfile(
+            new UserFirstname($this->faker->regexify('.{255}')),
+            new UserLastname($this->faker->regexify('.{255}')),
+            new UserPassword($this->faker->regexify('.{255}'))
+        );
+        $newProfile = new UserProfile(
+            new UserFirstname($this->faker->regexify('.{255}')),
+            new UserLastname($this->faker->regexify('.{255}')),
+            new UserPassword($this->faker->regexify('.{255}'))
+        );
+        $user = new User($id, $email, $profile);
+
+        $user->changeProfile($newProfile);
+
+        $events = $user->releaseEvents();
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(UserProfileWasChangedEvent::class, $events[0]);
+        $this->assertEquals($id->value, $events[0]->getAggregateId());
+        $this->assertEquals([
+            'firstname' => $newProfile->firstname->value,
+            'lastname' => $newProfile->lastname->value,
+            'password' => $newProfile->password->value
+        ], $events[0]->toPrimitives());
     }
 }

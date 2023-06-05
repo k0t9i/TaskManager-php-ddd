@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TaskManager\Users\Domain\Entity;
 
 use TaskManager\Shared\Domain\Aggregate\AggregateRoot;
+use TaskManager\Users\Domain\Event\UserProfileWasChangedEvent;
 use TaskManager\Users\Domain\Event\UserWasCreatedDomainEvent;
 use TaskManager\Users\Domain\ValueObject\UserEmail;
 use TaskManager\Users\Domain\ValueObject\UserId;
@@ -16,7 +17,7 @@ final class User extends AggregateRoot
     public function __construct(
         private readonly UserId $id,
         private readonly UserEmail $email,
-        private readonly UserProfile $profile
+        private UserProfile $profile
     ) {
     }
 
@@ -33,6 +34,18 @@ final class User extends AggregateRoot
         ));
 
         return $result;
+    }
+
+    public function changeProfile(UserProfile $profile): void
+    {
+        $this->profile = $profile;
+
+        $this->registerEvent(new UserProfileWasChangedEvent(
+            $this->id->value,
+            $this->profile->firstname->value,
+            $this->profile->lastname->value,
+            $this->profile->password->value,
+        ));
     }
 
     public function getId(): UserId
