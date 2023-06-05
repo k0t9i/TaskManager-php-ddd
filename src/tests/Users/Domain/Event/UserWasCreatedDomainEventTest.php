@@ -6,8 +6,8 @@ namespace TaskManager\Tests\Users\Domain\Event;
 
 use Faker\Factory;
 use Faker\Generator;
-use TaskManager\Users\Domain\Event\UserWasCreatedDomainEvent;
 use PHPUnit\Framework\TestCase;
+use TaskManager\Users\Domain\Event\UserWasCreatedDomainEvent;
 
 class UserWasCreatedDomainEventTest extends TestCase
 {

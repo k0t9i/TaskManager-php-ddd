@@ -6,12 +6,11 @@ namespace TaskManager\Tests\Users\Application\Handler;
 
 use Faker\Factory;
 use Faker\Generator;
+use PHPUnit\Framework\TestCase;
 use TaskManager\Shared\Application\Service\AuthenticatorServiceInterface;
 use TaskManager\Shared\Application\Service\PasswordHasherInterface;
 use TaskManager\Users\Application\Command\LoginCommand;
-use TaskManager\Users\Application\Command\RegisterCommand;
 use TaskManager\Users\Application\Handler\LoginCommandHandler;
-use PHPUnit\Framework\TestCase;
 use TaskManager\Users\Domain\Entity\User;
 use TaskManager\Users\Domain\Exception\UserNotExistException;
 use TaskManager\Users\Domain\Repository\UserRepositoryInterface;

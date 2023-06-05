@@ -10,12 +10,12 @@ use Lexik\Bundle\JWTAuthenticationBundle\Exception\JWTDecodeFailureException;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTManager;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\TokenExtractor\TokenExtractorInterface;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\KernelEvent;
 use TaskManager\Shared\Domain\Exception\AuthenticationException;
 use TaskManager\Shared\Domain\Exception\LogicException;
 use TaskManager\Shared\Infrastructure\Service\LexikJwtAuthenticatorService;
-use PHPUnit\Framework\TestCase;
 use TaskManager\Shared\Infrastructure\ValueObject\SymfonyUser;
 
 class LexikJwtAuthenticatorServiceTest extends TestCase

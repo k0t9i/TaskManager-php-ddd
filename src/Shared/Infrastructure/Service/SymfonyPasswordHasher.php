@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace TaskManager\Shared\Infrastructure\Service;
 
-use TaskManager\Shared\Application\Service\PasswordHasherInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface as SymfonyPasswordHasherInterface;
+use TaskManager\Shared\Application\Service\PasswordHasherInterface;
 
 final readonly class SymfonyPasswordHasher implements PasswordHasherInterface
 {
