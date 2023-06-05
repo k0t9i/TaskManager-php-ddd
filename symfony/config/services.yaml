@@ -49,3 +49,7 @@ services:
             $iterations: 100
 
     Symfony\Component\PasswordHasher\PasswordHasherInterface: '@Symfony\Component\PasswordHasher\Hasher\Pbkdf2PasswordHasher'
+
+    TaskManager\Shared\Infrastructure\Service\LexikJwtAuthenticatorService:
+        arguments:
+            $path: '^/api/(?!.*(security)|(test)).*$'
