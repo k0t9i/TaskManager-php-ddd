@@ -8,6 +8,7 @@ use TaskManager\Shared\Domain\Aggregate\AggregateRoot;
 use TaskManager\Users\Domain\Event\UserWasCreatedDomainEvent;
 use TaskManager\Users\Domain\ValueObject\UserEmail;
 use TaskManager\Users\Domain\ValueObject\UserId;
+use TaskManager\Users\Domain\ValueObject\UserPassword;
 use TaskManager\Users\Domain\ValueObject\UserProfile;
 
 final class User extends AggregateRoot
@@ -32,5 +33,15 @@ final class User extends AggregateRoot
         ));
 
         return $result;
+    }
+
+    public function getId(): UserId
+    {
+        return $this->id;
+    }
+
+    public function getPassword(): UserPassword
+    {
+        return $this->profile->password;
     }
 }
