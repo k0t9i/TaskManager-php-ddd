@@ -9,10 +9,12 @@ use Faker\Generator;
 use PHPUnit\Framework\TestCase;
 use TaskManager\Projects\Domain\Entity\Project;
 use TaskManager\Projects\Domain\Event\ProjectInformationWasChangedEvent;
+use TaskManager\Projects\Domain\Event\ProjectOwnerWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectStatusWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectWasCreatedEvent;
 use TaskManager\Projects\Domain\Exception\InvalidProjectStatusTransitionException;
 use TaskManager\Projects\Domain\Exception\ProjectModificationIsNotAllowedException;
+use TaskManager\Projects\Domain\Exception\UserIsAlreadyProjectOwnerException;
 use TaskManager\Projects\Domain\Exception\UserIsNotProjectOwnerException;
 use TaskManager\Projects\Domain\ValueObject\ActiveProjectStatus;
 use TaskManager\Projects\Domain\ValueObject\ClosedProjectStatus;
@@ -272,5 +274,90 @@ class ProjectTest extends TestCase
         ));
 
         $project->changeStatus(new ClosedProjectStatus(), $otherUserId);
+    }
+
+    public function testChangeOwner()
+    {
+        $id = new ProjectId($this->faker->uuid());
+        $information = new ProjectInformation(
+            new ProjectName($this->faker->regexify('.{255}')),
+            new ProjectDescription($this->faker->regexify('.{255}')),
+            new ProjectFinishDate(),
+        );
+        $owner = new ProjectOwner(new UserId($this->faker->uuid()));
+        $otherUserId = new UserId($this->faker->uuid());
+        $project = new Project($id, $information, new ActiveProjectStatus(), $owner);
+
+        $project->changeOwner(new ProjectOwner($otherUserId), $owner->userId);
+        $events = $project->releaseEvents();
+
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(ProjectOwnerWasChangedEvent::class, $events[0]);
+        $this->assertEquals($id->value, $events[0]->getAggregateId());
+        $this->assertEquals([
+            'ownerId' => $otherUserId->value,
+        ], $events[0]->toPrimitives());
+    }
+
+    public function testChangeOwnerToAlreadyOwner()
+    {
+        $id = new ProjectId($this->faker->uuid());
+        $information = new ProjectInformation(
+            new ProjectName($this->faker->regexify('.{255}')),
+            new ProjectDescription($this->faker->regexify('.{255}')),
+            new ProjectFinishDate(),
+        );
+        $owner = new ProjectOwner(new UserId($this->faker->uuid()));
+        $project = new Project($id, $information, new ActiveProjectStatus(), $owner);
+
+        $this->expectException(UserIsAlreadyProjectOwnerException::class);
+        $this->expectExceptionMessage(sprintf(
+            'User "%s" is already project owner',
+            $owner->userId->value
+        ));
+
+        $project->changeOwner($owner, $owner->userId);
+    }
+
+    public function testChangeOwnerByNonOwner()
+    {
+        $id = new ProjectId($this->faker->uuid());
+        $information = new ProjectInformation(
+            new ProjectName($this->faker->regexify('.{255}')),
+            new ProjectDescription($this->faker->regexify('.{255}')),
+            new ProjectFinishDate(),
+        );
+        $owner = new ProjectOwner(new UserId($this->faker->uuid()));
+        $otherUserId = new UserId($this->faker->uuid());
+        $project = new Project($id, $information, new ActiveProjectStatus(), $owner);
+
+        $this->expectException(UserIsNotProjectOwnerException::class);
+        $this->expectExceptionMessage(sprintf(
+            'User "%s" is not project owner',
+            $otherUserId->value
+        ));
+
+        $project->changeOwner(new ProjectOwner($otherUserId), $otherUserId);
+    }
+
+    public function testChangeOwnerInClosedProject()
+    {
+        $id = new ProjectId($this->faker->uuid());
+        $information = new ProjectInformation(
+            new ProjectName($this->faker->regexify('.{255}')),
+            new ProjectDescription($this->faker->regexify('.{255}')),
+            new ProjectFinishDate(),
+        );
+        $owner = new ProjectOwner(new UserId($this->faker->uuid()));
+        $otherUserId = new UserId($this->faker->uuid());
+        $project = new Project($id, $information, new ClosedProjectStatus(), $owner);
+
+        $this->expectException(ProjectModificationIsNotAllowedException::class);
+        $this->expectExceptionMessage(sprintf(
+            'Project modification is not allowed when status is "%s"',
+            ClosedProjectStatus::class
+        ));
+
+        $project->changeOwner(new ProjectOwner($otherUserId), $owner->userId);
     }
 }

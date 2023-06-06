@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TaskManager\Projects\Domain\Entity;
 
 use TaskManager\Projects\Domain\Event\ProjectInformationWasChangedEvent;
+use TaskManager\Projects\Domain\Event\ProjectOwnerWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectStatusWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectWasCreatedEvent;
 use TaskManager\Projects\Domain\ValueObject\ActiveProjectStatus;
@@ -91,6 +92,22 @@ final class Project extends AggregateRoot
         $this->registerEvent(new ProjectStatusWasChangedEvent(
             $this->id->value,
             (string) $status->getScalar()
+        ));
+    }
+
+    public function changeOwner(ProjectOwner $owner, UserId $currentUserId): void
+    {
+        $this->status->ensureAllowsModification();
+        $this->owner->ensureUserIsOwner($currentUserId);
+
+        $this->owner->ensureUserIsNotOwner($owner->userId);
+        //TODO add checks for participation and task existence
+
+        $this->owner = $owner;
+
+        $this->registerEvent(new ProjectOwnerWasChangedEvent(
+            $this->id->value,
+            $this->owner->userId->value
         ));
     }
 
