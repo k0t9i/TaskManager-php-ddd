@@ -54,8 +54,8 @@ services:
         arguments:
             $path: '^/api/(?!.*(security)|(test)).*$'
 
-    TaskManager\Shared\Infrastructure\Service\ContentDecoderInterface: '@TaskManager\Shared\Infrastructure\Service\JsonContentDecoder'
-
-    TaskManager\Users\Infrastructure\Symfony\UserRegisterValueResolver:
+    TaskManager\Shared\Infrastructure\Service\ExceptionListener:
         tags:
-            - { name: controller.argument_value_resolver, priority: 50 }
+            - { name: kernel.event_listener, event: kernel.exception, method: onException }
+        arguments:
+            $environment: '%env(string:APP_ENV)%'
