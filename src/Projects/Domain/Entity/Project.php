@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TaskManager\Projects\Domain\Entity;
 
 use TaskManager\Projects\Domain\Event\ProjectInformationWasChangedEvent;
+use TaskManager\Projects\Domain\Event\ProjectStatusWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectWasCreatedEvent;
 use TaskManager\Projects\Domain\ValueObject\ActiveProjectStatus;
 use TaskManager\Projects\Domain\ValueObject\ProjectDescription;
@@ -78,6 +79,19 @@ final class Project extends AggregateRoot
                 $information->finishDate->getValue()
             ));
         }
+    }
+
+    public function changeStatus(ProjectStatus $status, UserId $currentUserId): void
+    {
+        $this->status->ensureCanBeChangedTo($status);
+        $this->owner->ensureUserIsOwner($currentUserId);
+
+        $this->status = $status;
+
+        $this->registerEvent(new ProjectStatusWasChangedEvent(
+            $this->id->value,
+            (string) $status->getScalar()
+        ));
     }
 
     public function equals(Equatable $other): bool
