@@ -7,6 +7,7 @@ namespace TaskManager\Tests\Users\Domain\Entity;
 use Faker\Factory;
 use Faker\Generator;
 use PHPUnit\Framework\TestCase;
+use TaskManager\Shared\Domain\Equatable;
 use TaskManager\Shared\Domain\Event\DomainEventInterface;
 use TaskManager\Users\Domain\Entity\User;
 use TaskManager\Users\Domain\Event\UserProfileWasChangedEvent;
@@ -103,5 +104,34 @@ class UserTest extends TestCase
             'lastname' => $newProfile->lastname->value,
             'password' => $newProfile->password->value
         ], $events[0]->toPrimitives());
+    }
+
+    public function testEquals()
+    {
+        $id = new UserId($this->faker->uuid());
+        $email = new UserEmail($this->faker->email());
+        $profile = new UserProfile(
+            new UserFirstname($this->faker->regexify('.{255}')),
+            new UserLastname($this->faker->regexify('.{255}')),
+            new UserPassword($this->faker->regexify('.{255}'))
+        );
+        $user = new User($id, $email, $profile);
+        $equalUser = new User($id, $email, $profile);
+        $nonEqualUser = new User(
+            new UserId($this->faker->uuid()),
+            new UserEmail($this->faker->email()),
+            new UserProfile(
+                new UserFirstname($this->faker->regexify('.{255}')),
+                new UserLastname($this->faker->regexify('.{255}')),
+                new UserPassword($this->faker->regexify('.{255}'))
+            )
+        );
+        $otherEquatable = $this->getMockBuilder(Equatable::class)
+            ->getMock();
+
+        $this->assertTrue($user->equals($user));
+        $this->assertTrue($user->equals($equalUser));
+        $this->assertFalse($user->equals($nonEqualUser));
+        $this->assertFalse($user->equals($otherEquatable));
     }
 }

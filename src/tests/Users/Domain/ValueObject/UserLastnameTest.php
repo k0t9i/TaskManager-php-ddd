@@ -7,6 +7,7 @@ namespace TaskManager\Tests\Users\Domain\ValueObject;
 use Faker\Factory;
 use Faker\Generator;
 use PHPUnit\Framework\TestCase;
+use TaskManager\Shared\Domain\Equatable;
 use TaskManager\Shared\Domain\Exception\InvalidArgumentException;
 use TaskManager\Users\Domain\ValueObject\UserLastname;
 
@@ -52,5 +53,20 @@ final class UserLastnameTest extends TestCase
         $lastnameObject = new UserLastname($lastname);
 
         $this->assertEquals($lastname, (string) $lastnameObject);
+    }
+
+    public function testEquals(): void
+    {
+        $lastname = $this->faker->regexify('.{255}');
+        $lastnameObject = new UserLastname($lastname);
+        $equalLastname = new UserLastname($lastname);
+        $nonEqualLastname = new UserLastname($this->faker->regexify('.{255}'));
+        $otherEquatable = $this->getMockBuilder(Equatable::class)
+            ->getMock();
+
+        $this->assertTrue($lastnameObject->equals($lastnameObject));
+        $this->assertTrue($lastnameObject->equals($equalLastname));
+        $this->assertFalse($lastnameObject->equals($nonEqualLastname));
+        $this->assertFalse($lastnameObject->equals($otherEquatable));
     }
 }

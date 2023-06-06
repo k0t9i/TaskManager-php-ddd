@@ -7,9 +7,10 @@ namespace TaskManager\Shared\Domain\ValueObject;
 use DateTimeImmutable;
 use Exception;
 use Stringable;
+use TaskManager\Shared\Domain\Equatable;
 use TaskManager\Shared\Domain\Exception\InvalidArgumentException;
 
-class DateTime implements Stringable
+class DateTime implements Stringable, Equatable
 {
     // ATOM with microseconds
     public const DEFAULT_FORMAT = 'Y-m-d\TH:i:s.uP';
@@ -48,5 +49,10 @@ class DateTime implements Stringable
     public function isGreaterThan(self $other): bool
     {
         return $this->dateTime > $other->dateTime;
+    }
+
+    public function equals(Equatable $other): bool
+    {
+        return $other instanceof static && $this->getValue() === $other->getValue();
     }
 }

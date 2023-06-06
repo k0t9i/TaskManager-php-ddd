@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace TaskManager\Shared\Domain\Aggregate;
 
+use TaskManager\Shared\Domain\Equatable;
 use TaskManager\Shared\Domain\Event\DomainEventInterface;
 
-abstract class AggregateRoot
+abstract class AggregateRoot implements Equatable
 {
     /**
      * @var DomainEventInterface[]

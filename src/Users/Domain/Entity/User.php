@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TaskManager\Users\Domain\Entity;
 
 use TaskManager\Shared\Domain\Aggregate\AggregateRoot;
+use TaskManager\Shared\Domain\Equatable;
 use TaskManager\Users\Domain\Event\UserProfileWasChangedEvent;
 use TaskManager\Users\Domain\Event\UserWasCreatedDomainEvent;
 use TaskManager\Users\Domain\ValueObject\UserEmail;
@@ -56,5 +57,13 @@ final class User extends AggregateRoot
     public function getPassword(): UserPassword
     {
         return $this->profile->password;
+    }
+
+    public function equals(Equatable $other): bool
+    {
+        return $other instanceof self
+            && $other->id->equals($this->id)
+            && $other->email->equals($this->email)
+            && $other->profile->equals($this->profile);
     }
 }

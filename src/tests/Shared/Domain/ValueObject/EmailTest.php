@@ -7,6 +7,7 @@ namespace TaskManager\Tests\Shared\Domain\ValueObject;
 use Faker\Factory;
 use Faker\Generator;
 use PHPUnit\Framework\TestCase;
+use TaskManager\Shared\Domain\Equatable;
 use TaskManager\Shared\Domain\Exception\InvalidArgumentException;
 use TaskManager\Shared\Domain\ValueObject\Email;
 
@@ -44,5 +45,20 @@ final class EmailTest extends TestCase
         $emailObject = new Email($email);
 
         $this->assertEquals($email, (string) $emailObject);
+    }
+
+    public function testEquals(): void
+    {
+        $email = $this->faker->email();
+        $emailObject = new Email($email);
+        $equalEmail = new Email($email);
+        $nonEqualEmail = new Email($this->faker->email());
+        $otherEquatable = $this->getMockBuilder(Equatable::class)
+            ->getMock();
+
+        $this->assertTrue($emailObject->equals($emailObject));
+        $this->assertTrue($emailObject->equals($equalEmail));
+        $this->assertFalse($emailObject->equals($nonEqualEmail));
+        $this->assertFalse($emailObject->equals($otherEquatable));
     }
 }

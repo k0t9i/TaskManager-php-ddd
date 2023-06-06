@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TaskManager\Tests\Shared\Domain\ValueObject;
 
 use PHPUnit\Framework\TestCase;
+use TaskManager\Shared\Domain\Equatable;
 use TaskManager\Shared\Domain\Exception\InvalidArgumentException;
 use TaskManager\Shared\Domain\ValueObject\DateTime;
 
@@ -51,5 +52,19 @@ class DateTimeTest extends TestCase
         $dateObject = new DateTime(date('d-m-Y H:i:s'), $now);
 
         $this->assertEquals($date, (string) $dateObject);
+    }
+
+    public function testEquals(): void
+    {
+        $dateObject = new DateTime('01-01-1990');
+        $equalDate = new DateTime('01-01-1990');
+        $nonEqualDate = new DateTime('01-01-1999');
+        $otherEquatable = $this->getMockBuilder(Equatable::class)
+            ->getMock();
+
+        $this->assertTrue($dateObject->equals($dateObject));
+        $this->assertTrue($dateObject->equals($equalDate));
+        $this->assertFalse($dateObject->equals($nonEqualDate));
+        $this->assertFalse($dateObject->equals($otherEquatable));
     }
 }
