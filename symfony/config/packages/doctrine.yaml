@@ -13,6 +13,8 @@ doctrine:
             user_firstname: TaskManager\Users\Infrastructure\Persistence\Doctrine\UserFirstnameType
             user_lastname: TaskManager\Users\Infrastructure\Persistence\Doctrine\UserLastnameType
             user_password: TaskManager\Users\Infrastructure\Persistence\Doctrine\UserPasswordType
+
+            project_user_id: TaskManager\Projects\Infrastructure\Persistence\Doctrine\ProjectUserIdType
     orm:
         auto_generate_proxy_classes: true
         enable_lazy_ghost_objects: true
@@ -23,7 +25,7 @@ doctrine:
                 type: xml
                 dir: '%kernel.project_dir%/../src/Projects/Infrastructure/Persistence/Doctrine'
                 is_bundle: false
-                prefix: TaskManager\Projects\Domain\Entity
+                prefix: TaskManager\Projects\Domain
                 alias: TaskManagerProjects
             TaskManagerUsers:
                 type: xml

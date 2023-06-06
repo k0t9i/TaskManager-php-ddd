@@ -6,7 +6,7 @@ namespace TaskManager\Projects\Domain\ValueObject;
 
 use TaskManager\Shared\Domain\ValueObject\Uuid;
 
-final class UserId extends Uuid
+final class ProjectUserId extends Uuid
 {
 
 }

@@ -12,25 +12,25 @@ use TaskManager\Shared\Domain\Equatable;
 final readonly class ProjectOwner implements Equatable
 {
     public function __construct(
-        public UserId $userId
+        public ProjectUserId $userId
     ) {
     }
 
-    public function ensureUserIsOwner(UserId $userId): void
+    public function ensureUserIsOwner(ProjectUserId $userId): void
     {
         if (!$this->userIsOwner($userId)) {
             throw new UserIsNotProjectOwnerException($userId->value);
         }
     }
 
-    public function ensureUserIsNotOwner(UserId $userId): void
+    public function ensureUserIsNotOwner(ProjectUserId $userId): void
     {
         if ($this->userIsOwner($userId)) {
             throw new UserIsAlreadyProjectOwnerException($userId->value);
         }
     }
 
-    public function userIsOwner(UserId $userId): bool
+    public function userIsOwner(ProjectUserId $userId): bool
     {
         return $this->userId->equals($userId);
     }

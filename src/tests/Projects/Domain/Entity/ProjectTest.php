@@ -25,7 +25,7 @@ use TaskManager\Projects\Domain\ValueObject\ProjectInformation;
 use TaskManager\Projects\Domain\ValueObject\ProjectName;
 use TaskManager\Projects\Domain\ValueObject\ProjectOwner;
 use TaskManager\Projects\Domain\ValueObject\ProjectStatus;
-use TaskManager\Projects\Domain\ValueObject\UserId;
+use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
 
 class ProjectTest extends TestCase
 {
@@ -45,7 +45,7 @@ class ProjectTest extends TestCase
             new ProjectDescription($this->faker->regexify('.{255}')),
             new ProjectFinishDate(),
         );
-        $owner = new ProjectOwner(new UserId($this->faker->uuid()));
+        $owner = new ProjectOwner(new ProjectUserId($this->faker->uuid()));
         $project = Project::create($id, $information, $owner);
         $events = $project->releaseEvents();
 
@@ -75,7 +75,7 @@ class ProjectTest extends TestCase
             new ProjectDescription($this->faker->regexify('.{255}')),
             new ProjectFinishDate(),
         );
-        $owner = new ProjectOwner(new UserId($this->faker->uuid()));
+        $owner = new ProjectOwner(new ProjectUserId($this->faker->uuid()));
 
         $project = new Project($id, $information, new ActiveProjectStatus(), $owner);
 
@@ -142,8 +142,8 @@ class ProjectTest extends TestCase
             new ProjectDescription($this->faker->regexify('.{255}')),
             new ProjectFinishDate(),
         );
-        $owner = new ProjectOwner(new UserId($this->faker->uuid()));
-        $otherUserId = new UserId($this->faker->uuid());
+        $owner = new ProjectOwner(new ProjectUserId($this->faker->uuid()));
+        $otherUserId = new ProjectUserId($this->faker->uuid());
         $project = new Project($id, $information, new ActiveProjectStatus(), $owner);
 
         $this->expectException(UserIsNotProjectOwnerException::class);
@@ -173,7 +173,7 @@ class ProjectTest extends TestCase
             new ProjectDescription($this->faker->regexify('.{255}')),
             new ProjectFinishDate(),
         );
-        $owner = new ProjectOwner(new UserId($this->faker->uuid()));
+        $owner = new ProjectOwner(new ProjectUserId($this->faker->uuid()));
         $project = new Project($id, $information, new ClosedProjectStatus(), $owner);
 
         $this->expectException(ProjectModificationIsNotAllowedException::class);
@@ -198,7 +198,7 @@ class ProjectTest extends TestCase
             new ProjectDescription($this->faker->regexify('.{255}')),
             new ProjectFinishDate(),
         );
-        $owner = new ProjectOwner(new UserId($this->faker->uuid()));
+        $owner = new ProjectOwner(new ProjectUserId($this->faker->uuid()));
         $project = new Project($id, $information, new ActiveProjectStatus(), $owner);
 
         $project->changeStatus(new ClosedProjectStatus(), $owner->userId);
@@ -220,7 +220,7 @@ class ProjectTest extends TestCase
             new ProjectDescription($this->faker->regexify('.{255}')),
             new ProjectFinishDate(),
         );
-        $owner = new ProjectOwner(new UserId($this->faker->uuid()));
+        $owner = new ProjectOwner(new ProjectUserId($this->faker->uuid()));
         $project = new Project($id, $information, new ClosedProjectStatus(), $owner);
 
         $project->changeStatus(new ActiveProjectStatus(), $owner->userId);
@@ -242,7 +242,7 @@ class ProjectTest extends TestCase
             new ProjectDescription($this->faker->regexify('.{255}')),
             new ProjectFinishDate(),
         );
-        $owner = new ProjectOwner(new UserId($this->faker->uuid()));
+        $owner = new ProjectOwner(new ProjectUserId($this->faker->uuid()));
         $project = new Project($id, $information, new ActiveProjectStatus(), $owner);
 
         $this->expectException(InvalidProjectStatusTransitionException::class);
@@ -263,8 +263,8 @@ class ProjectTest extends TestCase
             new ProjectDescription($this->faker->regexify('.{255}')),
             new ProjectFinishDate(),
         );
-        $owner = new ProjectOwner(new UserId($this->faker->uuid()));
-        $otherUserId = new UserId($this->faker->uuid());
+        $owner = new ProjectOwner(new ProjectUserId($this->faker->uuid()));
+        $otherUserId = new ProjectUserId($this->faker->uuid());
         $project = new Project($id, $information, new ActiveProjectStatus(), $owner);
 
         $this->expectException(UserIsNotProjectOwnerException::class);
@@ -284,8 +284,8 @@ class ProjectTest extends TestCase
             new ProjectDescription($this->faker->regexify('.{255}')),
             new ProjectFinishDate(),
         );
-        $owner = new ProjectOwner(new UserId($this->faker->uuid()));
-        $otherUserId = new UserId($this->faker->uuid());
+        $owner = new ProjectOwner(new ProjectUserId($this->faker->uuid()));
+        $otherUserId = new ProjectUserId($this->faker->uuid());
         $project = new Project($id, $information, new ActiveProjectStatus(), $owner);
 
         $project->changeOwner(new ProjectOwner($otherUserId), $owner->userId);
@@ -307,7 +307,7 @@ class ProjectTest extends TestCase
             new ProjectDescription($this->faker->regexify('.{255}')),
             new ProjectFinishDate(),
         );
-        $owner = new ProjectOwner(new UserId($this->faker->uuid()));
+        $owner = new ProjectOwner(new ProjectUserId($this->faker->uuid()));
         $project = new Project($id, $information, new ActiveProjectStatus(), $owner);
 
         $this->expectException(UserIsAlreadyProjectOwnerException::class);
@@ -327,8 +327,8 @@ class ProjectTest extends TestCase
             new ProjectDescription($this->faker->regexify('.{255}')),
             new ProjectFinishDate(),
         );
-        $owner = new ProjectOwner(new UserId($this->faker->uuid()));
-        $otherUserId = new UserId($this->faker->uuid());
+        $owner = new ProjectOwner(new ProjectUserId($this->faker->uuid()));
+        $otherUserId = new ProjectUserId($this->faker->uuid());
         $project = new Project($id, $information, new ActiveProjectStatus(), $owner);
 
         $this->expectException(UserIsNotProjectOwnerException::class);
@@ -348,8 +348,8 @@ class ProjectTest extends TestCase
             new ProjectDescription($this->faker->regexify('.{255}')),
             new ProjectFinishDate(),
         );
-        $owner = new ProjectOwner(new UserId($this->faker->uuid()));
-        $otherUserId = new UserId($this->faker->uuid());
+        $owner = new ProjectOwner(new ProjectUserId($this->faker->uuid()));
+        $otherUserId = new ProjectUserId($this->faker->uuid());
         $project = new Project($id, $information, new ClosedProjectStatus(), $owner);
 
         $this->expectException(ProjectModificationIsNotAllowedException::class);

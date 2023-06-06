@@ -16,7 +16,7 @@ use TaskManager\Projects\Domain\ValueObject\ProjectInformation;
 use TaskManager\Projects\Domain\ValueObject\ProjectName;
 use TaskManager\Projects\Domain\ValueObject\ProjectOwner;
 use TaskManager\Projects\Domain\ValueObject\ProjectStatus;
-use TaskManager\Projects\Domain\ValueObject\UserId;
+use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
 use TaskManager\Shared\Domain\Aggregate\AggregateRoot;
 use TaskManager\Shared\Domain\Equatable;
 
@@ -59,7 +59,7 @@ final class Project extends AggregateRoot
         ?ProjectName $name,
         ?ProjectDescription $description,
         ?ProjectFinishDate $finishDate,
-        UserId $currentUserId
+        ProjectUserId $currentUserId
     ): void {
         $this->status->ensureAllowsModification();
         $this->owner->ensureUserIsOwner($currentUserId);
@@ -82,7 +82,7 @@ final class Project extends AggregateRoot
         }
     }
 
-    public function changeStatus(ProjectStatus $status, UserId $currentUserId): void
+    public function changeStatus(ProjectStatus $status, ProjectUserId $currentUserId): void
     {
         $this->status->ensureCanBeChangedTo($status);
         $this->owner->ensureUserIsOwner($currentUserId);
@@ -95,7 +95,7 @@ final class Project extends AggregateRoot
         ));
     }
 
-    public function changeOwner(ProjectOwner $owner, UserId $currentUserId): void
+    public function changeOwner(ProjectOwner $owner, ProjectUserId $currentUserId): void
     {
         $this->status->ensureAllowsModification();
         $this->owner->ensureUserIsOwner($currentUserId);
