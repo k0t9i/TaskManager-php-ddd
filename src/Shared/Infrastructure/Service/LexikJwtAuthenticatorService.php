@@ -7,13 +7,13 @@ namespace TaskManager\Shared\Infrastructure\Service;
 use Lexik\Bundle\JWTAuthenticationBundle\Exception\JWTDecodeFailureException;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\TokenExtractor\TokenExtractorInterface;
+use LogicException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\KernelEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use TaskManager\Shared\Application\Service\AuthenticatorServiceInterface;
 use TaskManager\Shared\Domain\Exception\AuthenticationException;
-use TaskManager\Shared\Domain\Exception\LogicException;
 use TaskManager\Shared\Infrastructure\ValueObject\SymfonyUser;
 
 final class LexikJwtAuthenticatorService implements AuthenticatorServiceInterface, EventSubscriberInterface

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace TaskManager\Tests\Shared\Infrastructure\Service;
 
+use LogicException;
 use PHPUnit\Framework\TestCase;
 use TaskManager\Shared\Domain\Event\DomainEvent;
-use TaskManager\Shared\Domain\Exception\LogicException;
 use TaskManager\Shared\Infrastructure\Service\DomainEventMapper;
 
 abstract class TestEvent extends DomainEvent
