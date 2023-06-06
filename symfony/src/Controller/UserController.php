@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Annotation\Route;
 use TaskManager\Shared\Application\Bus\Command\CommandBusInterface;
 use TaskManager\Users\Application\Command\UpdateProfileCommand;
-use TaskManager\Users\Infrastructure\Symfony\DTO\UserProfileUpdateDTO;
+use TaskManager\Users\Infrastructure\Service\DTO\UserProfileUpdateDTO;
 
 #[AsController]
 #[Route('/api/users', name: 'user.')]

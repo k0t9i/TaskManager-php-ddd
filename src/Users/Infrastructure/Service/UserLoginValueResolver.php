@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace TaskManager\Users\Infrastructure\Symfony;
+namespace TaskManager\Users\Infrastructure\Service;
 
-use TaskManager\Shared\Infrastructure\Symfony\ValueResolver;
-use TaskManager\Users\Infrastructure\Symfony\DTO\UserLoginDTO;
+use TaskManager\Shared\Infrastructure\Service\ValueResolver;
+use TaskManager\Users\Infrastructure\Service\DTO\UserLoginDTO;
 
 final class UserLoginValueResolver extends ValueResolver
 {

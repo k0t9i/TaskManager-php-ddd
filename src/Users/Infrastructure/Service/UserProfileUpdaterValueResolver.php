@@ -2,22 +2,21 @@
 
 declare(strict_types=1);
 
-namespace TaskManager\Users\Infrastructure\Symfony;
+namespace TaskManager\Users\Infrastructure\Service;
 
-use TaskManager\Shared\Infrastructure\Symfony\ValueResolver;
-use TaskManager\Users\Infrastructure\Symfony\DTO\UserRegisterDTO;
+use TaskManager\Shared\Infrastructure\Service\ValueResolver;
+use TaskManager\Users\Infrastructure\Service\DTO\UserProfileUpdateDTO;
 
-final class UserRegisterValueResolver extends ValueResolver
+final class UserProfileUpdaterValueResolver extends ValueResolver
 {
     protected function supportClass(): string
     {
-        return UserRegisterDTO::class;
+        return UserProfileUpdateDTO::class;
     }
 
     protected function doResolve(array $attributes): iterable
     {
-        yield new UserRegisterDTO(
-            $attributes['email'] ?? '',
+        yield new UserProfileUpdateDTO(
             $attributes['firstname'] ?? '',
             $attributes['lastname'] ?? '',
             $attributes['password'] ?? '',

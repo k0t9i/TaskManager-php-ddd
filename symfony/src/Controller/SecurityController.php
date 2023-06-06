@@ -12,8 +12,8 @@ use TaskManager\Shared\Application\Bus\Command\CommandBusInterface;
 use TaskManager\Shared\Application\Service\UuidGeneratorInterface;
 use TaskManager\Users\Application\Command\LoginCommand;
 use TaskManager\Users\Application\Command\RegisterCommand;
-use TaskManager\Users\Infrastructure\Symfony\DTO\UserLoginDTO;
-use TaskManager\Users\Infrastructure\Symfony\DTO\UserRegisterDTO;
+use TaskManager\Users\Infrastructure\Service\DTO\UserLoginDTO;
+use TaskManager\Users\Infrastructure\Service\DTO\UserRegisterDTO;
 
 #[AsController]
 #[Route('/api/security', name: 'security.')]

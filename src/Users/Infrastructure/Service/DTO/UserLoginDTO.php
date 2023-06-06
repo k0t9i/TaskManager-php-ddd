@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskManager\Users\Infrastructure\Symfony\DTO;
+namespace TaskManager\Users\Infrastructure\Service\DTO;
 
 final readonly class UserLoginDTO
 {

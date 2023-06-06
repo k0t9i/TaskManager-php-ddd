@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskManager\Tests\Users\Infrastructure\Symfony;
+namespace TaskManager\Tests\Users\Infrastructure\Service;
 
 use Faker\Factory;
 use Faker\Generator;
@@ -11,10 +11,10 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use TaskManager\Shared\Infrastructure\Service\ContentDecoderInterface;
-use TaskManager\Users\Infrastructure\Symfony\DTO\UserLoginDTO;
-use TaskManager\Users\Infrastructure\Symfony\UserLoginValueResolver;
+use TaskManager\Users\Infrastructure\Service\DTO\UserRegisterDTO;
+use TaskManager\Users\Infrastructure\Service\UserRegisterValueResolver;
 
-class UserLoginValueResolverTest extends TestCase
+class UserRegisterValueResolverTest extends TestCase
 {
     private Generator $faker;
 
@@ -26,7 +26,7 @@ class UserLoginValueResolverTest extends TestCase
 
     public function testResolveEmptyArgumentType()
     {
-        $resolver = new UserLoginValueResolver(
+        $resolver = new UserRegisterValueResolver(
             $this->getMockBuilder(ContentDecoderInterface::class)->getMock()
         );
 
@@ -42,7 +42,7 @@ class UserLoginValueResolverTest extends TestCase
 
     public function testResolveUnsupportedArgumentType()
     {
-        $resolver = new UserLoginValueResolver(
+        $resolver = new UserRegisterValueResolver(
             $this->getMockBuilder(ContentDecoderInterface::class)->getMock()
         );
         $metadata = $this->getMockBuilder(ArgumentMetadata::class)
@@ -63,14 +63,23 @@ class UserLoginValueResolverTest extends TestCase
     {
         $content = $this->faker->regexify('.{255}');
         $email = $this->faker->email();
+        $firstname = $this->faker->regexify('.{255}');
+        $lastname = $this->faker->regexify('.{255}');
         $password = $this->faker->regexify('.{255}');
+        $repeatPassword = $this->faker->regexify('.{255}');
         $attributes = [
             'email' => $email,
-            'password' => $password
+            'firstname' => $firstname,
+            'lastname' => $lastname,
+            'password' => $password,
+            'repeatPassword' => $repeatPassword
         ];
-        $dto = new UserLoginDTO(
+        $dto = new UserRegisterDTO(
             $email,
-            $password
+            $firstname,
+            $lastname,
+            $password,
+            $repeatPassword
         );
         $decoder = $this->getMockBuilder(ContentDecoderInterface::class)
             ->getMock();
@@ -78,7 +87,7 @@ class UserLoginValueResolverTest extends TestCase
             ->method('decode')
             ->willReturn($attributes)
             ->with($content);
-        $resolver = new UserLoginValueResolver(
+        $resolver = new UserRegisterValueResolver(
             $decoder
         );
         $request = $this->getMockBuilder(Request::class)
@@ -91,7 +100,7 @@ class UserLoginValueResolverTest extends TestCase
             ->getMock();
         $metadata->expects(self::once())
             ->method('getType')
-            ->willReturn(UserLoginDTO::class);
+            ->willReturn(UserRegisterDTO::class);
 
         /** @var PhpGenerator $result */
         $result = $resolver->resolve(

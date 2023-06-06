@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-namespace TaskManager\Shared\Infrastructure\Symfony;
+namespace TaskManager\Shared\Infrastructure\Service;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
-use TaskManager\Shared\Infrastructure\Service\ContentDecoderInterface;
 
 abstract class ValueResolver implements ValueResolverInterface
 {

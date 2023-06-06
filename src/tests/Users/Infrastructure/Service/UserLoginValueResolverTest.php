@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskManager\Tests\Users\Infrastructure\Symfony;
+namespace TaskManager\Tests\Users\Infrastructure\Service;
 
 use Faker\Factory;
 use Faker\Generator;
@@ -11,10 +11,10 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use TaskManager\Shared\Infrastructure\Service\ContentDecoderInterface;
-use TaskManager\Users\Infrastructure\Symfony\DTO\UserProfileUpdateDTO;
-use TaskManager\Users\Infrastructure\Symfony\UserProfileUpdaterValueResolver;
+use TaskManager\Users\Infrastructure\Service\DTO\UserLoginDTO;
+use TaskManager\Users\Infrastructure\Service\UserLoginValueResolver;
 
-class UserProfileUpdateValueResolverTest extends TestCase
+class UserLoginValueResolverTest extends TestCase
 {
     private Generator $faker;
 
@@ -26,7 +26,7 @@ class UserProfileUpdateValueResolverTest extends TestCase
 
     public function testResolveEmptyArgumentType()
     {
-        $resolver = new UserProfileUpdaterValueResolver(
+        $resolver = new UserLoginValueResolver(
             $this->getMockBuilder(ContentDecoderInterface::class)->getMock()
         );
 
@@ -42,7 +42,7 @@ class UserProfileUpdateValueResolverTest extends TestCase
 
     public function testResolveUnsupportedArgumentType()
     {
-        $resolver = new UserProfileUpdaterValueResolver(
+        $resolver = new UserLoginValueResolver(
             $this->getMockBuilder(ContentDecoderInterface::class)->getMock()
         );
         $metadata = $this->getMockBuilder(ArgumentMetadata::class)
@@ -62,21 +62,15 @@ class UserProfileUpdateValueResolverTest extends TestCase
     public function testResolve()
     {
         $content = $this->faker->regexify('.{255}');
-        $firstname = $this->faker->regexify('.{255}');
-        $lastname = $this->faker->regexify('.{255}');
+        $email = $this->faker->email();
         $password = $this->faker->regexify('.{255}');
-        $repeatPassword = $this->faker->regexify('.{255}');
         $attributes = [
-            'firstname' => $firstname,
-            'lastname' => $lastname,
-            'password' => $password,
-            'repeatPassword' => $repeatPassword
+            'email' => $email,
+            'password' => $password
         ];
-        $dto = new UserProfileUpdateDTO(
-            $firstname,
-            $lastname,
-            $password,
-            $repeatPassword
+        $dto = new UserLoginDTO(
+            $email,
+            $password
         );
         $decoder = $this->getMockBuilder(ContentDecoderInterface::class)
             ->getMock();
@@ -84,7 +78,7 @@ class UserProfileUpdateValueResolverTest extends TestCase
             ->method('decode')
             ->willReturn($attributes)
             ->with($content);
-        $resolver = new UserProfileUpdaterValueResolver(
+        $resolver = new UserLoginValueResolver(
             $decoder
         );
         $request = $this->getMockBuilder(Request::class)
@@ -97,7 +91,7 @@ class UserProfileUpdateValueResolverTest extends TestCase
             ->getMock();
         $metadata->expects(self::once())
             ->method('getType')
-            ->willReturn(UserProfileUpdateDTO::class);
+            ->willReturn(UserLoginDTO::class);
 
         /** @var PhpGenerator $result */
         $result = $resolver->resolve(
