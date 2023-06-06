@@ -55,3 +55,7 @@ services:
             $path: '^/api/(?!.*(security)|(test)).*$'
 
     TaskManager\Shared\Infrastructure\Service\ContentDecoderInterface: '@TaskManager\Shared\Infrastructure\Service\JsonContentDecoder'
+
+    TaskManager\Users\Infrastructure\Symfony\UserRegisterValueResolver:
+        tags:
+            - { name: controller.argument_value_resolver, priority: 50 }
