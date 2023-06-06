@@ -4,12 +4,17 @@ declare(strict_types=1);
 
 namespace TaskManager\Projects\Domain\Entity;
 
+use TaskManager\Projects\Domain\Event\ProjectInformationWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectWasCreatedEvent;
 use TaskManager\Projects\Domain\ValueObject\ActiveProjectStatus;
+use TaskManager\Projects\Domain\ValueObject\ProjectDescription;
+use TaskManager\Projects\Domain\ValueObject\ProjectFinishDate;
 use TaskManager\Projects\Domain\ValueObject\ProjectId;
 use TaskManager\Projects\Domain\ValueObject\ProjectInformation;
+use TaskManager\Projects\Domain\ValueObject\ProjectName;
 use TaskManager\Projects\Domain\ValueObject\ProjectOwner;
 use TaskManager\Projects\Domain\ValueObject\ProjectStatus;
+use TaskManager\Projects\Domain\ValueObject\UserId;
 use TaskManager\Shared\Domain\Aggregate\AggregateRoot;
 use TaskManager\Shared\Domain\Equatable;
 
@@ -46,6 +51,33 @@ final class Project extends AggregateRoot
         ));
 
         return $project;
+    }
+
+    public function changeInformation(
+        ?ProjectName $name,
+        ?ProjectDescription $description,
+        ?ProjectFinishDate $finishDate,
+        UserId $currentUserId
+    ): void {
+        $this->status->ensureAllowsModification();
+        $this->owner->ensureUserIsOwner($currentUserId);
+
+        $information = new ProjectInformation(
+            $name ?? $this->information->name,
+                $description ?? $this->information->description,
+                $finishDate ?? $this->information->finishDate,
+        );
+
+        if (!$this->information->equals($information)) {
+            $this->information = $information;
+
+            $this->registerEvent(new ProjectInformationWasChangedEvent(
+                $this->id->value,
+                $information->name->value,
+                $information->description->value,
+                $information->finishDate->getValue()
+            ));
+        }
     }
 
     public function equals(Equatable $other): bool
