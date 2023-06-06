@@ -9,7 +9,9 @@ use TaskManager\Shared\Domain\Equatable;
 use TaskManager\Users\Domain\Event\UserProfileWasChangedEvent;
 use TaskManager\Users\Domain\Event\UserWasCreatedDomainEvent;
 use TaskManager\Users\Domain\ValueObject\UserEmail;
+use TaskManager\Users\Domain\ValueObject\UserFirstname;
 use TaskManager\Users\Domain\ValueObject\UserId;
+use TaskManager\Users\Domain\ValueObject\UserLastname;
 use TaskManager\Users\Domain\ValueObject\UserPassword;
 use TaskManager\Users\Domain\ValueObject\UserProfile;
 
@@ -37,16 +39,24 @@ final class User extends AggregateRoot
         return $result;
     }
 
-    public function changeProfile(UserProfile $profile): void
+    public function changeProfile(?UserFirstname $firstname, ?UserLastname $lastname, ?UserPassword $password): void
     {
-        $this->profile = $profile;
+        $profile = new UserProfile(
+            $firstname ?? $this->profile->firstname,
+            $lastname ?? $this->profile->lastname,
+            $password ?? $this->profile->password,
+        );
 
-        $this->registerEvent(new UserProfileWasChangedEvent(
-            $this->id->value,
-            $this->profile->firstname->value,
-            $this->profile->lastname->value,
-            $this->profile->password->value,
-        ));
+        if (!$this->profile->equals($profile)) {
+            $this->profile = $profile;
+
+            $this->registerEvent(new UserProfileWasChangedEvent(
+                $this->id->value,
+                $this->profile->firstname->value,
+                $this->profile->lastname->value,
+                $this->profile->password->value,
+            ));
+        }
     }
 
     public function getId(): UserId

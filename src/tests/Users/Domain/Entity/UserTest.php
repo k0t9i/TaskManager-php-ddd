@@ -93,7 +93,11 @@ class UserTest extends TestCase
         );
         $user = new User($id, $email, $profile);
 
-        $user->changeProfile($newProfile);
+        $user->changeProfile(
+            $newProfile->firstname,
+            $newProfile->lastname,
+            $newProfile->password,
+        );
 
         $events = $user->releaseEvents();
         $this->assertCount(1, $events);
@@ -101,6 +105,35 @@ class UserTest extends TestCase
         $this->assertEquals($id->value, $events[0]->getAggregateId());
         $this->assertEquals([
             'firstname' => $newProfile->firstname->value,
+            'lastname' => $newProfile->lastname->value,
+            'password' => $newProfile->password->value
+        ], $events[0]->toPrimitives());
+
+        $user->changeProfile(
+            null,
+            null,
+            null,
+        );
+        $events = $user->releaseEvents();
+        $this->assertCount(0, $events);
+
+        $user->changeProfile(
+            $newProfile->firstname,
+            $newProfile->lastname,
+            $newProfile->password,
+        );
+        $events = $user->releaseEvents();
+        $this->assertCount(0, $events);
+
+        $user->changeProfile(
+            $profile->firstname,
+            null,
+            $newProfile->password,
+        );
+        $events = $user->releaseEvents();
+        $this->assertCount(1, $events);
+        $this->assertEquals([
+            'firstname' => $profile->firstname->value,
             'lastname' => $newProfile->lastname->value,
             'password' => $newProfile->password->value
         ], $events[0]->toPrimitives());
