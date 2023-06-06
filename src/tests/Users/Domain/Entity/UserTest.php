@@ -11,7 +11,7 @@ use TaskManager\Shared\Domain\Equatable;
 use TaskManager\Shared\Domain\Event\DomainEventInterface;
 use TaskManager\Users\Domain\Entity\User;
 use TaskManager\Users\Domain\Event\UserProfileWasChangedEvent;
-use TaskManager\Users\Domain\Event\UserWasCreatedDomainEvent;
+use TaskManager\Users\Domain\Event\UserWasCreatedEvent;
 use TaskManager\Users\Domain\ValueObject\UserEmail;
 use TaskManager\Users\Domain\ValueObject\UserFirstname;
 use TaskManager\Users\Domain\ValueObject\UserId;
@@ -44,7 +44,7 @@ class UserTest extends TestCase
 
         $this->assertInstanceOf(User::class, $user);
         $this->assertCount(1, $events);
-        $this->assertInstanceOf(UserWasCreatedDomainEvent::class, $events[0]);
+        $this->assertInstanceOf(UserWasCreatedEvent::class, $events[0]);
         $this->assertEquals($id->value, $events[0]->getAggregateId());
         $this->assertEquals([
             'email' => $email->value,

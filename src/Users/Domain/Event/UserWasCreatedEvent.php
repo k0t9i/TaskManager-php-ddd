@@ -6,7 +6,7 @@ namespace TaskManager\Users\Domain\Event;
 
 use TaskManager\Shared\Domain\Event\DomainEvent;
 
-final class UserWasCreatedDomainEvent extends DomainEvent
+final class UserWasCreatedEvent extends DomainEvent
 {
     public function __construct(
         string $id,

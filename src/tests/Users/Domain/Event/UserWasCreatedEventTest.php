@@ -7,9 +7,9 @@ namespace TaskManager\Tests\Users\Domain\Event;
 use Faker\Factory;
 use Faker\Generator;
 use PHPUnit\Framework\TestCase;
-use TaskManager\Users\Domain\Event\UserWasCreatedDomainEvent;
+use TaskManager\Users\Domain\Event\UserWasCreatedEvent;
 
-class UserWasCreatedDomainEventTest extends TestCase
+class UserWasCreatedEventTest extends TestCase
 {
     private Generator $faker;
 
@@ -32,7 +32,7 @@ class UserWasCreatedDomainEventTest extends TestCase
             'password' => $password
         ];
 
-        $event = new UserWasCreatedDomainEvent(
+        $event = new UserWasCreatedEvent(
             $this->faker->regexify('.{255}'),
             $email,
             $firstname,
@@ -46,7 +46,7 @@ class UserWasCreatedDomainEventTest extends TestCase
     public function testGetAggregateId(): void
     {
         $aggregateId = $this->faker->regexify('.{255}');
-        $event = new UserWasCreatedDomainEvent(
+        $event = new UserWasCreatedEvent(
             $aggregateId,
             $this->faker->regexify('.{255}'),
             $this->faker->regexify('.{255}'),
@@ -71,7 +71,7 @@ class UserWasCreatedDomainEventTest extends TestCase
             'lastname' => $lastname,
             'password' => $password
         ];
-        $expectedEvent = new UserWasCreatedDomainEvent(
+        $expectedEvent = new UserWasCreatedEvent(
             $aggregateId,
             $email,
             $firstname,
@@ -82,14 +82,14 @@ class UserWasCreatedDomainEventTest extends TestCase
 
         $this->assertEquals(
             $expectedEvent,
-            UserWasCreatedDomainEvent::fromPrimitives($aggregateId, $primitives, $occurredOn)
+            UserWasCreatedEvent::fromPrimitives($aggregateId, $primitives, $occurredOn)
         );
     }
 
     public function testGetOccurredOn(): void
     {
         $occurredOn = $this->faker->regexify('.{255}');
-        $event = new UserWasCreatedDomainEvent(
+        $event = new UserWasCreatedEvent(
             $this->faker->regexify('.{255}'),
             $this->faker->regexify('.{255}'),
             $this->faker->regexify('.{255}'),

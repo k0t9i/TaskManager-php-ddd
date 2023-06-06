@@ -7,7 +7,7 @@ namespace TaskManager\Users\Domain\Entity;
 use TaskManager\Shared\Domain\Aggregate\AggregateRoot;
 use TaskManager\Shared\Domain\Equatable;
 use TaskManager\Users\Domain\Event\UserProfileWasChangedEvent;
-use TaskManager\Users\Domain\Event\UserWasCreatedDomainEvent;
+use TaskManager\Users\Domain\Event\UserWasCreatedEvent;
 use TaskManager\Users\Domain\ValueObject\UserEmail;
 use TaskManager\Users\Domain\ValueObject\UserFirstname;
 use TaskManager\Users\Domain\ValueObject\UserId;
@@ -28,7 +28,7 @@ final class User extends AggregateRoot
     {
         $result = new self($id, $email, $profile);
 
-        $result->registerEvent(new UserWasCreatedDomainEvent(
+        $result->registerEvent(new UserWasCreatedEvent(
             $result->id->value,
             $result->email->value,
             $result->profile->firstname->value,
