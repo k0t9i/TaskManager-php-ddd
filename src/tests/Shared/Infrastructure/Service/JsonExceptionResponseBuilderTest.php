@@ -38,7 +38,9 @@ class JsonExceptionResponseBuilderTest extends TestCase
 
         $result = $builder->build($dto);
 
-        $this->assertEquals($response, $result);
+        $this->assertInstanceOf(JsonResponse::class, $result);
+        $this->assertEquals($response->getContent(), $result->getContent());
+        $this->assertEquals($response->getStatusCode(), $result->getStatusCode());
     }
 
     public function testBuildVerbose()
