@@ -28,7 +28,7 @@ final readonly class CreateProjectCommandHandler implements CommandHandlerInterf
 
     public function __invoke(CreateProjectCommand $command): void
     {
-        $projectUser = $this->userExtractor->extract();
+        $currentUser = $this->userExtractor->extract();
 
         $project = Project::create(
             new ProjectId($command->id),
@@ -38,7 +38,7 @@ final readonly class CreateProjectCommandHandler implements CommandHandlerInterf
                 new ProjectFinishDate($command->finishDate)
             ),
             new ProjectOwner(
-                $projectUser->id
+                $currentUser->id
             )
         );
 
