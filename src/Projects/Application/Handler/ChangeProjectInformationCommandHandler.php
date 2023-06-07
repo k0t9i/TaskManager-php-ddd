@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace TaskManager\Projects\Application\Handler;
 
 use TaskManager\Projects\Application\Command\ChangeProjectInformationCommand;
-use TaskManager\Projects\Application\Command\DateTime;
-use TaskManager\Projects\Application\Command\ProjectNotExistException;
 use TaskManager\Projects\Domain\Entity\Project;
 use TaskManager\Projects\Domain\Exception\ProjectDoesNotExistException;
 use TaskManager\Projects\Domain\Repository\ProjectRepositoryInterface;
@@ -14,7 +12,6 @@ use TaskManager\Projects\Domain\Repository\ProjectUserRepositoryInterface;
 use TaskManager\Projects\Domain\ValueObject\ProjectDescription;
 use TaskManager\Projects\Domain\ValueObject\ProjectFinishDate;
 use TaskManager\Projects\Domain\ValueObject\ProjectId;
-use TaskManager\Projects\Domain\ValueObject\ProjectInformation;
 use TaskManager\Projects\Domain\ValueObject\ProjectName;
 use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
 use TaskManager\Shared\Application\Bus\Command\CommandHandlerInterface;

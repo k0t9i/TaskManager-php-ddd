@@ -6,9 +6,9 @@ namespace TaskManager\Tests\Shared\Infrastructure\Service;
 
 use Faker\Factory;
 use Faker\Generator;
+use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use TaskManager\Shared\Infrastructure\Service\JsonContentDecoder;
-use PHPUnit\Framework\TestCase;
 
 class JsonContentDecoderTest extends TestCase
 {

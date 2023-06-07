@@ -7,7 +7,6 @@ namespace TaskManager\Shared\Infrastructure\Service;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use TaskManager\Shared\Infrastructure\Service\DTO\ExceptionDTO;
-use Throwable;
 
 final class JsonExceptionResponseBuilder implements ExceptionResponseBuilderInterface
 {

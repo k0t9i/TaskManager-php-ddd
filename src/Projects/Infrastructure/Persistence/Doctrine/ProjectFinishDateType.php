@@ -7,9 +7,7 @@ namespace TaskManager\Projects\Infrastructure\Persistence\Doctrine;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\DateTimeType;
-use Doctrine\DBAL\Types\StringType;
 use TaskManager\Projects\Domain\ValueObject\ProjectFinishDate;
-use TaskManager\Projects\Domain\ValueObject\ProjectName;
 
 final class ProjectFinishDateType extends DateTimeType
 {
