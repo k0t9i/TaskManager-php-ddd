@@ -55,4 +55,9 @@ class DateTime implements Stringable, Equatable
     {
         return $other instanceof static && $this->getValue() === $other->getValue();
     }
+
+    public function getPhpDateTime(): DateTimeImmutable
+    {
+        return $this->dateTime;
+    }
 }

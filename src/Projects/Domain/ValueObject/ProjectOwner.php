@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TaskManager\Projects\Domain\ValueObject;
 
-use phpDocumentor\Reflection\Types\Self_;
 use TaskManager\Projects\Domain\Exception\UserIsAlreadyProjectOwnerException;
 use TaskManager\Projects\Domain\Exception\UserIsNotProjectOwnerException;
 use TaskManager\Shared\Domain\Equatable;

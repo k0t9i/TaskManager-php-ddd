@@ -15,6 +15,11 @@ doctrine:
             user_password: TaskManager\Users\Infrastructure\Persistence\Doctrine\UserPasswordType
 
             project_user_id: TaskManager\Projects\Infrastructure\Persistence\Doctrine\ProjectUserIdType
+            project_id: TaskManager\Projects\Infrastructure\Persistence\Doctrine\ProjectIdType
+            project_name: TaskManager\Projects\Infrastructure\Persistence\Doctrine\ProjectNameType
+            project_description: TaskManager\Projects\Infrastructure\Persistence\Doctrine\ProjectDescriptionType
+            project_finish_date: TaskManager\Projects\Infrastructure\Persistence\Doctrine\ProjectFinishDateType
+            project_status: TaskManager\Projects\Infrastructure\Persistence\Doctrine\ProjectStatusType
     orm:
         auto_generate_proxy_classes: true
         enable_lazy_ghost_objects: true
