@@ -7,7 +7,7 @@ namespace TaskManager\Users\Infrastructure\Service;
 use TaskManager\Shared\Infrastructure\Service\ValueResolver;
 use TaskManager\Users\Infrastructure\Service\DTO\UserProfileUpdateDTO;
 
-final class UserProfileUpdaterValueResolver extends ValueResolver
+final class UserProfileUpdateValueResolver extends ValueResolver
 {
     protected function supportClass(): string
     {

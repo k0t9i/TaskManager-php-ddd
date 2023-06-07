@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 use TaskManager\Shared\Infrastructure\Service\ContentDecoderInterface;
 use TaskManager\Users\Infrastructure\Service\DTO\UserProfileUpdateDTO;
-use TaskManager\Users\Infrastructure\Service\UserProfileUpdaterValueResolver;
+use TaskManager\Users\Infrastructure\Service\UserProfileUpdateValueResolver;
 
 class UserProfileUpdateValueResolverTest extends TestCase
 {
@@ -26,7 +26,7 @@ class UserProfileUpdateValueResolverTest extends TestCase
 
     public function testResolveEmptyArgumentType()
     {
-        $resolver = new UserProfileUpdaterValueResolver(
+        $resolver = new UserProfileUpdateValueResolver(
             $this->getMockBuilder(ContentDecoderInterface::class)->getMock()
         );
 
@@ -42,7 +42,7 @@ class UserProfileUpdateValueResolverTest extends TestCase
 
     public function testResolveUnsupportedArgumentType()
     {
-        $resolver = new UserProfileUpdaterValueResolver(
+        $resolver = new UserProfileUpdateValueResolver(
             $this->getMockBuilder(ContentDecoderInterface::class)->getMock()
         );
         $metadata = $this->getMockBuilder(ArgumentMetadata::class)
@@ -84,7 +84,7 @@ class UserProfileUpdateValueResolverTest extends TestCase
             ->method('decode')
             ->willReturn($attributes)
             ->with($content);
-        $resolver = new UserProfileUpdaterValueResolver(
+        $resolver = new UserProfileUpdateValueResolver(
             $decoder
         );
         $request = $this->getMockBuilder(Request::class)
