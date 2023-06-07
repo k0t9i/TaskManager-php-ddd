@@ -9,10 +9,10 @@ use Faker\Generator;
 use PHPUnit\Framework\TestCase;
 use TaskManager\Shared\Application\Service\AuthenticatorServiceInterface;
 use TaskManager\Shared\Application\Service\PasswordHasherInterface;
+use TaskManager\Shared\Domain\Exception\UserDoesNotExistException;
 use TaskManager\Users\Application\Command\LoginCommand;
 use TaskManager\Users\Application\Handler\LoginCommandHandler;
 use TaskManager\Users\Domain\Entity\User;
-use TaskManager\Users\Domain\Exception\UserNotExistException;
 use TaskManager\Users\Domain\Repository\UserRepositoryInterface;
 use TaskManager\Users\Domain\ValueObject\UserEmail;
 use TaskManager\Users\Domain\ValueObject\UserFirstname;
@@ -62,7 +62,7 @@ class LoginCommandHandlerTest extends TestCase
             $this->getMockBuilder(AuthenticatorServiceInterface::class)->getMock(),
         );
 
-        $this->expectException(UserNotExistException::class);
+        $this->expectException(UserDoesNotExistException::class);
         $this->expectExceptionMessage(sprintf(
             'User "%s" doesn\'t exist',
             $this->command->email
@@ -83,7 +83,7 @@ class LoginCommandHandlerTest extends TestCase
             $this->getMockBuilder(AuthenticatorServiceInterface::class)->getMock(),
         );
 
-        $this->expectException(UserNotExistException::class);
+        $this->expectException(UserDoesNotExistException::class);
         $this->expectExceptionMessage(sprintf(
             'User "%s" doesn\'t exist',
             $this->command->email

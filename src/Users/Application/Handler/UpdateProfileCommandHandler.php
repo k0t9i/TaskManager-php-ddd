@@ -8,9 +8,9 @@ use TaskManager\Shared\Application\Bus\Command\CommandHandlerInterface;
 use TaskManager\Shared\Application\Bus\Event\IntegrationEventBusInterface;
 use TaskManager\Shared\Application\Service\AuthenticatorServiceInterface;
 use TaskManager\Shared\Application\Service\PasswordHasherInterface;
+use TaskManager\Shared\Domain\Exception\UserDoesNotExistException;
 use TaskManager\Users\Application\Command\UpdateProfileCommand;
 use TaskManager\Users\Domain\Exception\PasswordAndRepeatPasswordDoNotMatchException;
-use TaskManager\Users\Domain\Exception\UserNotExistException;
 use TaskManager\Users\Domain\Repository\UserRepositoryInterface;
 use TaskManager\Users\Domain\ValueObject\UserFirstname;
 use TaskManager\Users\Domain\ValueObject\UserId;
@@ -32,7 +32,7 @@ final readonly class UpdateProfileCommandHandler implements CommandHandlerInterf
         $userId = new UserId($this->authenticator->getUserId());
         $user = $this->repository->findById($userId);
         if (null === $user) {
-            throw new UserNotExistException($userId->value);
+            throw new UserDoesNotExistException($userId->value);
         }
 
         if ($command->password !== $command->repeatPassword) {

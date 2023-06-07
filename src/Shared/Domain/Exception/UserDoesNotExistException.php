@@ -2,11 +2,9 @@
 
 declare(strict_types=1);
 
-namespace TaskManager\Users\Domain\Exception;
+namespace TaskManager\Shared\Domain\Exception;
 
-use TaskManager\Shared\Domain\Exception\DomainException;
-
-final class UserNotExistException extends DomainException
+final class UserDoesNotExistException extends DomainException
 {
     public function __construct(string $userId)
     {

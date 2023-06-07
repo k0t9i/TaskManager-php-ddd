@@ -10,11 +10,11 @@ use PHPUnit\Framework\TestCase;
 use TaskManager\Shared\Application\Bus\Event\IntegrationEventBusInterface;
 use TaskManager\Shared\Application\Service\AuthenticatorServiceInterface;
 use TaskManager\Shared\Application\Service\PasswordHasherInterface;
+use TaskManager\Shared\Domain\Exception\UserDoesNotExistException;
 use TaskManager\Users\Application\Command\UpdateProfileCommand;
 use TaskManager\Users\Application\Handler\UpdateProfileCommandHandler;
 use TaskManager\Users\Domain\Entity\User;
 use TaskManager\Users\Domain\Exception\PasswordAndRepeatPasswordDoNotMatchException;
-use TaskManager\Users\Domain\Exception\UserNotExistException;
 use TaskManager\Users\Domain\Repository\UserRepositoryInterface;
 use TaskManager\Users\Domain\ValueObject\UserEmail;
 use TaskManager\Users\Domain\ValueObject\UserFirstname;
@@ -82,7 +82,7 @@ class UpdateProfileCommandHandlerTest extends TestCase
             $this->getMockBuilder(IntegrationEventBusInterface::class)->getMock(),
         );
 
-        $this->expectException(UserNotExistException::class);
+        $this->expectException(UserDoesNotExistException::class);
         $this->expectExceptionMessage(sprintf(
             'User "%s" doesn\'t exist',
             $id
