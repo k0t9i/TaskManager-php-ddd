@@ -9,6 +9,7 @@ use TaskManager\Projects\Domain\Event\ProjectOwnerWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectStatusWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectWasCreatedEvent;
 use TaskManager\Projects\Domain\ValueObject\ActiveProjectStatus;
+use TaskManager\Projects\Domain\ValueObject\ClosedProjectStatus;
 use TaskManager\Projects\Domain\ValueObject\ProjectDescription;
 use TaskManager\Projects\Domain\ValueObject\ProjectFinishDate;
 use TaskManager\Projects\Domain\ValueObject\ProjectId;
@@ -82,17 +83,14 @@ final class Project extends AggregateRoot
         }
     }
 
-    public function changeStatus(ProjectStatus $status, ProjectUserId $currentUserId): void
+    public function activate(ProjectUserId $currentUserId): void
     {
-        $this->status->ensureCanBeChangedTo($status);
-        $this->owner->ensureUserIsOwner($currentUserId);
+        $this->changeStatus(new ActiveProjectStatus(), $currentUserId);
+    }
 
-        $this->status = $status;
-
-        $this->registerEvent(new ProjectStatusWasChangedEvent(
-            $this->id->value,
-            (string) $status->getScalar()
-        ));
+    public function close(ProjectUserId $currentUserId): void
+    {
+        $this->changeStatus(new ClosedProjectStatus(), $currentUserId);
     }
 
     public function changeOwner(ProjectOwner $owner, ProjectUserId $currentUserId): void
@@ -118,5 +116,18 @@ final class Project extends AggregateRoot
             && $other->information->equals($this->information)
             && $other->status->equals($this->status)
             && $other->owner->equals($this->owner);
+    }
+
+    private function changeStatus(ProjectStatus $status, ProjectUserId $currentUserId): void
+    {
+        $this->status->ensureCanBeChangedTo($status);
+        $this->owner->ensureUserIsOwner($currentUserId);
+
+        $this->status = $status;
+
+        $this->registerEvent(new ProjectStatusWasChangedEvent(
+            $this->id->value,
+            (string) $status->getScalar()
+        ));
     }
 }

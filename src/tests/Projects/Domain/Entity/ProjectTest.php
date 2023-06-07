@@ -201,7 +201,7 @@ class ProjectTest extends TestCase
         $owner = new ProjectOwner(new ProjectUserId($this->faker->uuid()));
         $project = new Project($id, $information, new ActiveProjectStatus(), $owner);
 
-        $project->changeStatus(new ClosedProjectStatus(), $owner->userId);
+        $project->close($owner->userId);
         $events = $project->releaseEvents();
 
         $this->assertCount(1, $events);
@@ -223,7 +223,7 @@ class ProjectTest extends TestCase
         $owner = new ProjectOwner(new ProjectUserId($this->faker->uuid()));
         $project = new Project($id, $information, new ClosedProjectStatus(), $owner);
 
-        $project->changeStatus(new ActiveProjectStatus(), $owner->userId);
+        $project->activate($owner->userId);
         $events = $project->releaseEvents();
 
         $this->assertCount(1, $events);
@@ -252,7 +252,7 @@ class ProjectTest extends TestCase
             ActiveProjectStatus::class
         ));
 
-        $project->changeStatus(new ActiveProjectStatus(), $owner->userId);
+        $project->activate($owner->userId);
     }
 
     public function testChangeStatusByNonOwner()
@@ -273,7 +273,7 @@ class ProjectTest extends TestCase
             $otherUserId->value
         ));
 
-        $project->changeStatus(new ClosedProjectStatus(), $otherUserId);
+        $project->close($otherUserId);
     }
 
     public function testChangeOwner()
