@@ -6,21 +6,24 @@ namespace TaskManager\Shared\Infrastructure\Service;
 
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use TaskManager\Shared\Infrastructure\Service\DTO\ExceptionDTO;
 use Throwable;
 
 final class JsonExceptionResponseBuilder implements ExceptionResponseBuilderInterface
 {
-    public function build(string $message, int $code, array $trace): Response
+    public function build(ExceptionDTO $dto, bool $verbose = false): Response
     {
         $data = [
-            'code' => $code,
-            'message' => $message,
+            'code' => $dto->httpCode,
+            'message' => $dto->message,
         ];
 
-        if ($trace) {
-            $data['trace'] = $trace;
+        if ($verbose) {
+            $data['file'] = $dto->file;
+            $data['line'] = $dto->line;
+            $data['trace'] = $dto->trace;
         }
 
-        return new JsonResponse($data, $code);
+        return new JsonResponse($data, $dto->httpCode);
     }
 }

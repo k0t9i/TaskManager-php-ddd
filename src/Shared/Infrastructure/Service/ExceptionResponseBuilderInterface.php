@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace TaskManager\Shared\Infrastructure\Service;
 
 use Symfony\Component\HttpFoundation\Response;
-use Throwable;
+use TaskManager\Shared\Infrastructure\Service\DTO\ExceptionDTO;
 
 interface ExceptionResponseBuilderInterface
 {
-    public function build(string $message, int $code, array $trace): Response;
+    public function build(ExceptionDTO $dto, bool $verbose = false): Response;
 }

@@ -6,6 +6,7 @@ namespace TaskManager\Shared\Infrastructure\Service;
 
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use TaskManager\Shared\Domain\Exception\DomainException;
+use TaskManager\Shared\Infrastructure\Service\DTO\ExceptionDTO;
 use Throwable;
 
 final readonly class ExceptionListener
@@ -25,9 +26,14 @@ final readonly class ExceptionListener
 
         $event->setResponse(
             $this->responseBuilder->build(
-                $exception->getMessage(),
-                $code,
-                $this->environment !== 'prod' ? $exception->getTrace() : []
+                new ExceptionDTO(
+                    $exception->getMessage(),
+                    $code,
+                    $exception->getFile(),
+                    $exception->getLine(),
+                    $exception->getTrace()
+                ),
+                $this->environment !== 'prod'
             )
         );
     }
