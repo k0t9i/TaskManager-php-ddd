@@ -13,7 +13,7 @@ abstract class RequestStatus extends Status
     public const STATUS_CONFIRMED = 1;
     public const STATUS_REJECTED = 2;
 
-    public function getNextStatuses(): array
+    protected function getNextStatuses(): array
     {
         return [];
     }
