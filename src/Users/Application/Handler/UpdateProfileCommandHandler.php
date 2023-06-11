@@ -20,10 +20,10 @@ use TaskManager\Users\Domain\ValueObject\UserPassword;
 final readonly class UpdateProfileCommandHandler implements CommandHandlerInterface
 {
     public function __construct(
-        private UserRepositoryInterface       $repository,
-        private PasswordHasherInterface       $passwordHasher,
+        private UserRepositoryInterface $repository,
+        private PasswordHasherInterface $passwordHasher,
         private AuthenticatorServiceInterface $authenticator,
-        private IntegrationEventBusInterface  $eventBus
+        private IntegrationEventBusInterface $eventBus
     ) {
     }
 

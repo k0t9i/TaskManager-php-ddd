@@ -14,10 +14,10 @@ use TaskManager\Shared\Domain\Equatable;
 final class Request implements Equatable
 {
     public function __construct(
-        private readonly RequestId     $id,
+        private readonly RequestId $id,
         private readonly ProjectUserId $userId,
-        private RequestStatus          $status,
-        private RequestChangeDate      $changeDate
+        private RequestStatus $status,
+        private RequestChangeDate $changeDate
     ) {
     }
 

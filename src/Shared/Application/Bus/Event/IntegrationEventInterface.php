@@ -6,5 +6,4 @@ namespace TaskManager\Shared\Application\Bus\Event;
 
 interface IntegrationEventInterface
 {
-
 }

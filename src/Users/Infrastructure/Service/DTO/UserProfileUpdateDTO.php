@@ -7,10 +7,10 @@ namespace TaskManager\Users\Infrastructure\Service\DTO;
 final readonly class UserProfileUpdateDTO
 {
     public function __construct(
-        public string $firstname = "",
-        public string $lastname = "",
-        public string $password = "",
-        public string $repeatPassword = ""
+        public string $firstname = '',
+        public string $lastname = '',
+        public string $password = '',
+        public string $repeatPassword = ''
     ) {
     }
 }

@@ -19,7 +19,7 @@ final class UserPasswordType extends StringType
 
     /**
      * @param UserPassword $value
-     * @param AbstractPlatform $platform
+     *
      * @return mixed
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): string

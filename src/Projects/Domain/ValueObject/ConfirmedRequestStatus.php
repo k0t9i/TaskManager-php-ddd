@@ -6,5 +6,4 @@ namespace TaskManager\Projects\Domain\ValueObject;
 
 final class ConfirmedRequestStatus extends RequestStatus
 {
-
 }

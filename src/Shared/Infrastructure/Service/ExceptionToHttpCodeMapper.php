@@ -6,7 +6,6 @@ namespace TaskManager\Shared\Infrastructure\Service;
 
 use Symfony\Component\HttpFoundation\Response;
 use TaskManager\Shared\Domain\Exception\DomainException;
-use Throwable;
 
 final class ExceptionToHttpCodeMapper implements ExceptionToHttpCodeMapperInterface
 {
@@ -19,7 +18,7 @@ final class ExceptionToHttpCodeMapper implements ExceptionToHttpCodeMapperInterf
         DomainException::CODE_UNPROCESSABLE_ENTITY => Response::HTTP_UNPROCESSABLE_ENTITY,
     ];
 
-    public function getHttpCode(Throwable $exception): int
+    public function getHttpCode(\Throwable $exception): int
     {
         return $this->map[$exception->getCode()] ?? self::CODE_DEFAULT;
     }

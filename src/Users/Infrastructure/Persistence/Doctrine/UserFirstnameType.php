@@ -19,7 +19,7 @@ final class UserFirstnameType extends StringType
 
     /**
      * @param UserFirstname $value
-     * @param AbstractPlatform $platform
+     *
      * @return mixed
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): string

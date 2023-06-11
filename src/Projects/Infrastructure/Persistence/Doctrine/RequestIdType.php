@@ -19,7 +19,7 @@ final class RequestIdType extends StringType
 
     /**
      * @param RequestId $value
-     * @param AbstractPlatform $platform
+     *
      * @return mixed
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): string

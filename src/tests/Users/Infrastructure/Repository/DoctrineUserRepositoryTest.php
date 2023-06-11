@@ -47,7 +47,7 @@ class DoctrineUserRepositoryTest extends TestCase
             ->getMock();
         $repository->method('findOneBy')
             ->with([
-                'id' => $id
+                'id' => $id,
             ])
             ->willReturn($this->user);
         $em = $this->getMockBuilder(EntityManagerInterface::class)
@@ -80,7 +80,7 @@ class DoctrineUserRepositoryTest extends TestCase
             ->getMock();
         $repository->method('findOneBy')
             ->with([
-                'email' => $email
+                'email' => $email,
             ])
             ->willReturn($this->user);
         $em = $this->getMockBuilder(EntityManagerInterface::class)

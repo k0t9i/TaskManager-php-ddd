@@ -17,17 +17,11 @@ abstract class DomainEvent implements DomainEventInterface
         $this->occurredOn = $occurredOn ?: (new DateTime())->getValue();
     }
 
-    /**
-     * @return string
-     */
     public function getAggregateId(): string
     {
         return $this->aggregateId;
     }
 
-    /**
-     * @return string
-     */
     public function getOccurredOn(): string
     {
         return $this->occurredOn;

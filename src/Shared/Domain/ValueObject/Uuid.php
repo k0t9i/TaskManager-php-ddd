@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace TaskManager\Shared\Domain\ValueObject;
 
-use Stringable;
 use TaskManager\Shared\Domain\Equatable;
 use TaskManager\Shared\Domain\Exception\InvalidArgumentException;
 
-class Uuid implements Stringable, Equatable
+class Uuid implements \Stringable, Equatable
 {
     public function __construct(public readonly string $value)
     {

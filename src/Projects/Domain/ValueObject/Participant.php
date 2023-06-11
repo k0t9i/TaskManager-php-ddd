@@ -9,7 +9,7 @@ use TaskManager\Shared\Domain\Equatable;
 final readonly class Participant implements Equatable
 {
     public function __construct(
-        public ProjectId     $projectId,
+        public ProjectId $projectId,
         public ProjectUserId $userId
     ) {
     }

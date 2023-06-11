@@ -10,7 +10,6 @@ use Lexik\Bundle\JWTAuthenticationBundle\Exception\JWTDecodeFailureException;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTManager;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\TokenExtractor\TokenExtractorInterface;
-use LogicException;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\KernelEvent;
@@ -35,7 +34,7 @@ class LexikJwtAuthenticatorServiceTest extends TestCase
         $path = 'abc';
         $userId = $this->faker->regexify('.{255}');
         $payload = [
-            $idClaim => $userId
+            $idClaim => $userId,
         ];
         $tokenManager = $this->getMockBuilder(JWTManager::class)
             ->disableOriginalConstructor()
@@ -97,7 +96,7 @@ class LexikJwtAuthenticatorServiceTest extends TestCase
         $tokenExtractor = $this->getMockBuilder(TokenExtractorInterface::class)
             ->getMock();
 
-        $this->expectException(LogicException::class);
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(sprintf('Invalid path regexp "%s"', $path));
 
         new LexikJwtAuthenticatorService($tokenManager, $tokenExtractor, $path);
@@ -141,7 +140,7 @@ class LexikJwtAuthenticatorServiceTest extends TestCase
             ->getMock();
         $tokenManager->method('parse')
             ->willReturn([
-                'foo' => 'bar'
+                'foo' => 'bar',
             ])
             ->willThrowException(new JWTDecodeFailureException(
                 JWTDecodeFailureException::EXPIRED_TOKEN,
@@ -177,7 +176,7 @@ class LexikJwtAuthenticatorServiceTest extends TestCase
             ->getMock();
         $tokenManager->method('parse')
             ->willReturn([
-                'foo' => 'bar'
+                'foo' => 'bar',
             ])
             ->willThrowException(new JWTDecodeFailureException(
                 'foobar',

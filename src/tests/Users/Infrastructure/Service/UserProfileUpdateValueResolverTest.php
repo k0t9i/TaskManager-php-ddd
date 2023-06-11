@@ -70,7 +70,7 @@ class UserProfileUpdateValueResolverTest extends TestCase
             'firstname' => $firstname,
             'lastname' => $lastname,
             'password' => $password,
-            'repeatPassword' => $repeatPassword
+            'repeatPassword' => $repeatPassword,
         ];
         $dto = new UserProfileUpdateDTO(
             $firstname,

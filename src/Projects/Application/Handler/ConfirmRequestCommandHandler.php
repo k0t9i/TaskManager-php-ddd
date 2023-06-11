@@ -16,10 +16,10 @@ use TaskManager\Shared\Application\Bus\Event\IntegrationEventBusInterface;
 final readonly class ConfirmRequestCommandHandler implements CommandHandlerInterface
 {
     public function __construct(
-        private ProjectRepositoryInterface    $repository,
-        private ProjectFinderInterface        $finder,
+        private ProjectRepositoryInterface $repository,
+        private ProjectFinderInterface $finder,
         private CurrentUserExtractorInterface $userExtractor,
-        private IntegrationEventBusInterface  $eventBus,
+        private IntegrationEventBusInterface $eventBus,
     ) {
     }
 

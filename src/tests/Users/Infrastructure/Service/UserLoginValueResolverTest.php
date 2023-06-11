@@ -66,7 +66,7 @@ class UserLoginValueResolverTest extends TestCase
         $password = $this->faker->regexify('.{255}');
         $attributes = [
             'email' => $email,
-            'password' => $password
+            'password' => $password,
         ];
         $dto = new UserLoginDTO(
             $email,

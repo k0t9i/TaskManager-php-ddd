@@ -8,8 +8,6 @@ use Doctrine\Common\Collections\Collection;
 use Faker\Factory;
 use Faker\Generator;
 use PHPUnit\Framework\TestCase;
-use ReflectionException;
-use ReflectionObject;
 use TaskManager\Projects\Domain\Entity\Project;
 use TaskManager\Projects\Domain\Entity\Request;
 use TaskManager\Projects\Domain\Event\ProjectInformationWasChangedEvent;
@@ -99,7 +97,7 @@ class ProjectTest extends TestCase
         $this->assertEquals([
             'name' => $newInformation->name->value,
             'description' => $newInformation->description->value,
-            'finishDate' => $newInformation->finishDate->getValue()
+            'finishDate' => $newInformation->finishDate->getValue(),
         ], $events[0]->toPrimitives());
 
         $project->changeInformation(
@@ -131,7 +129,7 @@ class ProjectTest extends TestCase
         $this->assertEquals([
             'name' => $builder->getName()->value,
             'description' => $newInformation->description->value,
-            'finishDate' => $newInformation->finishDate->getValue()
+            'finishDate' => $newInformation->finishDate->getValue(),
         ], $events[0]->toPrimitives());
     }
 
@@ -546,7 +544,8 @@ class ProjectTest extends TestCase
 
     /**
      * @return void
-     * @throws ReflectionException
+     *
+     * @throws \ReflectionException
      */
     public function testConfirmRequest()
     {
@@ -559,7 +558,7 @@ class ProjectTest extends TestCase
                 new RequestChangeDate()
             ))
             ->build();
-        $reflection = new ReflectionObject($project);
+        $reflection = new \ReflectionObject($project);
 
         $project->confirmRequest(
             $builder->getRequests()[0]->getId(),

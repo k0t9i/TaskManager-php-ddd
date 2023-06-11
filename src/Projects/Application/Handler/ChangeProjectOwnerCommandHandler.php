@@ -19,11 +19,11 @@ use TaskManager\Shared\Domain\Exception\UserDoesNotExistException;
 final readonly class ChangeProjectOwnerCommandHandler implements CommandHandlerInterface
 {
     public function __construct(
-        private ProjectRepositoryInterface     $repository,
-        private ProjectFinderInterface         $finder,
+        private ProjectRepositoryInterface $repository,
+        private ProjectFinderInterface $finder,
         private ProjectUserRepositoryInterface $userRepository,
-        private CurrentUserExtractorInterface  $userExtractor,
-        private IntegrationEventBusInterface   $eventBus,
+        private CurrentUserExtractorInterface $userExtractor,
+        private IntegrationEventBusInterface $eventBus,
     ) {
     }
 

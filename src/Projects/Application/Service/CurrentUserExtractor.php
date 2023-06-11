@@ -14,7 +14,7 @@ final readonly class CurrentUserExtractor implements CurrentUserExtractorInterfa
 {
     public function __construct(
         private ProjectUserRepositoryInterface $repository,
-        private AuthenticatorServiceInterface  $authenticator,
+        private AuthenticatorServiceInterface $authenticator,
     ) {
     }
 

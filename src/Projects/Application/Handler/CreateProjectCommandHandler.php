@@ -20,9 +20,9 @@ use TaskManager\Shared\Application\Bus\Event\IntegrationEventBusInterface;
 final readonly class CreateProjectCommandHandler implements CommandHandlerInterface
 {
     public function __construct(
-        private ProjectRepositoryInterface    $projectRepository,
+        private ProjectRepositoryInterface $projectRepository,
         private CurrentUserExtractorInterface $userExtractor,
-        private IntegrationEventBusInterface  $eventBus,
+        private IntegrationEventBusInterface $eventBus,
     ) {
     }
 

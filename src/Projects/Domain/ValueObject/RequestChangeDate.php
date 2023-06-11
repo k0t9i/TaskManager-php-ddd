@@ -8,5 +8,4 @@ use TaskManager\Shared\Domain\ValueObject\DateTime;
 
 final class RequestChangeDate extends DateTime
 {
-
 }

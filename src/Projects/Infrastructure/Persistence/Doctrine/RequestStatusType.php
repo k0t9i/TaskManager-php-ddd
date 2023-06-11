@@ -19,7 +19,7 @@ final class RequestStatusType extends IntegerType
 
     /**
      * @param RequestStatus $value
-     * @param AbstractPlatform $platform
+     *
      * @return mixed
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): int

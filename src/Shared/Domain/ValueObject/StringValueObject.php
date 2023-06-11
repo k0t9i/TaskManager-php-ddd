@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace TaskManager\Shared\Domain\ValueObject;
 
-use Stringable;
 use TaskManager\Shared\Domain\Equatable;
 use TaskManager\Shared\Domain\Exception\InvalidArgumentException;
 
-abstract class StringValueObject implements Stringable, Equatable
+abstract class StringValueObject implements \Stringable, Equatable
 {
     public function __construct(public readonly string $value)
     {
@@ -30,18 +29,14 @@ abstract class StringValueObject implements Stringable, Equatable
     protected function ensureValidMaxLength(string $attributeName, int $maxLength): void
     {
         if (mb_strlen($this->value) > $maxLength) {
-            throw new InvalidArgumentException(
-                sprintf('"%s" should contain at most %s characters.', $attributeName, $maxLength)
-            );
+            throw new InvalidArgumentException(sprintf('"%s" should contain at most %s characters.', $attributeName, $maxLength));
         }
     }
 
     protected function ensureValidMinLength(string $attributeName, int $minLength): void
     {
         if (mb_strlen($this->value) < $minLength) {
-            throw new InvalidArgumentException(
-                sprintf('"%s" should contain at least %s characters.', $attributeName, $minLength)
-            );
+            throw new InvalidArgumentException(sprintf('"%s" should contain at least %s characters.', $attributeName, $minLength));
         }
     }
 

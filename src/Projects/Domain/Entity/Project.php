@@ -85,8 +85,8 @@ final class Project extends AggregateRoot
 
         $information = new ProjectInformation(
             $name ?? $this->information->name,
-                $description ?? $this->information->description,
-                $finishDate ?? $this->information->finishDate,
+            $description ?? $this->information->description,
+            $finishDate ?? $this->information->finishDate,
         );
 
         if (!$this->information->equals($information)) {
@@ -118,7 +118,7 @@ final class Project extends AggregateRoot
 
         $this->owner->ensureUserIsNotOwner($owner->id);
         $this->ensureUserIsNotParticipant($owner->id);
-        //TODO add checks for task existence
+        // TODO add checks for task existence
 
         $this->owner = $owner;
 
@@ -196,7 +196,7 @@ final class Project extends AggregateRoot
     private function removeParticipantInner(ProjectUserId $participantId): void
     {
         $this->status->ensureAllowsModification();
-        //TODO add checks for task existence
+        // TODO add checks for task existence
 
         $this->ensureUserIsParticipant($participantId);
         $this->participants->removeElement($this->getParticipant($participantId));

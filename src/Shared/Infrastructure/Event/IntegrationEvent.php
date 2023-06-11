@@ -22,33 +22,21 @@ final readonly class IntegrationEvent implements IntegrationEventInterface
         $this->domainEventName = $domainEvent::getEventName();
     }
 
-    /**
-     * @return string
-     */
     public function getAggregateId(): string
     {
         return $this->aggregateId;
     }
 
-    /**
-     * @return array
-     */
     public function getBody(): array
     {
         return $this->body;
     }
 
-    /**
-     * @return string
-     */
     public function getOccurredOn(): string
     {
         return $this->occurredOn;
     }
 
-    /**
-     * @return string
-     */
     public function getDomainEventName(): string
     {
         return $this->domainEventName;

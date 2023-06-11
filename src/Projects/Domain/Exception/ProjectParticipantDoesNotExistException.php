@@ -17,4 +17,3 @@ final class ProjectParticipantDoesNotExistException extends DomainException
         parent::__construct($message, self::CODE_NOT_FOUND);
     }
 }
-

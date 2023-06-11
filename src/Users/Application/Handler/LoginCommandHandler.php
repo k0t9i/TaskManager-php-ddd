@@ -15,8 +15,8 @@ use TaskManager\Users\Domain\ValueObject\UserEmail;
 final readonly class LoginCommandHandler implements CommandHandlerInterface
 {
     public function __construct(
-        private UserRepositoryInterface      $repository,
-        private PasswordHasherInterface      $passwordHasher,
+        private UserRepositoryInterface $repository,
+        private PasswordHasherInterface $passwordHasher,
         private AuthenticatorServiceInterface $authenticator
     ) {
     }

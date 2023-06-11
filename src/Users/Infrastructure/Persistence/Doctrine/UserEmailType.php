@@ -19,7 +19,7 @@ final class UserEmailType extends StringType
 
     /**
      * @param UserEmail $value
-     * @param AbstractPlatform $platform
+     *
      * @return mixed
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): string

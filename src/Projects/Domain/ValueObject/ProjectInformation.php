@@ -9,9 +9,9 @@ use TaskManager\Shared\Domain\Equatable;
 final readonly class ProjectInformation implements Equatable
 {
     public function __construct(
-        public ProjectName        $name,
+        public ProjectName $name,
         public ProjectDescription $description,
-        public ProjectFinishDate  $finishDate,
+        public ProjectFinishDate $finishDate,
     ) {
     }
 

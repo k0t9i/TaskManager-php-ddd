@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TaskManager\Projects\Domain\ValueObject;
 
-use LogicException;
 use TaskManager\Projects\Domain\Exception\InvalidProjectStatusTransitionException;
 use TaskManager\Projects\Domain\Exception\ProjectModificationIsNotAllowedException;
 
@@ -22,7 +21,7 @@ abstract class ProjectStatus extends Status
             return self::STATUS_ACTIVE;
         }
 
-        throw new LogicException(sprintf('Invalid type "%s" of project status', gettype($this)));
+        throw new \LogicException(sprintf('Invalid type "%s" of project status', gettype($this)));
     }
 
     public static function createFromScalar(int $status): static
@@ -34,7 +33,7 @@ abstract class ProjectStatus extends Status
             return new ActiveProjectStatus();
         }
 
-        throw new LogicException(sprintf('Invalid project status "%s"', gettype($status)));
+        throw new \LogicException(sprintf('Invalid project status "%s"', gettype($status)));
     }
 
     public function isClosed(): bool

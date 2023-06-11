@@ -20,8 +20,9 @@ final class RequestChangeDateType extends DateTimeType
 
     /**
      * @param RequestChangeDate $value
-     * @param AbstractPlatform $platform
+     *
      * @return mixed
+     *
      * @throws ConversionException
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): string

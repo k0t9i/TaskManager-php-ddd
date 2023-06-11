@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TaskManager\Projects\Domain\ValueObject;
 
-use LogicException;
 use TaskManager\Projects\Domain\Exception\InvalidProjectRequestStatusTransitionException;
 
 abstract class RequestStatus extends Status
@@ -35,7 +34,7 @@ abstract class RequestStatus extends Status
             return self::STATUS_REJECTED;
         }
 
-        throw new LogicException(sprintf('Invalid type "%s" of project request status', gettype($this)));
+        throw new \LogicException(sprintf('Invalid type "%s" of project request status', gettype($this)));
     }
 
     public static function createFromScalar(int $status): static
@@ -50,7 +49,7 @@ abstract class RequestStatus extends Status
             return new RejectedRequestStatus();
         }
 
-        throw new LogicException(sprintf('Invalid project request status "%s"', gettype($status)));
+        throw new \LogicException(sprintf('Invalid project request status "%s"', gettype($status)));
     }
 
     public function ensureCanBeChangedTo(self $status): void

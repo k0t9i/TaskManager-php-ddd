@@ -7,7 +7,6 @@ namespace TaskManager\Tests\Shared\Infrastructure\Service;
 use Faker\Factory;
 use Faker\Generator;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 use TaskManager\Shared\Infrastructure\Service\JsonContentDecoder;
 
 class JsonContentDecoderTest extends TestCase
@@ -24,7 +23,7 @@ class JsonContentDecoderTest extends TestCase
     {
         $decoder = new JsonContentDecoder();
 
-        $this->assertEquals([], $decoder->decode(""));
+        $this->assertEquals([], $decoder->decode(''));
     }
 
     public function testDecodeInvalidJson()
@@ -32,7 +31,7 @@ class JsonContentDecoderTest extends TestCase
         $json = $this->faker->regexify($this->faker->regexify('.{255}'));
         $decoder = new JsonContentDecoder();
 
-        $this->expectException(RuntimeException::class);
+        $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage(sprintf('Syntax error in json request content "%s"', $json));
 
         $decoder->decode($json);
@@ -51,7 +50,7 @@ class JsonContentDecoderTest extends TestCase
             $this->faker->regexify('[a-z][A-Z]{255}') => $this->faker->regexify('.{255}'),
             $this->faker->regexify('[a-z][A-Z]{255}') => $this->faker->regexify('.{255}'),
             $this->faker->regexify('[a-z][A-Z]{255}') => $this->faker->regexify('.{255}'),
-            $this->faker->regexify('[a-z][A-Z]{255}') => $this->faker->regexify('.{255}')
+            $this->faker->regexify('[a-z][A-Z]{255}') => $this->faker->regexify('.{255}'),
         ];
         $decoder = new JsonContentDecoder();
 

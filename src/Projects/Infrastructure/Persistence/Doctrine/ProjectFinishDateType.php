@@ -20,8 +20,9 @@ final class ProjectFinishDateType extends DateTimeType
 
     /**
      * @param ProjectFinishDate $value
-     * @param AbstractPlatform $platform
+     *
      * @return mixed
+     *
      * @throws ConversionException
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): string

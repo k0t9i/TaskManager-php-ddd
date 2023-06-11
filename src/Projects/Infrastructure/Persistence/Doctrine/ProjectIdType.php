@@ -19,7 +19,7 @@ final class ProjectIdType extends StringType
 
     /**
      * @param ProjectId $value
-     * @param AbstractPlatform $platform
+     *
      * @return mixed
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): string

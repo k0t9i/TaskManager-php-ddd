@@ -22,8 +22,8 @@ use TaskManager\Users\Domain\ValueObject\UserProfile;
 final readonly class RegisterCommandHandler implements CommandHandlerInterface
 {
     public function __construct(
-        private UserRepositoryInterface      $repository,
-        private PasswordHasherInterface      $passwordHasher,
+        private UserRepositoryInterface $repository,
+        private PasswordHasherInterface $passwordHasher,
         private IntegrationEventBusInterface $eventBus
     ) {
     }

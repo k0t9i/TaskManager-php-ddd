@@ -31,7 +31,7 @@ class JsonExceptionResponseBuilderTest extends TestCase
         );
         $data = [
             'code' => $code,
-            'message' => $message
+            'message' => $message,
         ];
         $response = new JsonResponse($data, $code);
         $builder = new JsonExceptionResponseBuilder();
@@ -57,7 +57,7 @@ class JsonExceptionResponseBuilderTest extends TestCase
             $this->faker->regexify('[a-z][A-Z]{255}') => $this->faker->regexify('.{255}'),
             $this->faker->regexify('[a-z][A-Z]{255}') => $this->faker->regexify('.{255}'),
             $this->faker->regexify('[a-z][A-Z]{255}') => $this->faker->regexify('.{255}'),
-            $this->faker->regexify('[a-z][A-Z]{255}') => $this->faker->regexify('.{255}')
+            $this->faker->regexify('[a-z][A-Z]{255}') => $this->faker->regexify('.{255}'),
         ];
         $dto = new ExceptionDTO(
             $message,

@@ -29,7 +29,7 @@ class UserWasCreatedEventTest extends TestCase
             'email' => $email,
             'firstname' => $firstname,
             'lastname' => $lastname,
-            'password' => $password
+            'password' => $password,
         ];
 
         $event = new UserWasCreatedEvent(
@@ -69,7 +69,7 @@ class UserWasCreatedEventTest extends TestCase
             'email' => $email,
             'firstname' => $firstname,
             'lastname' => $lastname,
-            'password' => $password
+            'password' => $password,
         ];
         $expectedEvent = new UserWasCreatedEvent(
             $aggregateId,

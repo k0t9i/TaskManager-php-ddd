@@ -11,7 +11,6 @@ use TaskManager\Shared\Domain\ValueObject\DateTime;
 
 class DateTimeTest extends TestCase
 {
-
     public function testIsGreaterThan()
     {
         $date = new DateTime('01-01-1990');

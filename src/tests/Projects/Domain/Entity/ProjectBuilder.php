@@ -52,36 +52,42 @@ final class ProjectBuilder
     public function withId(ProjectId $value): self
     {
         $this->id = $value;
+
         return $this;
     }
 
     public function withName(ProjectName $value): self
     {
         $this->name = $value;
+
         return $this;
     }
 
     public function withDescription(ProjectDescription $value): self
     {
         $this->description = $value;
+
         return $this;
     }
 
     public function withFinishDate(ProjectFinishDate $value): self
     {
         $this->finishDate = $value;
+
         return $this;
     }
 
     public function withStatus(ProjectStatus $value): self
     {
         $this->status = $value;
+
         return $this;
     }
 
     public function withOwner(ProjectOwner $value): self
     {
         $this->owner = $value;
+
         return $this;
     }
 
@@ -91,6 +97,7 @@ final class ProjectBuilder
             $this->participants = [];
         }
         $this->participants[] = $value;
+
         return $this;
     }
 
@@ -100,6 +107,7 @@ final class ProjectBuilder
             $this->requests = [];
         }
         $this->requests[] = $value;
+
         return $this;
     }
 

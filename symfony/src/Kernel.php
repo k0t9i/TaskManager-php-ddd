@@ -18,7 +18,7 @@ final class Kernel extends BaseKernel
         parent::build($container);
         $container->addCompilerPass(new ArrayArgumentLoaderCompilerPass());
     }
-    
+
     public function getProjectDir(): string
     {
         return dirname(__DIR__);

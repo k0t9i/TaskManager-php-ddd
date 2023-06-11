@@ -14,13 +14,10 @@ abstract class ValueResolver implements ValueResolverInterface
     {
     }
 
-    /**
-     * @inheritDoc
-     */
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
         $argumentType = $argument->getType();
-        if (!$argumentType  || !is_a($argumentType, $this->supportClass(), true)) {
+        if (!$argumentType || !is_a($argumentType, $this->supportClass(), true)) {
             return [];
         }
 

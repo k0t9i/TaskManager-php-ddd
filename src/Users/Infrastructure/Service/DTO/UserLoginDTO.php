@@ -7,8 +7,8 @@ namespace TaskManager\Users\Infrastructure\Service\DTO;
 final readonly class UserLoginDTO
 {
     public function __construct(
-        public string $email = "",
-        public string $password = "",
+        public string $email = '',
+        public string $password = '',
     ) {
     }
 }

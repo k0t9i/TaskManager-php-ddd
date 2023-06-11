@@ -8,5 +8,4 @@ use TaskManager\Shared\Domain\ValueObject\Uuid;
 
 final class ProjectUserId extends Uuid
 {
-
 }

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TaskManager\Tests\Shared\Infrastructure\Service;
 
-use LogicException;
 use PHPUnit\Framework\TestCase;
 use TaskManager\Shared\Domain\Event\DomainEvent;
 use TaskManager\Shared\Infrastructure\Service\DomainEventMapper;
@@ -35,10 +34,6 @@ abstract class AnotherTestEvent extends DomainEvent
 
 class DomainEventMapperTest extends TestCase
 {
-
-    /**
-     * @return void
-     */
     public function testCreateWithValidValue(): void
     {
         $events = [
@@ -49,11 +44,11 @@ class DomainEventMapperTest extends TestCase
         $expected = [
             TestEvent::getEventName() => [
                 TestEvent::class,
-                TestEventWithSameName::class
+                TestEventWithSameName::class,
             ],
             AnotherTestEvent::getEventName() => [
-                AnotherTestEvent::class
-            ]
+                AnotherTestEvent::class,
+            ],
         ];
 
         $service = new DomainEventMapper($events);
@@ -61,14 +56,11 @@ class DomainEventMapperTest extends TestCase
         $this->assertEquals($expected, $service->getEventMap());
     }
 
-    /**
-     * @return void
-     */
     public function testCreateWithInvalidValue(): void
     {
         $className = 'RandomClassName';
 
-        $this->expectException(LogicException::class);
+        $this->expectException(\LogicException::class);
         $this->expectExceptionMessage(sprintf('"%s" must be instance of DomainEvent', $className));
 
         new DomainEventMapper([$className]);

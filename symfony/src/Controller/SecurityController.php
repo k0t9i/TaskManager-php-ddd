@@ -20,7 +20,7 @@ use TaskManager\Users\Infrastructure\Service\DTO\UserRegisterDTO;
 final readonly class SecurityController
 {
     public function __construct(
-        private CommandBusInterface    $commandBus,
+        private CommandBusInterface $commandBus,
         private UuidGeneratorInterface $uuidGenerator
     ) {
     }

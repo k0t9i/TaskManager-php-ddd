@@ -4,29 +4,24 @@ declare(strict_types=1);
 
 namespace TaskManager\Shared\Domain\ValueObject;
 
-use DateTimeImmutable;
 use Exception;
-use Stringable;
 use TaskManager\Shared\Domain\Equatable;
 use TaskManager\Shared\Domain\Exception\InvalidArgumentException;
 
-class DateTime implements Stringable, Equatable
+class DateTime implements \Stringable, Equatable
 {
     // ATOM with microseconds
     public const DEFAULT_FORMAT = 'Y-m-d\TH:i:s.uP';
 
-    private DateTimeImmutable $dateTime;
+    private \DateTimeImmutable $dateTime;
 
-    /**
-     * @param string|null $value
-     */
     public function __construct(string $value = null)
     {
         try {
             if ($value) {
-                $this->dateTime = new DateTimeImmutable($value);
+                $this->dateTime = new \DateTimeImmutable($value);
             } else {
-                $this->dateTime = DateTimeImmutable::createFromFormat(
+                $this->dateTime = \DateTimeImmutable::createFromFormat(
                     'U.u',
                     sprintf('%.f', microtime(true))
                 );
@@ -56,7 +51,7 @@ class DateTime implements Stringable, Equatable
         return $other instanceof static && $this->getValue() === $other->getValue();
     }
 
-    public function getPhpDateTime(): DateTimeImmutable
+    public function getPhpDateTime(): \DateTimeImmutable
     {
         return $this->dateTime;
     }

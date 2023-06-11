@@ -10,8 +10,8 @@ final readonly class UserProfile implements Equatable
 {
     public function __construct(
         public UserFirstname $firstname,
-        public UserLastname  $lastname,
-        public UserPassword  $password
+        public UserLastname $lastname,
+        public UserPassword $password
     ) {
     }
 

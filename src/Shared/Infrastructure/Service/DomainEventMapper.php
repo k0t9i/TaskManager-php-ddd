@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TaskManager\Shared\Infrastructure\Service;
 
-use LogicException;
 use TaskManager\Shared\Domain\Event\DomainEventInterface;
 
 final class DomainEventMapper implements DomainEventMapperInterface
@@ -16,9 +15,6 @@ final class DomainEventMapper implements DomainEventMapperInterface
         $this->indexMap();
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getEventMap(): array
     {
         return $this->map;
@@ -29,9 +25,7 @@ final class DomainEventMapper implements DomainEventMapperInterface
         if (empty($this->map)) {
             foreach ($this->events as $eventClass) {
                 if (!is_subclass_of($eventClass, DomainEventInterface::class)) {
-                    throw new LogicException(
-                        sprintf('"%s" must be instance of DomainEvent', $eventClass)
-                    );
+                    throw new \LogicException(sprintf('"%s" must be instance of DomainEvent', $eventClass));
                 }
                 $eventName = $eventClass::getEventName();
                 $this->map[$eventName][] = $eventClass;

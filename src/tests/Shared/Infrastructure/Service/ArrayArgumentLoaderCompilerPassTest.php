@@ -16,27 +16,27 @@ final class ArrayArgumentLoaderCompilerPassTest extends TestCase
         $targetTag1 = 'test_target_tag';
         $targetTag2 = 'test_target_tag2';
         $targets1 = [
-            'targetOne', 'target2', 'lastTarget'
+            'targetOne', 'target2', 'lastTarget',
         ];
         $targets2 = [
-            'anotherTarget'
+            'anotherTarget',
         ];
         $container = new ContainerBuilder();
         $container->register('test')
             ->addTag(ArrayArgumentLoaderCompilerPass::TAG, [
-                ArrayArgumentLoaderCompilerPass::TARGET_TAG_FIELD => $targetTag1
+                ArrayArgumentLoaderCompilerPass::TARGET_TAG_FIELD => $targetTag1,
             ]);
         $container->register('same_target_tag')
             ->addTag(ArrayArgumentLoaderCompilerPass::TAG, [
-                ArrayArgumentLoaderCompilerPass::TARGET_TAG_FIELD => $targetTag1
+                ArrayArgumentLoaderCompilerPass::TARGET_TAG_FIELD => $targetTag1,
             ]);
         $container->register('different_target_tag')
             ->addTag(ArrayArgumentLoaderCompilerPass::TAG, [
-                ArrayArgumentLoaderCompilerPass::TARGET_TAG_FIELD => $targetTag2
+                ArrayArgumentLoaderCompilerPass::TARGET_TAG_FIELD => $targetTag2,
             ]);
         $container->register('empty')
             ->addTag(ArrayArgumentLoaderCompilerPass::TAG, [
-                ArrayArgumentLoaderCompilerPass::TARGET_TAG_FIELD => 'foo'
+                ArrayArgumentLoaderCompilerPass::TARGET_TAG_FIELD => 'foo',
             ]);
         $container->register('random_service');
 

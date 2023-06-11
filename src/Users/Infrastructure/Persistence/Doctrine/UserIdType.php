@@ -19,7 +19,7 @@ final class UserIdType extends StringType
 
     /**
      * @param UserId $value
-     * @param AbstractPlatform $platform
+     *
      * @return mixed
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): string

@@ -19,7 +19,7 @@ final class ProjectStatusType extends IntegerType
 
     /**
      * @param ProjectStatus $value
-     * @param AbstractPlatform $platform
+     *
      * @return mixed
      */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): int

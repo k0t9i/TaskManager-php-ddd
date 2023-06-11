@@ -50,7 +50,7 @@ class UserTest extends TestCase
             'email' => $email->value,
             'firstname' => $profile->firstname->value,
             'lastname' => $profile->lastname->value,
-            'password' => $profile->password->value
+            'password' => $profile->password->value,
         ], $events[0]->toPrimitives());
     }
 
@@ -106,7 +106,7 @@ class UserTest extends TestCase
         $this->assertEquals([
             'firstname' => $newProfile->firstname->value,
             'lastname' => $newProfile->lastname->value,
-            'password' => $newProfile->password->value
+            'password' => $newProfile->password->value,
         ], $events[0]->toPrimitives());
 
         $user->changeProfile(
@@ -135,7 +135,7 @@ class UserTest extends TestCase
         $this->assertEquals([
             'firstname' => $profile->firstname->value,
             'lastname' => $newProfile->lastname->value,
-            'password' => $newProfile->password->value
+            'password' => $newProfile->password->value,
         ], $events[0]->toPrimitives());
     }
 
