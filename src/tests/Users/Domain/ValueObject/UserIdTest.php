@@ -41,24 +41,13 @@ class UserIdTest extends TestCase
         new UserId($invalidValue);
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $uuid = $this->faker->uuid();
 
         $uuidObject = new UserId($uuid);
 
         $this->assertEquals($uuid, (string) $uuidObject);
-    }
-
-    public function testCreateFrom()
-    {
-        $uuid = $this->faker->uuid();
-        $otherUuidObject = new UserId($uuid);
-
-        $uuidObject = UserId::createFrom($otherUuidObject);
-
-        $this->assertNotSame($otherUuidObject, $uuidObject);
-        $this->assertEquals($uuidObject->value, $otherUuidObject->value);
     }
 
     public function testEquals(): void

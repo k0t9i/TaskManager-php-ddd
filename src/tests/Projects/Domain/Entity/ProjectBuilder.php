@@ -91,7 +91,7 @@ final class ProjectBuilder
         return $this;
     }
 
-    public function withParticipant(Participant $value, $reset = false): self
+    public function withParticipant(Participant $value, bool $reset = false): self
     {
         if ($reset) {
             $this->participants = [];
@@ -101,7 +101,7 @@ final class ProjectBuilder
         return $this;
     }
 
-    public function withRequest(Request $value, $reset = false): self
+    public function withRequest(Request $value, bool $reset = false): self
     {
         if ($reset) {
             $this->requests = [];

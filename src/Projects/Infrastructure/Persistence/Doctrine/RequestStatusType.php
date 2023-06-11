@@ -17,11 +17,6 @@ final class RequestStatusType extends IntegerType
         return RequestStatus::createFromScalar(parent::convertToPHPValue($value, $platform));
     }
 
-    /**
-     * @param RequestStatus $value
-     *
-     * @return mixed
-     */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): int
     {
         return $value->getScalar();

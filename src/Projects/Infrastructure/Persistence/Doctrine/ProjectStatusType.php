@@ -17,11 +17,6 @@ final class ProjectStatusType extends IntegerType
         return ProjectStatus::createFromScalar(parent::convertToPHPValue($value, $platform));
     }
 
-    /**
-     * @param ProjectStatus $value
-     *
-     * @return mixed
-     */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): int
     {
         return $value->getScalar();

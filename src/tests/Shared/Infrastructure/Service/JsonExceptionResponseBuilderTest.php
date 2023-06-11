@@ -21,7 +21,7 @@ class JsonExceptionResponseBuilderTest extends TestCase
         $this->faker = Factory::create();
     }
 
-    public function testBuild()
+    public function testBuild(): void
     {
         $message = $this->faker->regexify('.{255}');
         $code = $this->faker->numberBetween(200, 599);
@@ -43,7 +43,7 @@ class JsonExceptionResponseBuilderTest extends TestCase
         $this->assertEquals($response->getStatusCode(), $result->getStatusCode());
     }
 
-    public function testBuildVerbose()
+    public function testBuildVerbose(): void
     {
         $message = $this->faker->regexify('.{255}');
         $code = $this->faker->numberBetween(200, 599);

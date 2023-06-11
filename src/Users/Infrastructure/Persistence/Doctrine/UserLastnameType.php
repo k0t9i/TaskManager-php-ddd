@@ -17,11 +17,6 @@ final class UserLastnameType extends StringType
         return new UserLastname($value);
     }
 
-    /**
-     * @param UserLastname $value
-     *
-     * @return mixed
-     */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): string
     {
         return $value->value;

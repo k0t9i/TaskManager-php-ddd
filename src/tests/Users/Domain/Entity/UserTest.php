@@ -139,7 +139,7 @@ class UserTest extends TestCase
         ], $events[0]->toPrimitives());
     }
 
-    public function testEquals()
+    public function testEquals(): void
     {
         $id = new UserId($this->faker->uuid());
         $email = new UserEmail($this->faker->email());

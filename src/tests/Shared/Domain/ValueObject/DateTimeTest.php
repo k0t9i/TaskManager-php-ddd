@@ -11,7 +11,7 @@ use TaskManager\Shared\Domain\ValueObject\DateTime;
 
 class DateTimeTest extends TestCase
 {
-    public function testIsGreaterThan()
+    public function testIsGreaterThan(): void
     {
         $date = new DateTime('01-01-1990');
         $sameDate = new DateTime('01-01-1990');
@@ -23,17 +23,17 @@ class DateTimeTest extends TestCase
         $this->assertFalse($sameDate->isGreaterThan($date));
     }
 
-    public function testCreateWithValidValue()
+    public function testCreateWithValidValue(): void
     {
         $now = time();
         $date = date(DateTime::DEFAULT_FORMAT, $now);
 
-        $dateObject = new DateTime(date('d-m-Y H:i:s'), $now);
+        $dateObject = new DateTime(date('d-m-Y H:i:s'));
 
         $this->assertEquals($date, $dateObject->getValue());
     }
 
-    public function testCreateWithInvalidValue()
+    public function testCreateWithInvalidValue(): void
     {
         $invalidValue = 'abcdefg';
 
@@ -43,12 +43,12 @@ class DateTimeTest extends TestCase
         new DateTime($invalidValue);
     }
 
-    public function testToString()
+    public function testToString(): void
     {
         $now = time();
         $date = date(DateTime::DEFAULT_FORMAT, $now);
 
-        $dateObject = new DateTime(date('d-m-Y H:i:s'), $now);
+        $dateObject = new DateTime(date('d-m-Y H:i:s'));
 
         $this->assertEquals($date, (string) $dateObject);
     }

@@ -19,7 +19,7 @@ class SymfonyUserTest extends TestCase
         $this->faker = Factory::create();
     }
 
-    public function testGetUserIdentifier()
+    public function testGetUserIdentifier(): void
     {
         $id = $this->faker->regexify('.{255}');
 

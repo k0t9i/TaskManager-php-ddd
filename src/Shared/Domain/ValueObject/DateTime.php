@@ -17,18 +17,24 @@ class DateTime implements \Stringable, Equatable
 
     public function __construct(string $value = null)
     {
-        try {
+
             if ($value) {
-                $this->dateTime = new \DateTimeImmutable($value);
+                try {
+                    $this->dateTime = new \DateTimeImmutable($value);
+                } catch (Exception) {
+                    throw new InvalidArgumentException(sprintf('Invalid datetime value "%s"', $value));
+                }
             } else {
-                $this->dateTime = \DateTimeImmutable::createFromFormat(
+                $dateTime = \DateTimeImmutable::createFromFormat(
                     'U.u',
                     sprintf('%.f', microtime(true))
                 );
+                if (false === $dateTime) {
+                    throw new \LogicException('Cannot create DateTimeImmutable from format');
+                }
+                $this->dateTime = $dateTime;
             }
-        } catch (Exception) {
-            throw new InvalidArgumentException(sprintf('Invalid datetime value "%s"', $value));
-        }
+
     }
 
     public function getValue(): string

@@ -19,14 +19,14 @@ class JsonContentDecoderTest extends TestCase
         $this->faker = Factory::create();
     }
 
-    public function testDecodeEmpty()
+    public function testDecodeEmpty(): void
     {
         $decoder = new JsonContentDecoder();
 
         $this->assertEquals([], $decoder->decode(''));
     }
 
-    public function testDecodeInvalidJson()
+    public function testDecodeInvalidJson(): void
     {
         $json = $this->faker->regexify($this->faker->regexify('.{255}'));
         $decoder = new JsonContentDecoder();
@@ -37,7 +37,7 @@ class JsonContentDecoderTest extends TestCase
         $decoder->decode($json);
     }
 
-    public function testDecodeValidJson()
+    public function testDecodeValidJson(): void
     {
         $source = [
             $this->faker->regexify('[a-z][A-Z]{255}') => $this->faker->regexify('.{255}'),

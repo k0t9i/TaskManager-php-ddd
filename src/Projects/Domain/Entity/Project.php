@@ -37,6 +37,14 @@ use TaskManager\Shared\Domain\Equatable;
 
 final class Project extends AggregateRoot
 {
+    /**
+     * @param ProjectId $id
+     * @param ProjectInformation $information
+     * @param ProjectStatus $status
+     * @param ProjectOwner $owner
+     * @param Collection<array-key, Participant> $participants
+     * @param Collection<array-key, Request> $requests
+     */
     public function __construct(
         private readonly ProjectId $id,
         private ProjectInformation $information,

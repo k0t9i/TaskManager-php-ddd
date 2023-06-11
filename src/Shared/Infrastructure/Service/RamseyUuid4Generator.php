@@ -19,6 +19,6 @@ final class RamseyUuid4Generator implements UuidGeneratorInterfaceAlias
 
     public function generate(): string
     {
-        return $this->uuid->toString();
+        return $this->uuid ? $this->uuid->toString() : '';
     }
 }

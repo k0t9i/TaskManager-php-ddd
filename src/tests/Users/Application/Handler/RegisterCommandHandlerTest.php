@@ -67,7 +67,7 @@ class RegisterCommandHandlerTest extends TestCase
         );
     }
 
-    public function testEmailIsAlreadyTaken()
+    public function testEmailIsAlreadyTaken(): void
     {
         $repository = $this->getMockBuilder(UserRepositoryInterface::class)
             ->getMock();
@@ -87,7 +87,7 @@ class RegisterCommandHandlerTest extends TestCase
         ))($this->repeatPasswordCommand);
     }
 
-    public function testPasswordAndRepeatPasswordDoNotMatch()
+    public function testPasswordAndRepeatPasswordDoNotMatch(): void
     {
         $repository = $this->getMockBuilder(UserRepositoryInterface::class)
             ->getMock();
@@ -103,7 +103,7 @@ class RegisterCommandHandlerTest extends TestCase
         ))($this->repeatPasswordCommand);
     }
 
-    public function testValidRun()
+    public function testValidRun(): void
     {
         $repository = $this->getMockBuilder(UserRepositoryInterface::class)
             ->getMock();

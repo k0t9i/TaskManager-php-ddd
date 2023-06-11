@@ -17,11 +17,6 @@ final class UserEmailType extends StringType
         return new UserEmail($value);
     }
 
-    /**
-     * @param UserEmail $value
-     *
-     * @return mixed
-     */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): string
     {
         return $value->value;

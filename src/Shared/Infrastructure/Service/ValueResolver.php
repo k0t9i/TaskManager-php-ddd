@@ -26,6 +26,9 @@ abstract class ValueResolver implements ValueResolverInterface
         return $this->doResolve($attributes);
     }
 
+    /**
+     * @return class-string
+     */
     abstract protected function supportClass(): string;
 
     abstract protected function doResolve(array $attributes): iterable;

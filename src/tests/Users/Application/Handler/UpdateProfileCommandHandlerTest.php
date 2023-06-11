@@ -64,7 +64,7 @@ class UpdateProfileCommandHandlerTest extends TestCase
         );
     }
 
-    public function testUserNotFound()
+    public function testUserNotFound(): void
     {
         $id = $this->faker->uuid();
         $repository = $this->getMockBuilder(UserRepositoryInterface::class)
@@ -90,7 +90,7 @@ class UpdateProfileCommandHandlerTest extends TestCase
         $handler($this->command);
     }
 
-    public function testPasswordAndRepeatPasswordDoNotMatch()
+    public function testPasswordAndRepeatPasswordDoNotMatch(): void
     {
         $repository = $this->getMockBuilder(UserRepositoryInterface::class)
             ->getMock();
@@ -111,7 +111,7 @@ class UpdateProfileCommandHandlerTest extends TestCase
         $handler($this->repeatPasswordCommand);
     }
 
-    public function testValidRun()
+    public function testValidRun(): void
     {
         $id = $this->faker->uuid();
         $userId = new UserId($id);

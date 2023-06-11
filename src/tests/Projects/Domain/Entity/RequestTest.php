@@ -26,7 +26,7 @@ class RequestTest extends TestCase
         $this->faker = Factory::create();
     }
 
-    public function testCreate()
+    public function testCreate(): void
     {
         $id = new RequestId($this->faker->uuid());
         $userId = new ProjectUserId($this->faker->uuid());
@@ -38,7 +38,7 @@ class RequestTest extends TestCase
         $this->assertInstanceOf(PendingRequestStatus::class, $request->getStatus());
     }
 
-    public function testIsPendingForUser()
+    public function testIsPendingForUser(): void
     {
         $userId = new ProjectUserId($this->faker->uuid());
         $pendingRequest = new Request(
@@ -59,7 +59,7 @@ class RequestTest extends TestCase
         $this->assertFalse($rejectedRequest->isPendingForUser($userId));
     }
 
-    public function testConfirmRequest()
+    public function testConfirmRequest(): void
     {
         $request = new Request(
             new RequestId($this->faker->uuid()),
@@ -73,7 +73,7 @@ class RequestTest extends TestCase
         $this->assertInstanceOf(ConfirmedRequestStatus::class, $request->getStatus());
     }
 
-    public function testRejectRequest()
+    public function testRejectRequest(): void
     {
         $request = new Request(
             new RequestId($this->faker->uuid()),
@@ -87,7 +87,7 @@ class RequestTest extends TestCase
         $this->assertInstanceOf(RejectedRequestStatus::class, $request->getStatus());
     }
 
-    public function testChangeToInvalidStatus()
+    public function testChangeToInvalidStatus(): void
     {
         $request = new Request(
             new RequestId($this->faker->uuid()),

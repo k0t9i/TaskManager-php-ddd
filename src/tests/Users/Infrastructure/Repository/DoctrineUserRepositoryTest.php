@@ -40,7 +40,7 @@ class DoctrineUserRepositoryTest extends TestCase
         );
     }
 
-    public function testFindById()
+    public function testFindById(): void
     {
         $id = new UserId($this->faker->uuid());
         $repository = $this->getMockBuilder(ObjectRepository::class)
@@ -60,7 +60,7 @@ class DoctrineUserRepositoryTest extends TestCase
         $this->assertSame($this->user, $object->findById($id));
     }
 
-    public function testSave()
+    public function testSave(): void
     {
         $em = $this->getMockBuilder(EntityManagerInterface::class)
             ->getMock();
@@ -73,7 +73,7 @@ class DoctrineUserRepositoryTest extends TestCase
         $object->save($this->user);
     }
 
-    public function testFindByEmail()
+    public function testFindByEmail(): void
     {
         $email = new UserEmail($this->faker->email());
         $repository = $this->getMockBuilder(ObjectRepository::class)

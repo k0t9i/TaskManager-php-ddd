@@ -37,7 +37,7 @@ abstract class RequestStatus extends Status
         throw new \LogicException(sprintf('Invalid type "%s" of project request status', gettype($this)));
     }
 
-    public static function createFromScalar(int $status): static
+    public static function createFromScalar(?int $status): static
     {
         if (self::STATUS_PENDING === $status) {
             return new PendingRequestStatus();

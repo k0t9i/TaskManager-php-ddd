@@ -39,11 +39,13 @@ final readonly class UpdateProfileCommandHandler implements CommandHandlerInterf
             throw new PasswordAndRepeatPasswordDoNotMatchException();
         }
 
-        $hashedPassword = $this->passwordHasher->hashPassword($command->password);
+        $hashedPassword = $command->password ?
+            new UserPassword($this->passwordHasher->hashPassword($command->password)) :
+            null;
         $user->changeProfile(
             $command->firstname ? new UserFirstname($command->firstname) : null,
             $command->lastname ? new UserLastname($command->lastname) : null,
-            $command->password ? new UserPassword($hashedPassword) : null
+            $hashedPassword
         );
 
         $this->repository->save($user);

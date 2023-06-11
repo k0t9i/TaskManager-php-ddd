@@ -27,7 +27,7 @@ class LexikJwtAuthenticatorServiceTest extends TestCase
         $this->faker = Factory::create();
     }
 
-    public function testOnKernelController()
+    public function testOnKernelController(): void
     {
         $idClaim = $this->faker->regexify('[a-zA-Z]{50}');
         $token = $this->faker->regexify('.{255}');
@@ -68,7 +68,7 @@ class LexikJwtAuthenticatorServiceTest extends TestCase
         $this->assertEquals($userId, $service->getUserId());
     }
 
-    public function testGetToken()
+    public function testGetToken(): void
     {
         $path = 'abc';
         $userId = $this->faker->regexify('.{255}');
@@ -88,7 +88,7 @@ class LexikJwtAuthenticatorServiceTest extends TestCase
         $this->assertEquals($token, $service->getToken($userId));
     }
 
-    public function testCreateWithInvalidPath()
+    public function testCreateWithInvalidPath(): void
     {
         $path = $this->faker->regexify('.{255}');
         $tokenManager = $this->getMockBuilder(JWTTokenManagerInterface::class)
@@ -102,7 +102,7 @@ class LexikJwtAuthenticatorServiceTest extends TestCase
         new LexikJwtAuthenticatorService($tokenManager, $tokenExtractor, $path);
     }
 
-    public function testEmptyPayload()
+    public function testEmptyPayload(): void
     {
         $path = 'abc';
         $tokenManager = $this->getMockBuilder(JWTManager::class)
@@ -132,7 +132,7 @@ class LexikJwtAuthenticatorServiceTest extends TestCase
         $service->onKernelController($event);
     }
 
-    public function testExpiredToken()
+    public function testExpiredToken(): void
     {
         $path = 'abc';
         $tokenManager = $this->getMockBuilder(JWTManager::class)
@@ -168,7 +168,7 @@ class LexikJwtAuthenticatorServiceTest extends TestCase
         $service->onKernelController($event);
     }
 
-    public function testOtherTokenParseException()
+    public function testOtherTokenParseException(): void
     {
         $path = 'abc';
         $tokenManager = $this->getMockBuilder(JWTManager::class)

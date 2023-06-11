@@ -53,7 +53,7 @@ class ProjectTest extends TestCase
         $this->faker = Factory::create();
     }
 
-    public function testCreate()
+    public function testCreate(): void
     {
         $builder = new ProjectBuilder($this->faker);
         $project = $builder->buildViaCreate();
@@ -72,7 +72,7 @@ class ProjectTest extends TestCase
         ], $events[0]->toPrimitives());
     }
 
-    public function testChangeInformation()
+    public function testChangeInformation(): void
     {
         $builder = new ProjectBuilder($this->faker);
         $newInformation = new ProjectInformation(
@@ -133,7 +133,7 @@ class ProjectTest extends TestCase
         ], $events[0]->toPrimitives());
     }
 
-    public function testChangeInformationByNonOwner()
+    public function testChangeInformationByNonOwner(): void
     {
         $builder = new ProjectBuilder($this->faker);
         $newInformation = new ProjectInformation(
@@ -154,7 +154,7 @@ class ProjectTest extends TestCase
         );
     }
 
-    public function testChangeInformationInClosedProject()
+    public function testChangeInformationInClosedProject(): void
     {
         $builder = new ProjectBuilder($this->faker);
         $newInformation = new ProjectInformation(
@@ -176,7 +176,7 @@ class ProjectTest extends TestCase
         );
     }
 
-    public function testCloseProject()
+    public function testCloseProject(): void
     {
         $builder = new ProjectBuilder($this->faker);
         $project = $builder->build();
@@ -192,7 +192,7 @@ class ProjectTest extends TestCase
         ], $events[0]->toPrimitives());
     }
 
-    public function testActivateProject()
+    public function testActivateProject(): void
     {
         $builder = new ProjectBuilder($this->faker);
         $project = $builder
@@ -210,7 +210,7 @@ class ProjectTest extends TestCase
         ], $events[0]->toPrimitives());
     }
 
-    public function testChangeToInvalidStatus()
+    public function testChangeToInvalidStatus(): void
     {
         $builder = new ProjectBuilder($this->faker);
         $project = $builder->build();
@@ -225,7 +225,7 @@ class ProjectTest extends TestCase
         $project->activate($builder->getOwner()->id);
     }
 
-    public function testChangeStatusByNonOwner()
+    public function testChangeStatusByNonOwner(): void
     {
         $builder = new ProjectBuilder($this->faker);
         $otherUserId = new ProjectUserId($this->faker->uuid());
@@ -236,7 +236,7 @@ class ProjectTest extends TestCase
         $project->close($otherUserId);
     }
 
-    public function testChangeOwner()
+    public function testChangeOwner(): void
     {
         $builder = new ProjectBuilder($this->faker);
         $otherUserId = new ProjectUserId($this->faker->uuid());
@@ -253,7 +253,7 @@ class ProjectTest extends TestCase
         ], $events[0]->toPrimitives());
     }
 
-    public function testChangeOwnerToAlreadyOwner()
+    public function testChangeOwnerToAlreadyOwner(): void
     {
         $builder = new ProjectBuilder($this->faker);
         $project = $builder->build();
@@ -263,7 +263,7 @@ class ProjectTest extends TestCase
         $project->changeOwner($builder->getOwner(), $builder->getOwner()->id);
     }
 
-    public function testChangeOwnerToAlreadyParticipant()
+    public function testChangeOwnerToAlreadyParticipant(): void
     {
         $builder = new ProjectBuilder($this->faker);
         $project = $builder
@@ -278,7 +278,7 @@ class ProjectTest extends TestCase
         $project->changeOwner(new ProjectOwner($builder->getParticipants()[0]->userId), $builder->getOwner()->id);
     }
 
-    public function testChangeOwnerByNonOwner()
+    public function testChangeOwnerByNonOwner(): void
     {
         $builder = new ProjectBuilder($this->faker);
         $otherUserId = new ProjectUserId($this->faker->uuid());
@@ -289,7 +289,7 @@ class ProjectTest extends TestCase
         $project->changeOwner(new ProjectOwner($otherUserId), $otherUserId);
     }
 
-    public function testChangeOwnerInClosedProject()
+    public function testChangeOwnerInClosedProject(): void
     {
         $builder = new ProjectBuilder($this->faker);
         $otherUserId = new ProjectUserId($this->faker->uuid());
@@ -302,7 +302,7 @@ class ProjectTest extends TestCase
         $project->changeOwner(new ProjectOwner($otherUserId), $builder->getOwner()->id);
     }
 
-    public function testRemoveParticipant()
+    public function testRemoveParticipant(): void
     {
         $builder = new ProjectBuilder($this->faker);
         $project = $builder
@@ -323,7 +323,7 @@ class ProjectTest extends TestCase
         ], $events[0]->toPrimitives());
     }
 
-    public function testRemoveParticipantByNonOwner()
+    public function testRemoveParticipantByNonOwner(): void
     {
         $builder = new ProjectBuilder($this->faker);
         $otherUserId = new ProjectUserId($this->faker->uuid());
@@ -339,7 +339,7 @@ class ProjectTest extends TestCase
         $project->removeParticipant($builder->getParticipants()[0]->userId, $otherUserId);
     }
 
-    public function testRemoveParticipantFromClosedProject()
+    public function testRemoveParticipantFromClosedProject(): void
     {
         $builder = new ProjectBuilder($this->faker);
         $project = $builder
@@ -355,7 +355,7 @@ class ProjectTest extends TestCase
         $project->removeParticipant($builder->getParticipants()[0]->userId, $builder->getOwner()->id);
     }
 
-    public function testRemoveNonExistingParticipant()
+    public function testRemoveNonExistingParticipant(): void
     {
         $builder = new ProjectBuilder($this->faker);
         $otherUserId = new ProjectUserId($this->faker->uuid());
@@ -371,7 +371,7 @@ class ProjectTest extends TestCase
         $project->removeParticipant($otherUserId, $builder->getOwner()->id);
     }
 
-    public function testLeaveProject()
+    public function testLeaveProject(): void
     {
         $builder = new ProjectBuilder($this->faker);
         $project = $builder
@@ -392,7 +392,7 @@ class ProjectTest extends TestCase
         ], $events[0]->toPrimitives());
     }
 
-    public function testLeaveClosedProject()
+    public function testLeaveClosedProject(): void
     {
         $builder = new ProjectBuilder($this->faker);
         $project = $builder
@@ -408,7 +408,7 @@ class ProjectTest extends TestCase
         $project->leaveProject($builder->getParticipants()[0]->userId);
     }
 
-    public function testLeaveProjectByNonParticipant()
+    public function testLeaveProjectByNonParticipant(): void
     {
         $builder = new ProjectBuilder($this->faker);
         $otherUserId = new ProjectUserId($this->faker->uuid());
@@ -424,7 +424,7 @@ class ProjectTest extends TestCase
         $project->leaveProject($otherUserId);
     }
 
-    public function testCreateRequest()
+    public function testCreateRequest(): void
     {
         $builder = new ProjectBuilder($this->faker);
         $project = $builder->build();
@@ -448,7 +448,7 @@ class ProjectTest extends TestCase
         $this->assertEquals($userId, $request->getUserId());
     }
 
-    public function testCreateRequestInClosedProject()
+    public function testCreateRequestInClosedProject(): void
     {
         $builder = new ProjectBuilder($this->faker);
         $project = $builder
@@ -462,7 +462,7 @@ class ProjectTest extends TestCase
         $project->createRequest($requestId, $userId);
     }
 
-    public function testCreateRequestByProjectOwner()
+    public function testCreateRequestByProjectOwner(): void
     {
         $builder = new ProjectBuilder($this->faker);
         $project = $builder->build();
@@ -473,7 +473,7 @@ class ProjectTest extends TestCase
         $project->createRequest($requestId, $builder->getOwner()->id);
     }
 
-    public function testCreateRequestByProjectParticipant()
+    public function testCreateRequestByProjectParticipant(): void
     {
         $builder = new ProjectBuilder($this->faker);
         $project = $builder
@@ -489,7 +489,7 @@ class ProjectTest extends TestCase
         $project->createRequest($requestId, $builder->getParticipants()[0]->userId);
     }
 
-    public function testCreateRequestByProjectParticipantWithPendingRequest()
+    public function testCreateRequestByProjectParticipantWithPendingRequest(): void
     {
         $builder = new ProjectBuilder($this->faker);
         $project = $builder
@@ -512,7 +512,7 @@ class ProjectTest extends TestCase
         $project->createRequest($requestId, $builder->getRequests()[0]->getUserId());
     }
 
-    public function testRejectRequest()
+    public function testRejectRequest(): void
     {
         $builder = new ProjectBuilder($this->faker);
         $project = $builder
@@ -547,7 +547,7 @@ class ProjectTest extends TestCase
      *
      * @throws \ReflectionException
      */
-    public function testConfirmRequest()
+    public function testConfirmRequest(): void
     {
         $builder = new ProjectBuilder($this->faker);
         $project = $builder
@@ -584,7 +584,7 @@ class ProjectTest extends TestCase
         $this->assertEquals($builder->getRequests()[0]->getUserId(), $participants[0]->userId);
     }
 
-    public function testChangeRequestStatusInClosedProject()
+    public function testChangeRequestStatusInClosedProject(): void
     {
         $builder = new ProjectBuilder($this->faker);
         $project = $builder
@@ -605,7 +605,7 @@ class ProjectTest extends TestCase
         );
     }
 
-    public function testChangeRequestStatusByNonOwner()
+    public function testChangeRequestStatusByNonOwner(): void
     {
         $builder = new ProjectBuilder($this->faker);
         $project = $builder
@@ -626,7 +626,7 @@ class ProjectTest extends TestCase
         );
     }
 
-    public function testChangeNonExistingRequestStatus()
+    public function testChangeNonExistingRequestStatus(): void
     {
         $builder = new ProjectBuilder($this->faker);
         $project = $builder

@@ -17,7 +17,7 @@ final readonly class SymfonyUser implements UserInterface
         return [];
     }
 
-    public function eraseCredentials()
+    public function eraseCredentials(): void
     {
     }
 

@@ -50,7 +50,7 @@ class LoginCommandHandlerTest extends TestCase
         );
     }
 
-    public function testUserNotFound()
+    public function testUserNotFound(): void
     {
         $repository = $this->getMockBuilder(UserRepositoryInterface::class)
             ->getMock();
@@ -71,7 +71,7 @@ class LoginCommandHandlerTest extends TestCase
         $handler($this->command);
     }
 
-    public function testPasswordAndRepeatPasswordDoNotMatch()
+    public function testPasswordAndRepeatPasswordDoNotMatch(): void
     {
         $hasher = $this->getMockBuilder(PasswordHasherInterface::class)
             ->getMock();
@@ -92,7 +92,7 @@ class LoginCommandHandlerTest extends TestCase
         $handler($this->command);
     }
 
-    public function testValidRun()
+    public function testValidRun(): void
     {
         $token = $this->faker->regexify('.{255}');
         $repository = $this->getMockBuilder(UserRepositoryInterface::class)

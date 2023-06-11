@@ -24,7 +24,7 @@ abstract class ProjectStatus extends Status
         throw new \LogicException(sprintf('Invalid type "%s" of project status', gettype($this)));
     }
 
-    public static function createFromScalar(int $status): static
+    public static function createFromScalar(?int $status): static
     {
         if (self::STATUS_CLOSED === $status) {
             return new ClosedProjectStatus();

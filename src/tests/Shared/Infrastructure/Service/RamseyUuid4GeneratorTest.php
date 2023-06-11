@@ -20,7 +20,7 @@ class RamseyUuid4GeneratorTest extends TestCase
         $this->faker = Factory::create();
     }
 
-    public function testGenerate()
+    public function testGenerate(): void
     {
         $result = $this->faker->regexify('.{255}');
         $generator = $this->getMockBuilder(UuidInterface::class)

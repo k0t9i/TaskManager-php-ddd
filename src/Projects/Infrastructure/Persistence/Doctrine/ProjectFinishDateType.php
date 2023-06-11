@@ -18,13 +18,6 @@ final class ProjectFinishDateType extends DateTimeType
         return new ProjectFinishDate($value);
     }
 
-    /**
-     * @param ProjectFinishDate $value
-     *
-     * @return mixed
-     *
-     * @throws ConversionException
-     */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): string
     {
         return parent::convertToDatabaseValue($value->getPhpDateTime(), $platform);

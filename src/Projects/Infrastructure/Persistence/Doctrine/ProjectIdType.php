@@ -17,11 +17,6 @@ final class ProjectIdType extends StringType
         return new ProjectId($value);
     }
 
-    /**
-     * @param ProjectId $value
-     *
-     * @return mixed
-     */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): string
     {
         return $value->value;

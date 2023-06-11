@@ -17,11 +17,6 @@ final class UserIdType extends StringType
         return new UserId($value);
     }
 
-    /**
-     * @param UserId $value
-     *
-     * @return mixed
-     */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): string
     {
         return $value->value;

@@ -17,11 +17,6 @@ final class RequestIdType extends StringType
         return new RequestId($value);
     }
 
-    /**
-     * @param RequestId $value
-     *
-     * @return mixed
-     */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): string
     {
         return $value->value;

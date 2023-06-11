@@ -17,11 +17,6 @@ final class ProjectNameType extends StringType
         return new ProjectName($value);
     }
 
-    /**
-     * @param ProjectName $value
-     *
-     * @return mixed
-     */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): string
     {
         return $value->value;

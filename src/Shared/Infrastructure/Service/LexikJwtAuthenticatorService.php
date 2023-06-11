@@ -17,18 +17,18 @@ use TaskManager\Shared\Infrastructure\ValueObject\SymfonyUser;
 
 final class LexikJwtAuthenticatorService implements AuthenticatorServiceInterface, EventSubscriberInterface
 {
-    private ?string $userId = null;
+    private string $userId;
     private string $pathRegexp;
 
     public function __construct(
         private readonly JWTTokenManagerInterface $tokenManager,
         private readonly TokenExtractorInterface $tokenExtractor,
-        private $path
+        private string $path
     ) {
         $this->configurePathRegexp();
     }
 
-    public function getUserId(): ?string
+    public function getUserId(): string
     {
         return $this->userId;
     }
@@ -81,7 +81,7 @@ final class LexikJwtAuthenticatorService implements AuthenticatorServiceInterfac
         }
     }
 
-    private function getUserIdClaim(array $payload): ?string
+    private function getUserIdClaim(array $payload): string
     {
         $idClaim = $this->tokenManager->getUserIdClaim();
         if (!isset($payload[$idClaim])) {

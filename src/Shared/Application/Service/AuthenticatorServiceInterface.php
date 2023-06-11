@@ -6,7 +6,7 @@ namespace TaskManager\Shared\Application\Service;
 
 interface AuthenticatorServiceInterface
 {
-    public function getUserId(): ?string;
+    public function getUserId(): string;
 
     public function getToken(string $id): string;
 }

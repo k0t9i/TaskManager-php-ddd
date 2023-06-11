@@ -17,11 +17,6 @@ final class UserPasswordType extends StringType
         return new UserPassword($value);
     }
 
-    /**
-     * @param UserPassword $value
-     *
-     * @return mixed
-     */
     public function convertToDatabaseValue($value, AbstractPlatform $platform): string
     {
         return $value->value;

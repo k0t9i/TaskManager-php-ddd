@@ -24,7 +24,7 @@ class UserRegisterValueResolverTest extends TestCase
         $this->faker = Factory::create();
     }
 
-    public function testResolveEmptyArgumentType()
+    public function testResolveEmptyArgumentType(): void
     {
         $resolver = new UserRegisterValueResolver(
             $this->getMockBuilder(ContentDecoderInterface::class)->getMock()
@@ -40,7 +40,7 @@ class UserRegisterValueResolverTest extends TestCase
         $this->assertEquals([], $result);
     }
 
-    public function testResolveUnsupportedArgumentType()
+    public function testResolveUnsupportedArgumentType(): void
     {
         $resolver = new UserRegisterValueResolver(
             $this->getMockBuilder(ContentDecoderInterface::class)->getMock()
@@ -59,7 +59,7 @@ class UserRegisterValueResolverTest extends TestCase
         $this->assertEquals([], $result);
     }
 
-    public function testResolve()
+    public function testResolve(): void
     {
         $content = $this->faker->regexify('.{255}');
         $email = $this->faker->email();
