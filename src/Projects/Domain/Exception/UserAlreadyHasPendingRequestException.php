@@ -6,14 +6,14 @@ namespace TaskManager\Projects\Domain\Exception;
 
 use TaskManager\Shared\Domain\Exception\DomainException;
 
-final class InvalidProjectStatusTransitionException extends DomainException
+final class UserAlreadyHasPendingRequestException extends DomainException
 {
-    public function __construct(string $fromStatus, string $toStatus)
+    public function __construct(string $id, string $projectId)
     {
         $message = sprintf(
-            'Project status "%s" cannot be changed to "%s"',
-            $fromStatus,
-            $toStatus
+            'User "%s" already has request to project "%s"',
+            $id,
+            $projectId
         );
         parent::__construct($message, self::CODE_FORBIDDEN);
     }

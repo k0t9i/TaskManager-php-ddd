@@ -6,12 +6,12 @@ namespace TaskManager\Projects\Domain\Exception;
 
 use TaskManager\Shared\Domain\Exception\DomainException;
 
-final class InvalidProjectStatusTransitionException extends DomainException
+final class InvalidProjectRequestStatusTransitionException extends DomainException
 {
     public function __construct(string $fromStatus, string $toStatus)
     {
         $message = sprintf(
-            'Project status "%s" cannot be changed to "%s"',
+            'Project request status "%s" cannot be changed to "%s"',
             $fromStatus,
             $toStatus
         );

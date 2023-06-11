@@ -11,10 +11,15 @@ use TaskManager\Projects\Domain\Event\ProjectOwnerWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectParticipantWasRemovedEvent;
 use TaskManager\Projects\Domain\Event\ProjectStatusWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectWasCreatedEvent;
+use TaskManager\Projects\Domain\Event\RequestStatusWasChangedEvent;
+use TaskManager\Projects\Domain\Event\RequestWasCreatedEvent;
 use TaskManager\Projects\Domain\Exception\ProjectParticipantDoesNotExistException;
+use TaskManager\Projects\Domain\Exception\RequestDoesNotExistException;
+use TaskManager\Projects\Domain\Exception\UserAlreadyHasPendingRequestException;
 use TaskManager\Projects\Domain\Exception\UserIsAlreadyProjectParticipantException;
 use TaskManager\Projects\Domain\ValueObject\ActiveProjectStatus;
 use TaskManager\Projects\Domain\ValueObject\ClosedProjectStatus;
+use TaskManager\Projects\Domain\ValueObject\ConfirmedRequestStatus;
 use TaskManager\Projects\Domain\ValueObject\ProjectDescription;
 use TaskManager\Projects\Domain\ValueObject\ProjectFinishDate;
 use TaskManager\Projects\Domain\ValueObject\ProjectId;
@@ -24,6 +29,9 @@ use TaskManager\Projects\Domain\ValueObject\ProjectOwner;
 use TaskManager\Projects\Domain\ValueObject\ProjectStatus;
 use TaskManager\Projects\Domain\ValueObject\ProjectUser;
 use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
+use TaskManager\Projects\Domain\ValueObject\RejectedRequestStatus;
+use TaskManager\Projects\Domain\ValueObject\RequestId;
+use TaskManager\Projects\Domain\ValueObject\RequestStatus;
 use TaskManager\Shared\Domain\Aggregate\AggregateRoot;
 use TaskManager\Shared\Domain\Equatable;
 
@@ -34,7 +42,8 @@ final class Project extends AggregateRoot
         private ProjectInformation $information,
         private ProjectStatus $status,
         private ProjectOwner $owner,
-        private Collection $participants
+        private Collection $participants,
+        private Collection $requests,
     ) {
     }
 
@@ -49,6 +58,7 @@ final class Project extends AggregateRoot
             $information,
             $status,
             $owner,
+            new ArrayCollection(),
             new ArrayCollection()
         );
 
@@ -138,6 +148,36 @@ final class Project extends AggregateRoot
         $this->removeParticipantInner($participant->id);
     }
 
+    public function createRequest(RequestId $id, ProjectUserId $userId): void
+    {
+        $this->status->ensureAllowsModification();
+        $this->owner->ensureUserIsNotOwner($userId);
+        $this->ensureUserIsNotParticipant($userId);
+        $this->ensureUserDoesNotHavePendingRequest($userId);
+
+        $request = Request::create($id, $userId);
+
+        $this->requests->add($request);
+
+        $this->registerEvent(new RequestWasCreatedEvent(
+            $this->id->value,
+            $id->value,
+            $userId->value,
+            (string) $request->getStatus()->getScalar(),
+            $request->getChangeDate()->getValue()
+        ));
+    }
+
+    public function confirmRequest(RequestId $id, ProjectUserId $currentUserId): void
+    {
+        $this->changeRequestStatus($id, new ConfirmedRequestStatus(), $currentUserId);
+    }
+
+    public function rejectRequest(RequestId $id, ProjectUserId $currentUserId): void
+    {
+        $this->changeRequestStatus($id, new RejectedRequestStatus(), $currentUserId);
+    }
+
     private function changeStatus(ProjectStatus $status, ProjectUserId $currentUserId): void
     {
         $this->status->ensureCanBeChangedTo($status);
@@ -183,6 +223,51 @@ final class Project extends AggregateRoot
     {
         return $this->participants->findFirst(function ($key, ProjectUser $participant) use ($userId) {
             return $participant->id->equals($userId);
+        });
+    }
+
+    private function changeRequestStatus(
+        RequestId $id,
+        RequestStatus $status,
+        ProjectUserId $currentUserId
+    ): void {
+        $this->status->ensureAllowsModification();
+        $this->owner->ensureUserIsOwner($currentUserId);
+        $request = $this->getRequest($id);
+        if (null === $request) {
+            throw new RequestDoesNotExistException($id->value, $this->id->value);
+        }
+
+        $request->changeStatus($status);
+
+        if ($status->isConfirmed()) {
+            $this->participants->add(new ProjectUser($request->getUserId()));
+        }
+
+        $this->registerEvent(new RequestStatusWasChangedEvent(
+            $this->id->value,
+            $request->getId()->value,
+            $request->getUserId()->value,
+            (string) $request->getStatus()->getScalar(),
+            $request->getChangeDate()->getValue()
+        ));
+    }
+
+    private function ensureUserDoesNotHavePendingRequest(ProjectUserId $userId): void
+    {
+        $request = $this->requests->findFirst(function ($key, Request $request) use ($userId) {
+            return $request->isPendingForUser($userId);
+        });
+
+        if (null !== $request) {
+            throw new UserAlreadyHasPendingRequestException($this->id->value, $userId->value);
+        }
+    }
+
+    private function getRequest(RequestId $requestId): ?Request
+    {
+        return $this->participants->findFirst(function ($key, Request $request) use ($requestId) {
+            return $request->getId()->equals($requestId);
         });
     }
 }
