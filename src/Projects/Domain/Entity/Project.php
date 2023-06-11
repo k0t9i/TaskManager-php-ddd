@@ -34,7 +34,7 @@ final class Project extends AggregateRoot
         private ProjectInformation $information,
         private ProjectStatus $status,
         private ProjectOwner $owner,
-        private readonly Collection $participants
+        private Collection $participants
     ) {
     }
 
