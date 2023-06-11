@@ -12,8 +12,11 @@ use TaskManager\Projects\Application\Command\ActivateProjectCommand;
 use TaskManager\Projects\Application\Command\ChangeProjectInformationCommand;
 use TaskManager\Projects\Application\Command\ChangeProjectOwnerCommand;
 use TaskManager\Projects\Application\Command\CloseProjectCommand;
+use TaskManager\Projects\Application\Command\ConfirmRequestCommand;
 use TaskManager\Projects\Application\Command\CreateProjectCommand;
+use TaskManager\Projects\Application\Command\CreateRequestCommand;
 use TaskManager\Projects\Application\Command\LeaveCommand;
+use TaskManager\Projects\Application\Command\RejectRequestCommand;
 use TaskManager\Projects\Application\Command\RemoveParticipantCommand;
 use TaskManager\Projects\Infrastructure\Service\DTO\ProjectInformationDTO;
 use TaskManager\Shared\Application\Bus\Command\CommandBusInterface;
@@ -103,6 +106,45 @@ final readonly class ProjectController
     public function leave(string $id): JsonResponse
     {
         $command = new LeaveCommand($id);
+
+        $this->commandBus->dispatch($command);
+
+        return new JsonResponse();
+    }
+
+    #[Route('/{id}/requests/', name: 'createRequest', methods: ['POST'])]
+    public function createRequest(string $id): JsonResponse
+    {
+        $command = new CreateRequestCommand(
+            $this->uuidGenerator->generate(),
+            $id
+        );
+
+        $this->commandBus->dispatch($command);
+
+        return new JsonResponse(['id' => $command->id], Response::HTTP_CREATED);
+    }
+
+    #[Route('/{id}/requests/{requestId}/confirm/', name: 'confirmRequest', methods: ['PATCH'])]
+    public function confirmRequest(string $id, string $requestId): JsonResponse
+    {
+        $command = new ConfirmRequestCommand(
+            $requestId,
+            $id
+        );
+
+        $this->commandBus->dispatch($command);
+
+        return new JsonResponse();
+    }
+
+    #[Route('/{id}/requests/{requestId}/reject/', name: 'rejectRequest', methods: ['PATCH'])]
+    public function rejectRequest(string $id, string $requestId): JsonResponse
+    {
+        $command = new RejectRequestCommand(
+            $requestId,
+            $id
+        );
 
         $this->commandBus->dispatch($command);
 
