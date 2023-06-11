@@ -4,23 +4,33 @@ declare(strict_types=1);
 
 namespace TaskManager\Tests\Projects\Domain\Entity;
 
+use Doctrine\Common\Collections\Collection;
 use Faker\Factory;
 use Faker\Generator;
 use PHPUnit\Framework\TestCase;
+use ReflectionException;
+use ReflectionObject;
 use TaskManager\Projects\Domain\Entity\Project;
+use TaskManager\Projects\Domain\Entity\Request;
 use TaskManager\Projects\Domain\Event\ProjectInformationWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectOwnerWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectParticipantWasRemovedEvent;
 use TaskManager\Projects\Domain\Event\ProjectStatusWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectWasCreatedEvent;
+use TaskManager\Projects\Domain\Event\RequestStatusWasChangedEvent;
+use TaskManager\Projects\Domain\Event\RequestWasCreatedEvent;
 use TaskManager\Projects\Domain\Exception\InvalidProjectStatusTransitionException;
 use TaskManager\Projects\Domain\Exception\ProjectModificationIsNotAllowedException;
 use TaskManager\Projects\Domain\Exception\ProjectParticipantDoesNotExistException;
+use TaskManager\Projects\Domain\Exception\RequestDoesNotExistException;
+use TaskManager\Projects\Domain\Exception\UserAlreadyHasPendingRequestException;
 use TaskManager\Projects\Domain\Exception\UserIsAlreadyProjectOwnerException;
 use TaskManager\Projects\Domain\Exception\UserIsAlreadyProjectParticipantException;
 use TaskManager\Projects\Domain\Exception\UserIsNotProjectOwnerException;
 use TaskManager\Projects\Domain\ValueObject\ActiveProjectStatus;
 use TaskManager\Projects\Domain\ValueObject\ClosedProjectStatus;
+use TaskManager\Projects\Domain\ValueObject\ConfirmedRequestStatus;
+use TaskManager\Projects\Domain\ValueObject\PendingRequestStatus;
 use TaskManager\Projects\Domain\ValueObject\ProjectDescription;
 use TaskManager\Projects\Domain\ValueObject\ProjectFinishDate;
 use TaskManager\Projects\Domain\ValueObject\ProjectInformation;
@@ -29,6 +39,10 @@ use TaskManager\Projects\Domain\ValueObject\ProjectOwner;
 use TaskManager\Projects\Domain\ValueObject\ProjectStatus;
 use TaskManager\Projects\Domain\ValueObject\ProjectUser;
 use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
+use TaskManager\Projects\Domain\ValueObject\RejectedRequestStatus;
+use TaskManager\Projects\Domain\ValueObject\RequestChangeDate;
+use TaskManager\Projects\Domain\ValueObject\RequestId;
+use TaskManager\Projects\Domain\ValueObject\RequestStatus;
 
 class ProjectTest extends TestCase
 {
@@ -245,11 +259,7 @@ class ProjectTest extends TestCase
         $builder = new ProjectBuilder($this->faker);
         $project = $builder->build();
 
-        $this->expectException(UserIsAlreadyProjectOwnerException::class);
-        $this->expectExceptionMessage(sprintf(
-            'User "%s" is already project owner',
-            $builder->getOwner()->id->value
-        ));
+        $this->expectUserIsAlreadyProjectOwnerException($builder->getOwner()->id);
 
         $project->changeOwner($builder->getOwner(), $builder->getOwner()->id);
     }
@@ -263,11 +273,7 @@ class ProjectTest extends TestCase
             ))
             ->build();
 
-        $this->expectException(UserIsAlreadyProjectParticipantException::class);
-        $this->expectExceptionMessage(sprintf(
-            'User "%s" is already project participant',
-            $builder->getParticipants()[0]->id
-        ));
+        $this->expectUserIsAlreadyProjectParticipantException($builder->getParticipants()[0]->id);
 
         $project->changeOwner(new ProjectOwner($builder->getParticipants()[0]->id), $builder->getOwner()->id);
     }
@@ -346,7 +352,7 @@ class ProjectTest extends TestCase
         $project->removeParticipant($builder->getParticipants()[0], $builder->getOwner()->id);
     }
 
-    public function testRemoveNonExistenceParticipant()
+    public function testRemoveNonExistingParticipant()
     {
         $builder = new ProjectBuilder($this->faker);
         $otherUser = new ProjectUser(new ProjectUserId($this->faker->uuid()));
@@ -411,6 +417,232 @@ class ProjectTest extends TestCase
         $project->leaveProject($otherUser);
     }
 
+    public function testCreateRequest()
+    {
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder->build();
+        $requestId = new RequestId($this->faker->uuid());
+        $userId = new ProjectUserId($this->faker->uuid());
+
+        $request = $project->createRequest($requestId, $userId);
+        $events = $project->releaseEvents();
+
+        $this->assertInstanceOf(Request::class, $request);
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(RequestWasCreatedEvent::class, $events[0]);
+        $this->assertEquals($builder->getId()->value, $events[0]->getAggregateId());
+        $this->assertEquals([
+            'requestId' => $request->getId()->value,
+            'userId' => $request->getUserId()->value,
+            'status' => $request->getStatus()->getScalar(),
+            'changeDate' => $request->getChangeDate()->getValue(),
+        ], $events[0]->toPrimitives());
+        $this->assertEquals($requestId, $request->getId());
+        $this->assertEquals($userId, $request->getUserId());
+    }
+
+    public function testCreateRequestInClosedProject()
+    {
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder
+            ->withStatus(new ClosedProjectStatus())
+            ->build();
+        $requestId = new RequestId($this->faker->uuid());
+        $userId = new ProjectUserId($this->faker->uuid());
+
+        $this->expectProjectModificationIsNotAllowedException();
+
+        $project->createRequest($requestId, $userId);
+    }
+
+    public function testCreateRequestByProjectOwner()
+    {
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder->build();
+        $requestId = new RequestId($this->faker->uuid());
+
+        $this->expectUserIsAlreadyProjectOwnerException($builder->getOwner()->id);
+
+        $project->createRequest($requestId, $builder->getOwner()->id);
+    }
+
+    public function testCreateRequestByProjectParticipant()
+    {
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder
+            ->withParticipant(new ProjectUser(
+                new ProjectUserId($this->faker->uuid())
+            ))
+            ->build();
+        $requestId = new RequestId($this->faker->uuid());
+
+        $this->expectUserIsAlreadyProjectParticipantException($builder->getParticipants()[0]->id);
+
+        $project->createRequest($requestId, $builder->getParticipants()[0]->id);
+    }
+
+    public function testCreateRequestByProjectParticipantWithPendingRequest()
+    {
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder
+            ->withRequest(new Request(
+                new RequestId($this->faker->uuid()),
+                new ProjectUserId($this->faker->uuid()),
+                new PendingRequestStatus(),
+                new RequestChangeDate()
+            ))
+            ->build();
+        $requestId = new RequestId($this->faker->uuid());
+
+        $this->expectException(UserAlreadyHasPendingRequestException::class);
+        $this->expectExceptionMessage(sprintf(
+            'User "%s" already has request to project "%s"',
+            $builder->getRequests()[0]->getUserId()->value,
+            $builder->getId()->value
+        ));
+
+        $project->createRequest($requestId, $builder->getRequests()[0]->getUserId());
+    }
+
+    public function testRejectRequest()
+    {
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder
+            ->withRequest(new Request(
+                new RequestId($this->faker->uuid()),
+                new ProjectUserId($this->faker->uuid()),
+                new PendingRequestStatus(),
+                new RequestChangeDate()
+            ))
+            ->build();
+
+        $project->rejectRequest(
+            $builder->getRequests()[0]->getId(),
+            $builder->getOwner()->id
+        );
+        $events = $project->releaseEvents();
+
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(RequestStatusWasChangedEvent::class, $events[0]);
+        $this->assertEquals($builder->getId()->value, $events[0]->getAggregateId());
+        $this->assertEquals([
+            'requestId' => $builder->getRequests()[0]->getId()->value,
+            'userId' => $builder->getRequests()[0]->getUserId()->value,
+            'status' => RequestStatus::STATUS_REJECTED,
+            'changeDate' => $builder->getRequests()[0]->getChangeDate()->getValue(),
+        ], $events[0]->toPrimitives());
+        $this->assertInstanceOf(RejectedRequestStatus::class, $builder->getRequests()[0]->getStatus());
+    }
+
+    /**
+     * @return void
+     * @throws ReflectionException
+     */
+    public function testConfirmRequest()
+    {
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder
+            ->withRequest(new Request(
+                new RequestId($this->faker->uuid()),
+                new ProjectUserId($this->faker->uuid()),
+                new PendingRequestStatus(),
+                new RequestChangeDate()
+            ))
+            ->build();
+        $reflection = new ReflectionObject($project);
+
+        $project->confirmRequest(
+            $builder->getRequests()[0]->getId(),
+            $builder->getOwner()->id
+        );
+        /** @var Collection $participantCollection */
+        $participantCollection = $reflection->getProperty('participants')->getValue($project);
+        /** @var ProjectUser[] $participants */
+        $participants = $participantCollection->toArray();
+        $events = $project->releaseEvents();
+
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(RequestStatusWasChangedEvent::class, $events[0]);
+        $this->assertEquals($builder->getId()->value, $events[0]->getAggregateId());
+        $this->assertEquals([
+            'requestId' => $builder->getRequests()[0]->getId()->value,
+            'userId' => $builder->getRequests()[0]->getUserId()->value,
+            'status' => RequestStatus::STATUS_CONFIRMED,
+            'changeDate' => $builder->getRequests()[0]->getChangeDate()->getValue(),
+        ], $events[0]->toPrimitives());
+        $this->assertInstanceOf(ConfirmedRequestStatus::class, $builder->getRequests()[0]->getStatus());
+        $this->assertCount(1, $participants);
+        $this->assertEquals($builder->getRequests()[0]->getUserId(), $participants[0]->id);
+    }
+
+    public function testChangeRequestStatusInClosedProject()
+    {
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder
+            ->withStatus(new ClosedProjectStatus())
+            ->withRequest(new Request(
+                new RequestId($this->faker->uuid()),
+                new ProjectUserId($this->faker->uuid()),
+                new PendingRequestStatus(),
+                new RequestChangeDate()
+            ))
+            ->build();
+
+        $this->expectProjectModificationIsNotAllowedException();
+
+        $project->rejectRequest(
+            $builder->getRequests()[0]->getId(),
+            $builder->getOwner()->id
+        );
+    }
+
+    public function testChangeRequestStatusByNonOwner()
+    {
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder
+            ->withRequest(new Request(
+                new RequestId($this->faker->uuid()),
+                new ProjectUserId($this->faker->uuid()),
+                new PendingRequestStatus(),
+                new RequestChangeDate()
+            ))
+            ->build();
+        $otherUserId = new ProjectUserId($this->faker->uuid());
+
+        $this->expectUserIsNotProjectOwnerException($otherUserId);
+
+        $project->rejectRequest(
+            $builder->getRequests()[0]->getId(),
+            $otherUserId
+        );
+    }
+
+    public function testChangeNonExistingRequestStatus()
+    {
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder
+            ->withRequest(new Request(
+                new RequestId($this->faker->uuid()),
+                new ProjectUserId($this->faker->uuid()),
+                new PendingRequestStatus(),
+                new RequestChangeDate()
+            ))
+            ->build();
+        $requestId = new RequestId($this->faker->uuid());
+
+        $this->expectException(RequestDoesNotExistException::class);
+        $this->expectExceptionMessage(sprintf(
+            'Request "%s" to project "%s" doesn\'t exist',
+            $requestId->value,
+            $builder->getId()->value
+        ));
+
+        $project->rejectRequest(
+            $requestId,
+            $builder->getOwner()->id
+        );
+    }
+
     private function expectProjectModificationIsNotAllowedException(): void
     {
         $this->expectException(ProjectModificationIsNotAllowedException::class);
@@ -435,6 +667,24 @@ class ProjectTest extends TestCase
         $this->expectExceptionMessage($message = sprintf(
             'Project participant "%s" doesn\'t exist',
             $user->id->value
+        ));
+    }
+
+    private function expectUserIsAlreadyProjectOwnerException(ProjectUserId $id): void
+    {
+        $this->expectException(UserIsAlreadyProjectOwnerException::class);
+        $this->expectExceptionMessage(sprintf(
+            'User "%s" is already project owner',
+            $id->value
+        ));
+    }
+
+    private function expectUserIsAlreadyProjectParticipantException(ProjectUserId $id): void
+    {
+        $this->expectException(UserIsAlreadyProjectParticipantException::class);
+        $this->expectExceptionMessage(sprintf(
+            'User "%s" is already project participant',
+            $id->value
         ));
     }
 }

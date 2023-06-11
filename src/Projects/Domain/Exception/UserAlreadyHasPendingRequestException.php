@@ -8,11 +8,11 @@ use TaskManager\Shared\Domain\Exception\DomainException;
 
 final class UserAlreadyHasPendingRequestException extends DomainException
 {
-    public function __construct(string $id, string $projectId)
+    public function __construct(string $userId, string $projectId)
     {
         $message = sprintf(
             'User "%s" already has request to project "%s"',
-            $id,
+            $userId,
             $projectId
         );
         parent::__construct($message, self::CODE_FORBIDDEN);

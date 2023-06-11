@@ -148,7 +148,7 @@ final class Project extends AggregateRoot
         $this->removeParticipantInner($participant->id);
     }
 
-    public function createRequest(RequestId $id, ProjectUserId $userId): void
+    public function createRequest(RequestId $id, ProjectUserId $userId): Request
     {
         $this->status->ensureAllowsModification();
         $this->owner->ensureUserIsNotOwner($userId);
@@ -166,6 +166,8 @@ final class Project extends AggregateRoot
             (string) $request->getStatus()->getScalar(),
             $request->getChangeDate()->getValue()
         ));
+
+        return $request;
     }
 
     public function confirmRequest(RequestId $id, ProjectUserId $currentUserId): void
@@ -260,13 +262,13 @@ final class Project extends AggregateRoot
         });
 
         if (null !== $request) {
-            throw new UserAlreadyHasPendingRequestException($this->id->value, $userId->value);
+            throw new UserAlreadyHasPendingRequestException($userId->value, $this->id->value);
         }
     }
 
     private function getRequest(RequestId $requestId): ?Request
     {
-        return $this->participants->findFirst(function ($key, Request $request) use ($requestId) {
+        return $this->requests->findFirst(function ($key, Request $request) use ($requestId) {
             return $request->getId()->equals($requestId);
         });
     }
