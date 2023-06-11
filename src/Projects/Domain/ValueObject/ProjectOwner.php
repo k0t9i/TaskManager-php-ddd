@@ -11,7 +11,7 @@ use TaskManager\Shared\Domain\Equatable;
 final readonly class ProjectOwner implements Equatable
 {
     public function __construct(
-        public ProjectUserId $userId
+        public ProjectUserId $id
     ) {
     }
 
@@ -31,12 +31,12 @@ final readonly class ProjectOwner implements Equatable
 
     public function userIsOwner(ProjectUserId $userId): bool
     {
-        return $this->userId->equals($userId);
+        return $this->id->equals($userId);
     }
 
     public function equals(Equatable $other): bool
     {
         return $other instanceof self
-            && $other->userId->equals($this->userId);
+            && $other->id->equals($this->id);
     }
 }

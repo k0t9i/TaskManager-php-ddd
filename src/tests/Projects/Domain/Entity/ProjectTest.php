@@ -4,17 +4,21 @@ declare(strict_types=1);
 
 namespace TaskManager\Tests\Projects\Domain\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Faker\Factory;
 use Faker\Generator;
 use PHPUnit\Framework\TestCase;
 use TaskManager\Projects\Domain\Entity\Project;
 use TaskManager\Projects\Domain\Event\ProjectInformationWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectOwnerWasChangedEvent;
+use TaskManager\Projects\Domain\Event\ProjectParticipantWasRemovedEvent;
 use TaskManager\Projects\Domain\Event\ProjectStatusWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectWasCreatedEvent;
 use TaskManager\Projects\Domain\Exception\InvalidProjectStatusTransitionException;
 use TaskManager\Projects\Domain\Exception\ProjectModificationIsNotAllowedException;
+use TaskManager\Projects\Domain\Exception\ProjectParticipantDoesNotExistException;
 use TaskManager\Projects\Domain\Exception\UserIsAlreadyProjectOwnerException;
+use TaskManager\Projects\Domain\Exception\UserIsAlreadyProjectParticipantException;
 use TaskManager\Projects\Domain\Exception\UserIsNotProjectOwnerException;
 use TaskManager\Projects\Domain\ValueObject\ActiveProjectStatus;
 use TaskManager\Projects\Domain\ValueObject\ClosedProjectStatus;
@@ -25,6 +29,7 @@ use TaskManager\Projects\Domain\ValueObject\ProjectInformation;
 use TaskManager\Projects\Domain\ValueObject\ProjectName;
 use TaskManager\Projects\Domain\ValueObject\ProjectOwner;
 use TaskManager\Projects\Domain\ValueObject\ProjectStatus;
+use TaskManager\Projects\Domain\ValueObject\ProjectUser;
 use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
 
 class ProjectTest extends TestCase
@@ -58,7 +63,7 @@ class ProjectTest extends TestCase
             'description' => $information->description,
             'finishDate' => $information->finishDate,
             'status' => ProjectStatus::STATUS_ACTIVE,
-            'ownerId' => $owner->userId->value,
+            'ownerId' => $owner->id->value,
         ], $events[0]->toPrimitives());
     }
 
@@ -77,13 +82,19 @@ class ProjectTest extends TestCase
         );
         $owner = new ProjectOwner(new ProjectUserId($this->faker->uuid()));
 
-        $project = new Project($id, $information, new ActiveProjectStatus(), $owner);
+        $project = new Project(
+            $id,
+            $information,
+            new ActiveProjectStatus(),
+            $owner,
+            new ArrayCollection()
+        );
 
         $project->changeInformation(
             $newInformation->name,
             $newInformation->description,
             $newInformation->finishDate,
-            $owner->userId
+            $owner->id
         );
 
         $events = $project->releaseEvents();
@@ -100,7 +111,7 @@ class ProjectTest extends TestCase
             null,
             null,
             null,
-            $owner->userId
+            $owner->id
         );
         $events = $project->releaseEvents();
         $this->assertCount(0, $events);
@@ -109,7 +120,7 @@ class ProjectTest extends TestCase
             $newInformation->name,
             $newInformation->description,
             $newInformation->finishDate,
-            $owner->userId
+            $owner->id
         );
         $events = $project->releaseEvents();
         $this->assertCount(0, $events);
@@ -118,7 +129,7 @@ class ProjectTest extends TestCase
             $information->name,
             null,
             $newInformation->finishDate,
-            $owner->userId
+            $owner->id
         );
         $events = $project->releaseEvents();
         $this->assertCount(1, $events);
@@ -144,7 +155,13 @@ class ProjectTest extends TestCase
         );
         $owner = new ProjectOwner(new ProjectUserId($this->faker->uuid()));
         $otherUserId = new ProjectUserId($this->faker->uuid());
-        $project = new Project($id, $information, new ActiveProjectStatus(), $owner);
+        $project = new Project(
+            $id,
+            $information,
+            new ActiveProjectStatus(),
+            $owner,
+            new ArrayCollection()
+        );
 
         $this->expectException(UserIsNotProjectOwnerException::class);
         $this->expectExceptionMessage(sprintf(
@@ -174,7 +191,13 @@ class ProjectTest extends TestCase
             new ProjectFinishDate(),
         );
         $owner = new ProjectOwner(new ProjectUserId($this->faker->uuid()));
-        $project = new Project($id, $information, new ClosedProjectStatus(), $owner);
+        $project = new Project(
+            $id,
+            $information,
+            new ClosedProjectStatus(),
+            $owner,
+            new ArrayCollection()
+        );
 
         $this->expectException(ProjectModificationIsNotAllowedException::class);
         $this->expectExceptionMessage(sprintf(
@@ -186,7 +209,7 @@ class ProjectTest extends TestCase
             $newInformation->name,
             $newInformation->description,
             $newInformation->finishDate,
-            $owner->userId
+            $owner->id
         );
     }
 
@@ -199,9 +222,15 @@ class ProjectTest extends TestCase
             new ProjectFinishDate(),
         );
         $owner = new ProjectOwner(new ProjectUserId($this->faker->uuid()));
-        $project = new Project($id, $information, new ActiveProjectStatus(), $owner);
+        $project = new Project(
+            $id,
+            $information,
+            new ActiveProjectStatus(),
+            $owner,
+            new ArrayCollection()
+        );
 
-        $project->close($owner->userId);
+        $project->close($owner->id);
         $events = $project->releaseEvents();
 
         $this->assertCount(1, $events);
@@ -221,9 +250,15 @@ class ProjectTest extends TestCase
             new ProjectFinishDate(),
         );
         $owner = new ProjectOwner(new ProjectUserId($this->faker->uuid()));
-        $project = new Project($id, $information, new ClosedProjectStatus(), $owner);
+        $project = new Project(
+            $id,
+            $information,
+            new ClosedProjectStatus(),
+            $owner,
+            new ArrayCollection()
+        );
 
-        $project->activate($owner->userId);
+        $project->activate($owner->id);
         $events = $project->releaseEvents();
 
         $this->assertCount(1, $events);
@@ -243,7 +278,13 @@ class ProjectTest extends TestCase
             new ProjectFinishDate(),
         );
         $owner = new ProjectOwner(new ProjectUserId($this->faker->uuid()));
-        $project = new Project($id, $information, new ActiveProjectStatus(), $owner);
+        $project = new Project(
+            $id,
+            $information,
+            new ActiveProjectStatus(),
+            $owner,
+            new ArrayCollection()
+        );
 
         $this->expectException(InvalidProjectStatusTransitionException::class);
         $this->expectExceptionMessage(sprintf(
@@ -252,7 +293,7 @@ class ProjectTest extends TestCase
             ActiveProjectStatus::class
         ));
 
-        $project->activate($owner->userId);
+        $project->activate($owner->id);
     }
 
     public function testChangeStatusByNonOwner()
@@ -265,7 +306,13 @@ class ProjectTest extends TestCase
         );
         $owner = new ProjectOwner(new ProjectUserId($this->faker->uuid()));
         $otherUserId = new ProjectUserId($this->faker->uuid());
-        $project = new Project($id, $information, new ActiveProjectStatus(), $owner);
+        $project = new Project(
+            $id,
+            $information,
+            new ActiveProjectStatus(),
+            $owner,
+            new ArrayCollection()
+        );
 
         $this->expectException(UserIsNotProjectOwnerException::class);
         $this->expectExceptionMessage(sprintf(
@@ -286,9 +333,15 @@ class ProjectTest extends TestCase
         );
         $owner = new ProjectOwner(new ProjectUserId($this->faker->uuid()));
         $otherUserId = new ProjectUserId($this->faker->uuid());
-        $project = new Project($id, $information, new ActiveProjectStatus(), $owner);
+        $project = new Project(
+            $id,
+            $information,
+            new ActiveProjectStatus(),
+            $owner,
+            new ArrayCollection()
+        );
 
-        $project->changeOwner(new ProjectOwner($otherUserId), $owner->userId);
+        $project->changeOwner(new ProjectOwner($otherUserId), $owner->id);
         $events = $project->releaseEvents();
 
         $this->assertCount(1, $events);
@@ -308,15 +361,49 @@ class ProjectTest extends TestCase
             new ProjectFinishDate(),
         );
         $owner = new ProjectOwner(new ProjectUserId($this->faker->uuid()));
-        $project = new Project($id, $information, new ActiveProjectStatus(), $owner);
+        $project = new Project(
+            $id,
+            $information,
+            new ActiveProjectStatus(),
+            $owner,
+            new ArrayCollection()
+        );
 
         $this->expectException(UserIsAlreadyProjectOwnerException::class);
         $this->expectExceptionMessage(sprintf(
             'User "%s" is already project owner',
-            $owner->userId->value
+            $owner->id->value
         ));
 
-        $project->changeOwner($owner, $owner->userId);
+        $project->changeOwner($owner, $owner->id);
+    }
+
+    public function testChangeOwnerToAlreadyParticipant()
+    {
+        $id = new ProjectId($this->faker->uuid());
+        $information = new ProjectInformation(
+            new ProjectName($this->faker->regexify('.{255}')),
+            new ProjectDescription($this->faker->regexify('.{255}')),
+            new ProjectFinishDate(),
+        );
+        $owner = new ProjectOwner(new ProjectUserId($this->faker->uuid()));
+        $participant = new ProjectUser(new ProjectUserId($this->faker->uuid()));
+        $participants = new ArrayCollection([$participant]);
+        $project = new Project(
+            $id,
+            $information,
+            new ActiveProjectStatus(),
+            $owner,
+            $participants
+        );
+
+        $this->expectException(UserIsAlreadyProjectParticipantException::class);
+        $this->expectExceptionMessage(sprintf(
+            'User "%s" is already project participant',
+            $participant->id
+        ));
+
+        $project->changeOwner(new ProjectOwner($participant->id), $owner->id);
     }
 
     public function testChangeOwnerByNonOwner()
@@ -329,7 +416,13 @@ class ProjectTest extends TestCase
         );
         $owner = new ProjectOwner(new ProjectUserId($this->faker->uuid()));
         $otherUserId = new ProjectUserId($this->faker->uuid());
-        $project = new Project($id, $information, new ActiveProjectStatus(), $owner);
+        $project = new Project(
+            $id,
+            $information,
+            new ActiveProjectStatus(),
+            $owner,
+            new ArrayCollection()
+        );
 
         $this->expectException(UserIsNotProjectOwnerException::class);
         $this->expectExceptionMessage(sprintf(
@@ -350,7 +443,13 @@ class ProjectTest extends TestCase
         );
         $owner = new ProjectOwner(new ProjectUserId($this->faker->uuid()));
         $otherUserId = new ProjectUserId($this->faker->uuid());
-        $project = new Project($id, $information, new ClosedProjectStatus(), $owner);
+        $project = new Project(
+            $id,
+            $information,
+            new ClosedProjectStatus(),
+            $owner,
+            new ArrayCollection()
+        );
 
         $this->expectException(ProjectModificationIsNotAllowedException::class);
         $this->expectExceptionMessage(sprintf(
@@ -358,6 +457,209 @@ class ProjectTest extends TestCase
             ClosedProjectStatus::class
         ));
 
-        $project->changeOwner(new ProjectOwner($otherUserId), $owner->userId);
+        $project->changeOwner(new ProjectOwner($otherUserId), $owner->id);
+    }
+
+    public function testRemoveParticipant()
+    {
+        $id = new ProjectId($this->faker->uuid());
+        $information = new ProjectInformation(
+            new ProjectName($this->faker->regexify('.{255}')),
+            new ProjectDescription($this->faker->regexify('.{255}')),
+            new ProjectFinishDate(),
+        );
+        $owner = new ProjectOwner(new ProjectUserId($this->faker->uuid()));
+        $participant = new ProjectUser(new ProjectUserId($this->faker->uuid()));
+        $participants = new ArrayCollection([$participant]);
+        $project = new Project(
+            $id,
+            $information,
+            new ActiveProjectStatus(),
+            $owner,
+            $participants
+        );
+
+        $project->removeParticipant($participant, $owner->id);
+        $events = $project->releaseEvents();
+
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(ProjectParticipantWasRemovedEvent::class, $events[0]);
+        $this->assertEquals($id->value, $events[0]->getAggregateId());
+        $this->assertEquals([
+            'participantId' => $participant->id->value,
+        ], $events[0]->toPrimitives());
+    }
+
+    public function testRemoveParticipantByNonOwner()
+    {
+        $id = new ProjectId($this->faker->uuid());
+        $information = new ProjectInformation(
+            new ProjectName($this->faker->regexify('.{255}')),
+            new ProjectDescription($this->faker->regexify('.{255}')),
+            new ProjectFinishDate(),
+        );
+        $owner = new ProjectOwner(new ProjectUserId($this->faker->uuid()));
+        $otherUserId = new ProjectUserId($this->faker->uuid());
+        $participant = new ProjectUser(new ProjectUserId($this->faker->uuid()));
+        $participants = new ArrayCollection([$participant]);
+        $project = new Project(
+            $id,
+            $information,
+            new ActiveProjectStatus(),
+            $owner,
+            $participants
+        );
+
+        $this->expectException(UserIsNotProjectOwnerException::class);
+        $this->expectExceptionMessage(sprintf(
+            'User "%s" is not project owner',
+            $otherUserId->value
+        ));
+
+        $project->removeParticipant($participant, $otherUserId);
+    }
+
+    public function testRemoveParticipantFromClosedProject()
+    {
+        $id = new ProjectId($this->faker->uuid());
+        $information = new ProjectInformation(
+            new ProjectName($this->faker->regexify('.{255}')),
+            new ProjectDescription($this->faker->regexify('.{255}')),
+            new ProjectFinishDate(),
+        );
+        $owner = new ProjectOwner(new ProjectUserId($this->faker->uuid()));
+        $participant = new ProjectUser(new ProjectUserId($this->faker->uuid()));
+        $participants = new ArrayCollection([$participant]);
+        $project = new Project(
+            $id,
+            $information,
+            new ClosedProjectStatus(),
+            $owner,
+            $participants
+        );
+
+        $this->expectException(ProjectModificationIsNotAllowedException::class);
+        $this->expectExceptionMessage(sprintf(
+            'Project modification is not allowed when status is "%s"',
+            ClosedProjectStatus::class
+        ));
+
+        $project->removeParticipant($participant, $owner->id);
+    }
+
+    public function testRemoveNonExistenceParticipant()
+    {
+        $id = new ProjectId($this->faker->uuid());
+        $information = new ProjectInformation(
+            new ProjectName($this->faker->regexify('.{255}')),
+            new ProjectDescription($this->faker->regexify('.{255}')),
+            new ProjectFinishDate(),
+        );
+        $owner = new ProjectOwner(new ProjectUserId($this->faker->uuid()));
+        $otherUser = new ProjectUser(new ProjectUserId($this->faker->uuid()));
+        $participant = new ProjectUser(new ProjectUserId($this->faker->uuid()));
+        $participants = new ArrayCollection([$participant]);
+        $project = new Project(
+            $id,
+            $information,
+            new ActiveProjectStatus(),
+            $owner,
+            $participants
+        );
+
+        $this->expectException(ProjectParticipantDoesNotExistException::class);
+        $this->expectExceptionMessage($message = sprintf(
+            'Project participant "%s" doesn\'t exist',
+            $otherUser->id->value
+        ));
+
+        $project->removeParticipant($otherUser, $owner->id);
+    }
+
+    public function testLeaveProject()
+    {
+        $id = new ProjectId($this->faker->uuid());
+        $information = new ProjectInformation(
+            new ProjectName($this->faker->regexify('.{255}')),
+            new ProjectDescription($this->faker->regexify('.{255}')),
+            new ProjectFinishDate(),
+        );
+        $owner = new ProjectOwner(new ProjectUserId($this->faker->uuid()));
+        $participant = new ProjectUser(new ProjectUserId($this->faker->uuid()));
+        $participants = new ArrayCollection([$participant]);
+        $project = new Project(
+            $id,
+            $information,
+            new ActiveProjectStatus(),
+            $owner,
+            $participants
+        );
+
+        $project->leaveProject($participant);
+        $events = $project->releaseEvents();
+
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(ProjectParticipantWasRemovedEvent::class, $events[0]);
+        $this->assertEquals($id->value, $events[0]->getAggregateId());
+        $this->assertEquals([
+            'participantId' => $participant->id->value,
+        ], $events[0]->toPrimitives());
+    }
+
+    public function testLeaveClosedProject()
+    {
+        $id = new ProjectId($this->faker->uuid());
+        $information = new ProjectInformation(
+            new ProjectName($this->faker->regexify('.{255}')),
+            new ProjectDescription($this->faker->regexify('.{255}')),
+            new ProjectFinishDate(),
+        );
+        $owner = new ProjectOwner(new ProjectUserId($this->faker->uuid()));
+        $participant = new ProjectUser(new ProjectUserId($this->faker->uuid()));
+        $participants = new ArrayCollection([$participant]);
+        $project = new Project(
+            $id,
+            $information,
+            new ClosedProjectStatus(),
+            $owner,
+            $participants
+        );
+
+        $this->expectException(ProjectModificationIsNotAllowedException::class);
+        $this->expectExceptionMessage(sprintf(
+            'Project modification is not allowed when status is "%s"',
+            ClosedProjectStatus::class
+        ));
+
+        $project->leaveProject($participant);
+    }
+
+    public function testLeaveProjectByNonParticipant()
+    {
+        $id = new ProjectId($this->faker->uuid());
+        $information = new ProjectInformation(
+            new ProjectName($this->faker->regexify('.{255}')),
+            new ProjectDescription($this->faker->regexify('.{255}')),
+            new ProjectFinishDate(),
+        );
+        $owner = new ProjectOwner(new ProjectUserId($this->faker->uuid()));
+        $otherUser = new ProjectUser(new ProjectUserId($this->faker->uuid()));
+        $participant = new ProjectUser(new ProjectUserId($this->faker->uuid()));
+        $participants = new ArrayCollection([$participant]);
+        $project = new Project(
+            $id,
+            $information,
+            new ActiveProjectStatus(),
+            $owner,
+            $participants
+        );
+
+        $this->expectException(ProjectParticipantDoesNotExistException::class);
+        $this->expectExceptionMessage($message = sprintf(
+            'Project participant "%s" doesn\'t exist',
+            $otherUser->id->value
+        ));
+
+        $project->leaveProject($otherUser);
     }
 }

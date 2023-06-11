@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace TaskManager\Projects\Domain\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use TaskManager\Projects\Domain\Event\ProjectInformationWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectOwnerWasChangedEvent;
+use TaskManager\Projects\Domain\Event\ProjectParticipantWasRemovedEvent;
 use TaskManager\Projects\Domain\Event\ProjectStatusWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectWasCreatedEvent;
+use TaskManager\Projects\Domain\Exception\ProjectParticipantDoesNotExistException;
+use TaskManager\Projects\Domain\Exception\UserIsAlreadyProjectParticipantException;
 use TaskManager\Projects\Domain\ValueObject\ActiveProjectStatus;
 use TaskManager\Projects\Domain\ValueObject\ClosedProjectStatus;
 use TaskManager\Projects\Domain\ValueObject\ProjectDescription;
@@ -17,6 +22,7 @@ use TaskManager\Projects\Domain\ValueObject\ProjectInformation;
 use TaskManager\Projects\Domain\ValueObject\ProjectName;
 use TaskManager\Projects\Domain\ValueObject\ProjectOwner;
 use TaskManager\Projects\Domain\ValueObject\ProjectStatus;
+use TaskManager\Projects\Domain\ValueObject\ProjectUser;
 use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
 use TaskManager\Shared\Domain\Aggregate\AggregateRoot;
 use TaskManager\Shared\Domain\Equatable;
@@ -27,7 +33,8 @@ final class Project extends AggregateRoot
         private readonly ProjectId $id,
         private ProjectInformation $information,
         private ProjectStatus $status,
-        private ProjectOwner $owner
+        private ProjectOwner $owner,
+        private readonly Collection $participants
     ) {
     }
 
@@ -41,7 +48,8 @@ final class Project extends AggregateRoot
             $id,
             $information,
             $status,
-            $owner
+            $owner,
+            new ArrayCollection()
         );
 
         $project->registerEvent(new ProjectWasCreatedEvent(
@@ -50,7 +58,7 @@ final class Project extends AggregateRoot
             $information->description->value,
             $information->finishDate->getValue(),
             (string) $status->getScalar(),
-            $owner->userId->value
+            $owner->id->value
         ));
 
         return $project;
@@ -98,14 +106,15 @@ final class Project extends AggregateRoot
         $this->status->ensureAllowsModification();
         $this->owner->ensureUserIsOwner($currentUserId);
 
-        $this->owner->ensureUserIsNotOwner($owner->userId);
-        //TODO add checks for participation and task existence
+        $this->owner->ensureUserIsNotOwner($owner->id);
+        $this->ensureUserIsNotParticipant($owner->id);
+        //TODO add checks for task existence
 
         $this->owner = $owner;
 
         $this->registerEvent(new ProjectOwnerWasChangedEvent(
             $this->id->value,
-            $this->owner->userId->value
+            $this->owner->id->value
         ));
     }
 
@@ -116,6 +125,17 @@ final class Project extends AggregateRoot
             && $other->information->equals($this->information)
             && $other->status->equals($this->status)
             && $other->owner->equals($this->owner);
+    }
+
+    public function removeParticipant(ProjectUser $participant, ProjectUserId $currentUserId): void
+    {
+        $this->owner->ensureUserIsOwner($currentUserId);
+        $this->removeParticipantInner($participant->id);
+    }
+
+    public function leaveProject(ProjectUser $participant): void
+    {
+        $this->removeParticipantInner($participant->id);
     }
 
     private function changeStatus(ProjectStatus $status, ProjectUserId $currentUserId): void
@@ -129,5 +149,40 @@ final class Project extends AggregateRoot
             $this->id->value,
             (string) $status->getScalar()
         ));
+    }
+
+    private function removeParticipantInner(ProjectUserId $participantId): void
+    {
+        $this->status->ensureAllowsModification();
+        //TODO add checks for task existence
+
+        $this->ensureUserIsParticipant($participantId);
+        $this->participants->removeElement($this->getParticipant($participantId));
+
+        $this->registerEvent(new ProjectParticipantWasRemovedEvent(
+            $this->id->value,
+            $participantId->value
+        ));
+    }
+
+    private function ensureUserIsParticipant(ProjectUserId $userId): void
+    {
+        if (null === $this->getParticipant($userId)) {
+            throw new ProjectParticipantDoesNotExistException($userId->value);
+        }
+    }
+
+    private function ensureUserIsNotParticipant(ProjectUserId $userId): void
+    {
+        if (null !== $this->getParticipant($userId)) {
+            throw new UserIsAlreadyProjectParticipantException($userId->value);
+        }
+    }
+
+    private function getParticipant(ProjectUserId $userId): ?ProjectUser
+    {
+        return $this->participants->findFirst(function ($key, ProjectUser $participant) use ($userId) {
+            return $participant->id->equals($userId);
+        });
     }
 }
