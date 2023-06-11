@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TaskManager\Projects\Infrastructure\Persistence\Doctrine;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\DateTimeType;
 use TaskManager\Projects\Domain\ValueObject\RequestChangeDate;
 

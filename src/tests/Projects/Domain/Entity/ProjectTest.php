@@ -543,8 +543,6 @@ class ProjectTest extends TestCase
     }
 
     /**
-     * @return void
-     *
      * @throws \ReflectionException
      */
     public function testConfirmRequest(): void
