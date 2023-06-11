@@ -6,8 +6,8 @@ namespace TaskManager\Tests\Projects\Domain\Entity;
 
 use Faker\Factory;
 use Faker\Generator;
-use TaskManager\Projects\Domain\Entity\Request;
 use PHPUnit\Framework\TestCase;
+use TaskManager\Projects\Domain\Entity\Request;
 use TaskManager\Projects\Domain\Exception\InvalidProjectRequestStatusTransitionException;
 use TaskManager\Projects\Domain\ValueObject\ConfirmedRequestStatus;
 use TaskManager\Projects\Domain\ValueObject\PendingRequestStatus;

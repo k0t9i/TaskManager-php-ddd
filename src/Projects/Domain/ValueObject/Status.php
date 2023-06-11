@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace TaskManager\Projects\Domain\ValueObject;
 
-use LogicException;
-use TaskManager\Projects\Domain\Exception\InvalidProjectStatusTransitionException;
-use TaskManager\Projects\Domain\Exception\ProjectModificationIsNotAllowedException;
 use TaskManager\Shared\Domain\Equatable;
 
 abstract class Status implements Equatable

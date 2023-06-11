@@ -7,17 +7,13 @@ namespace TaskManager\Projects\Application\Handler;
 use TaskManager\Projects\Application\Command\ChangeProjectInformationCommand;
 use TaskManager\Projects\Application\Service\CurrentUserExtractorInterface;
 use TaskManager\Projects\Application\Service\ProjectFinderInterface;
-use TaskManager\Projects\Domain\Entity\Project;
-use TaskManager\Projects\Domain\Exception\ProjectDoesNotExistException;
 use TaskManager\Projects\Domain\Repository\ProjectRepositoryInterface;
 use TaskManager\Projects\Domain\ValueObject\ProjectDescription;
 use TaskManager\Projects\Domain\ValueObject\ProjectFinishDate;
 use TaskManager\Projects\Domain\ValueObject\ProjectId;
 use TaskManager\Projects\Domain\ValueObject\ProjectName;
-use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
 use TaskManager\Shared\Application\Bus\Command\CommandHandlerInterface;
 use TaskManager\Shared\Application\Bus\Event\IntegrationEventBusInterface;
-use TaskManager\Shared\Domain\Exception\UserDoesNotExistException;
 
 final readonly class ChangeProjectInformationCommandHandler implements CommandHandlerInterface
 {
