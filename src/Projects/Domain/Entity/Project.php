@@ -20,6 +20,7 @@ use TaskManager\Projects\Domain\Exception\UserIsAlreadyProjectParticipantExcepti
 use TaskManager\Projects\Domain\ValueObject\ActiveProjectStatus;
 use TaskManager\Projects\Domain\ValueObject\ClosedProjectStatus;
 use TaskManager\Projects\Domain\ValueObject\ConfirmedRequestStatus;
+use TaskManager\Projects\Domain\ValueObject\Participant;
 use TaskManager\Projects\Domain\ValueObject\ProjectDescription;
 use TaskManager\Projects\Domain\ValueObject\ProjectFinishDate;
 use TaskManager\Projects\Domain\ValueObject\ProjectId;
@@ -27,7 +28,6 @@ use TaskManager\Projects\Domain\ValueObject\ProjectInformation;
 use TaskManager\Projects\Domain\ValueObject\ProjectName;
 use TaskManager\Projects\Domain\ValueObject\ProjectOwner;
 use TaskManager\Projects\Domain\ValueObject\ProjectStatus;
-use TaskManager\Projects\Domain\ValueObject\ProjectUser;
 use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
 use TaskManager\Projects\Domain\ValueObject\RejectedRequestStatus;
 use TaskManager\Projects\Domain\ValueObject\RequestId;
@@ -137,15 +137,15 @@ final class Project extends AggregateRoot
             && $other->owner->equals($this->owner);
     }
 
-    public function removeParticipant(ProjectUser $participant, ProjectUserId $currentUserId): void
+    public function removeParticipant(ProjectUserId $participantId, ProjectUserId $currentUserId): void
     {
         $this->owner->ensureUserIsOwner($currentUserId);
-        $this->removeParticipantInner($participant->id);
+        $this->removeParticipantInner($participantId);
     }
 
-    public function leaveProject(ProjectUser $participant): void
+    public function leaveProject(ProjectUserId $participantId): void
     {
-        $this->removeParticipantInner($participant->id);
+        $this->removeParticipantInner($participantId);
     }
 
     public function createRequest(RequestId $id, ProjectUserId $userId): Request
@@ -221,10 +221,10 @@ final class Project extends AggregateRoot
         }
     }
 
-    private function getParticipant(ProjectUserId $userId): ?ProjectUser
+    private function getParticipant(ProjectUserId $userId): ?Participant
     {
-        return $this->participants->findFirst(function ($key, ProjectUser $participant) use ($userId) {
-            return $participant->id->equals($userId);
+        return $this->participants->findFirst(function ($key, Participant $participant) use ($userId) {
+            return $participant->userId->equals($userId);
         });
     }
 
@@ -243,7 +243,10 @@ final class Project extends AggregateRoot
         $request->changeStatus($status);
 
         if ($status->isConfirmed()) {
-            $this->participants->add(new ProjectUser($request->getUserId()));
+            $this->participants->add(new Participant(
+                $this->id,
+                $request->getUserId()
+            ));
         }
 
         $this->registerEvent(new RequestStatusWasChangedEvent(

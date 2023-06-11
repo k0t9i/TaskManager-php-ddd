@@ -9,6 +9,7 @@ use Faker\Generator;
 use TaskManager\Projects\Domain\Entity\Project;
 use TaskManager\Projects\Domain\Entity\Request;
 use TaskManager\Projects\Domain\ValueObject\ActiveProjectStatus;
+use TaskManager\Projects\Domain\ValueObject\Participant;
 use TaskManager\Projects\Domain\ValueObject\ProjectDescription;
 use TaskManager\Projects\Domain\ValueObject\ProjectFinishDate;
 use TaskManager\Projects\Domain\ValueObject\ProjectId;
@@ -16,7 +17,6 @@ use TaskManager\Projects\Domain\ValueObject\ProjectInformation;
 use TaskManager\Projects\Domain\ValueObject\ProjectName;
 use TaskManager\Projects\Domain\ValueObject\ProjectOwner;
 use TaskManager\Projects\Domain\ValueObject\ProjectStatus;
-use TaskManager\Projects\Domain\ValueObject\ProjectUser;
 use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
 
 final class ProjectBuilder
@@ -34,7 +34,7 @@ final class ProjectBuilder
     private ProjectOwner $owner;
 
     /**
-     * @var ProjectUser[]
+     * @var Participant[]
      */
     private array $participants;
 
@@ -85,7 +85,7 @@ final class ProjectBuilder
         return $this;
     }
 
-    public function withParticipant(ProjectUser $value, $reset = false): self
+    public function withParticipant(Participant $value, $reset = false): self
     {
         if ($reset) {
             $this->participants = [];
@@ -159,7 +159,7 @@ final class ProjectBuilder
     }
 
     /**
-     * @return ProjectUser[]
+     * @return Participant[]
      */
     public function getParticipants(): array
     {

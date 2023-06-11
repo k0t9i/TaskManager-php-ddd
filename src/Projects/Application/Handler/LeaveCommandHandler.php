@@ -9,7 +9,6 @@ use TaskManager\Projects\Application\Service\CurrentUserExtractorInterface;
 use TaskManager\Projects\Application\Service\ProjectFinderInterface;
 use TaskManager\Projects\Domain\Repository\ProjectRepositoryInterface;
 use TaskManager\Projects\Domain\ValueObject\ProjectId;
-use TaskManager\Projects\Domain\ValueObject\ProjectUser;
 use TaskManager\Shared\Application\Bus\Command\CommandHandlerInterface;
 use TaskManager\Shared\Application\Bus\Event\IntegrationEventBusInterface;
 
@@ -28,7 +27,7 @@ final readonly class LeaveCommandHandler implements CommandHandlerInterface
         $currentUser = $this->userExtractor->extract();
         $project = $this->finder->find(new ProjectId($command->projectId));
 
-        $project->leaveProject(new ProjectUser($currentUser->id));
+        $project->leaveProject($currentUser->id);
 
         $this->repository->save($project);
         $this->eventBus->dispatch(...$project->releaseEvents());

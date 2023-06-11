@@ -8,7 +8,7 @@
         <embedded name="information" class="TaskManager\Projects\Domain\ValueObject\ProjectInformation" use-column-prefix="false" />
         <field name="status" type="project_status" />
         <embedded name="owner" class="TaskManager\Projects\Domain\ValueObject\ProjectOwner" use-column-prefix="false" />
-        <many-to-many field="participants" target-entity="TaskManager\Projects\Domain\ValueObject\ProjectUser">
+        <many-to-many field="participants" target-entity="TaskManager\Projects\Domain\ValueObject\Participant" orphan-removal="true">
             <cascade>
                 <cascade-persist />
             </cascade>
@@ -17,7 +17,8 @@
                     <join-column name="project_id" />
                 </join-columns>
                 <inverse-join-columns>
-                    <join-column name="participant_id" />
+                    <join-column name="participant_project_id" referenced-column-name="project_id" />
+                    <join-column name="participant_user_id" referenced-column-name="user_id" />
                 </inverse-join-columns>
             </join-table>
         </many-to-many>

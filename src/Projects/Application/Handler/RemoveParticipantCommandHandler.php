@@ -9,7 +9,6 @@ use TaskManager\Projects\Application\Service\CurrentUserExtractorInterface;
 use TaskManager\Projects\Application\Service\ProjectFinderInterface;
 use TaskManager\Projects\Domain\Repository\ProjectRepositoryInterface;
 use TaskManager\Projects\Domain\ValueObject\ProjectId;
-use TaskManager\Projects\Domain\ValueObject\ProjectUser;
 use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
 use TaskManager\Shared\Application\Bus\Command\CommandHandlerInterface;
 use TaskManager\Shared\Application\Bus\Event\IntegrationEventBusInterface;
@@ -30,7 +29,7 @@ final readonly class RemoveParticipantCommandHandler implements CommandHandlerIn
         $project = $this->finder->find(new ProjectId($command->projectId));
 
         $project->removeParticipant(
-            new ProjectUser(new ProjectUserId($command->participantId)),
+            new ProjectUserId($command->participantId),
             $currentUser->id
         );
 

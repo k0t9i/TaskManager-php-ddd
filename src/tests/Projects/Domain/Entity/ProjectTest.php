@@ -30,14 +30,15 @@ use TaskManager\Projects\Domain\Exception\UserIsNotProjectOwnerException;
 use TaskManager\Projects\Domain\ValueObject\ActiveProjectStatus;
 use TaskManager\Projects\Domain\ValueObject\ClosedProjectStatus;
 use TaskManager\Projects\Domain\ValueObject\ConfirmedRequestStatus;
+use TaskManager\Projects\Domain\ValueObject\Participant;
 use TaskManager\Projects\Domain\ValueObject\PendingRequestStatus;
 use TaskManager\Projects\Domain\ValueObject\ProjectDescription;
 use TaskManager\Projects\Domain\ValueObject\ProjectFinishDate;
+use TaskManager\Projects\Domain\ValueObject\ProjectId;
 use TaskManager\Projects\Domain\ValueObject\ProjectInformation;
 use TaskManager\Projects\Domain\ValueObject\ProjectName;
 use TaskManager\Projects\Domain\ValueObject\ProjectOwner;
 use TaskManager\Projects\Domain\ValueObject\ProjectStatus;
-use TaskManager\Projects\Domain\ValueObject\ProjectUser;
 use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
 use TaskManager\Projects\Domain\ValueObject\RejectedRequestStatus;
 use TaskManager\Projects\Domain\ValueObject\RequestChangeDate;
@@ -268,14 +269,15 @@ class ProjectTest extends TestCase
     {
         $builder = new ProjectBuilder($this->faker);
         $project = $builder
-            ->withParticipant(new ProjectUser(
+            ->withParticipant(new Participant(
+                new ProjectId($this->faker->uuid()),
                 new ProjectUserId($this->faker->uuid())
             ))
             ->build();
 
-        $this->expectUserIsAlreadyProjectParticipantException($builder->getParticipants()[0]->id);
+        $this->expectUserIsAlreadyProjectParticipantException($builder->getParticipants()[0]->userId);
 
-        $project->changeOwner(new ProjectOwner($builder->getParticipants()[0]->id), $builder->getOwner()->id);
+        $project->changeOwner(new ProjectOwner($builder->getParticipants()[0]->userId), $builder->getOwner()->id);
     }
 
     public function testChangeOwnerByNonOwner()
@@ -306,19 +308,20 @@ class ProjectTest extends TestCase
     {
         $builder = new ProjectBuilder($this->faker);
         $project = $builder
-            ->withParticipant(new ProjectUser(
+            ->withParticipant(new Participant(
+                new ProjectId($this->faker->uuid()),
                 new ProjectUserId($this->faker->uuid())
             ))
             ->build();
 
-        $project->removeParticipant($builder->getParticipants()[0], $builder->getOwner()->id);
+        $project->removeParticipant($builder->getParticipants()[0]->userId, $builder->getOwner()->id);
         $events = $project->releaseEvents();
 
         $this->assertCount(1, $events);
         $this->assertInstanceOf(ProjectParticipantWasRemovedEvent::class, $events[0]);
         $this->assertEquals($builder->getId()->value, $events[0]->getAggregateId());
         $this->assertEquals([
-            'participantId' => $builder->getParticipants()[0]->id->value,
+            'participantId' => $builder->getParticipants()[0]->userId->value,
         ], $events[0]->toPrimitives());
     }
 
@@ -327,14 +330,15 @@ class ProjectTest extends TestCase
         $builder = new ProjectBuilder($this->faker);
         $otherUserId = new ProjectUserId($this->faker->uuid());
         $project = $builder
-            ->withParticipant(new ProjectUser(
+            ->withParticipant(new Participant(
+                new ProjectId($this->faker->uuid()),
                 new ProjectUserId($this->faker->uuid())
             ))
             ->build();
 
         $this->expectUserIsNotProjectOwnerException($otherUserId);
 
-        $project->removeParticipant($builder->getParticipants()[0], $otherUserId);
+        $project->removeParticipant($builder->getParticipants()[0]->userId, $otherUserId);
     }
 
     public function testRemoveParticipantFromClosedProject()
@@ -342,48 +346,51 @@ class ProjectTest extends TestCase
         $builder = new ProjectBuilder($this->faker);
         $project = $builder
             ->withStatus(new ClosedProjectStatus())
-            ->withParticipant(new ProjectUser(
+            ->withParticipant(new Participant(
+                new ProjectId($this->faker->uuid()),
                 new ProjectUserId($this->faker->uuid())
             ))
             ->build();
 
         $this->expectProjectModificationIsNotAllowedException();
 
-        $project->removeParticipant($builder->getParticipants()[0], $builder->getOwner()->id);
+        $project->removeParticipant($builder->getParticipants()[0]->userId, $builder->getOwner()->id);
     }
 
     public function testRemoveNonExistingParticipant()
     {
         $builder = new ProjectBuilder($this->faker);
-        $otherUser = new ProjectUser(new ProjectUserId($this->faker->uuid()));
+        $otherUserId = new ProjectUserId($this->faker->uuid());
         $project = $builder
-            ->withParticipant(new ProjectUser(
+            ->withParticipant(new Participant(
+                new ProjectId($this->faker->uuid()),
                 new ProjectUserId($this->faker->uuid())
             ))
             ->build();
 
-        $this->expectProjectParticipantDoesNotExistException($otherUser);
+        $this->expectProjectParticipantDoesNotExistException($otherUserId);
 
-        $project->removeParticipant($otherUser, $builder->getOwner()->id);
+        $project->removeParticipant($otherUserId, $builder->getOwner()->id);
     }
 
     public function testLeaveProject()
     {
         $builder = new ProjectBuilder($this->faker);
         $project = $builder
-            ->withParticipant(new ProjectUser(
+            ->withParticipant(new Participant(
+                new ProjectId($this->faker->uuid()),
                 new ProjectUserId($this->faker->uuid())
             ))
             ->build();
 
-        $project->leaveProject($builder->getParticipants()[0]);
+        $project->leaveProject($builder->getParticipants()[0]->userId);
         $events = $project->releaseEvents();
 
         $this->assertCount(1, $events);
         $this->assertInstanceOf(ProjectParticipantWasRemovedEvent::class, $events[0]);
         $this->assertEquals($builder->getId()->value, $events[0]->getAggregateId());
         $this->assertEquals([
-            'participantId' => $builder->getParticipants()[0]->id->value,
+            'participantId' => $builder->getParticipants()[0]->userId->value,
         ], $events[0]->toPrimitives());
     }
 
@@ -392,29 +399,31 @@ class ProjectTest extends TestCase
         $builder = new ProjectBuilder($this->faker);
         $project = $builder
             ->withStatus(new ClosedProjectStatus())
-            ->withParticipant(new ProjectUser(
+            ->withParticipant(new Participant(
+                new ProjectId($this->faker->uuid()),
                 new ProjectUserId($this->faker->uuid())
             ))
             ->build();
 
         $this->expectProjectModificationIsNotAllowedException();
 
-        $project->leaveProject($builder->getParticipants()[0]);
+        $project->leaveProject($builder->getParticipants()[0]->userId);
     }
 
     public function testLeaveProjectByNonParticipant()
     {
         $builder = new ProjectBuilder($this->faker);
-        $otherUser = new ProjectUser(new ProjectUserId($this->faker->uuid()));
+        $otherUserId = new ProjectUserId($this->faker->uuid());
         $project = $builder
-            ->withParticipant(new ProjectUser(
+            ->withParticipant(new Participant(
+                new ProjectId($this->faker->uuid()),
                 new ProjectUserId($this->faker->uuid())
             ))
             ->build();
 
-        $this->expectProjectParticipantDoesNotExistException($otherUser);
+        $this->expectProjectParticipantDoesNotExistException($otherUserId);
 
-        $project->leaveProject($otherUser);
+        $project->leaveProject($otherUserId);
     }
 
     public function testCreateRequest()
@@ -470,15 +479,16 @@ class ProjectTest extends TestCase
     {
         $builder = new ProjectBuilder($this->faker);
         $project = $builder
-            ->withParticipant(new ProjectUser(
+            ->withParticipant(new Participant(
+                new ProjectId($this->faker->uuid()),
                 new ProjectUserId($this->faker->uuid())
             ))
             ->build();
         $requestId = new RequestId($this->faker->uuid());
 
-        $this->expectUserIsAlreadyProjectParticipantException($builder->getParticipants()[0]->id);
+        $this->expectUserIsAlreadyProjectParticipantException($builder->getParticipants()[0]->userId);
 
-        $project->createRequest($requestId, $builder->getParticipants()[0]->id);
+        $project->createRequest($requestId, $builder->getParticipants()[0]->userId);
     }
 
     public function testCreateRequestByProjectParticipantWithPendingRequest()
@@ -557,7 +567,7 @@ class ProjectTest extends TestCase
         );
         /** @var Collection $participantCollection */
         $participantCollection = $reflection->getProperty('participants')->getValue($project);
-        /** @var ProjectUser[] $participants */
+        /** @var Participant[] $participants */
         $participants = $participantCollection->toArray();
         $events = $project->releaseEvents();
 
@@ -572,7 +582,7 @@ class ProjectTest extends TestCase
         ], $events[0]->toPrimitives());
         $this->assertInstanceOf(ConfirmedRequestStatus::class, $builder->getRequests()[0]->getStatus());
         $this->assertCount(1, $participants);
-        $this->assertEquals($builder->getRequests()[0]->getUserId(), $participants[0]->id);
+        $this->assertEquals($builder->getRequests()[0]->getUserId(), $participants[0]->userId);
     }
 
     public function testChangeRequestStatusInClosedProject()
@@ -661,12 +671,12 @@ class ProjectTest extends TestCase
         ));
     }
 
-    private function expectProjectParticipantDoesNotExistException(ProjectUser $user): void
+    private function expectProjectParticipantDoesNotExistException(ProjectUserId $userId): void
     {
         $this->expectException(ProjectParticipantDoesNotExistException::class);
         $this->expectExceptionMessage($message = sprintf(
             'Project participant "%s" doesn\'t exist',
-            $user->id->value
+            $userId->value
         ));
     }
 
