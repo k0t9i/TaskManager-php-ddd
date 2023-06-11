@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - run: docker-compose pull
+
+      - run: docker-compose up -d --build
+
+      - run: make composer-install
+
+      - run: make code-style
+
+      - run: make static-analysis
+
+      - run: make test
