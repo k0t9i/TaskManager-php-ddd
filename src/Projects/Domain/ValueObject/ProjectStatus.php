@@ -9,7 +9,7 @@ use TaskManager\Projects\Domain\Exception\InvalidProjectStatusTransitionExceptio
 use TaskManager\Projects\Domain\Exception\ProjectModificationIsNotAllowedException;
 use TaskManager\Shared\Domain\Equatable;
 
-abstract class ProjectStatus implements Equatable
+abstract class ProjectStatus extends Status
 {
     public const STATUS_CLOSED = 0;
     public const STATUS_ACTIVE = 1;
@@ -43,11 +43,6 @@ abstract class ProjectStatus implements Equatable
         return self::STATUS_CLOSED === $this->getScalar();
     }
 
-    public function canBeChangedTo(self $status): bool
-    {
-        return in_array(get_class($status), $this->getNextStatuses(), true);
-    }
-
     public function ensureCanBeChangedTo(self $status): void
     {
         if (!$this->canBeChangedTo($status)) {
@@ -61,13 +56,4 @@ abstract class ProjectStatus implements Equatable
             throw new ProjectModificationIsNotAllowedException(get_class($this));
         }
     }
-
-    public function equals(Equatable $other): bool
-    {
-        return $other instanceof static;
-    }
-
-    abstract protected function getNextStatuses(): array;
-
-    abstract public function allowsModification(): bool;
 }
