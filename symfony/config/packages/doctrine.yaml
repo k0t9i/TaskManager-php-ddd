@@ -20,6 +20,10 @@ doctrine:
             project_description: TaskManager\Projects\Infrastructure\Persistence\Doctrine\ProjectDescriptionType
             project_finish_date: TaskManager\Projects\Infrastructure\Persistence\Doctrine\ProjectFinishDateType
             project_status: TaskManager\Projects\Infrastructure\Persistence\Doctrine\ProjectStatusType
+
+            request_id: TaskManager\Projects\Infrastructure\Persistence\Doctrine\RequestIdType
+            request_status: TaskManager\Projects\Infrastructure\Persistence\Doctrine\RequestStatusType
+            request_change_date: TaskManager\Projects\Infrastructure\Persistence\Doctrine\RequestChangeDateType
     orm:
         auto_generate_proxy_classes: true
         enable_lazy_ghost_objects: true

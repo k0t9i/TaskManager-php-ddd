@@ -9,12 +9,28 @@
         <field name="status" type="project_status" />
         <embedded name="owner" class="TaskManager\Projects\Domain\ValueObject\ProjectOwner" use-column-prefix="false" />
         <many-to-many field="participants" target-entity="TaskManager\Projects\Domain\ValueObject\ProjectUser">
+            <cascade>
+                <cascade-persist />
+            </cascade>
             <join-table name="project_participants">
                 <join-columns>
                     <join-column name="project_id" />
                 </join-columns>
                 <inverse-join-columns>
                     <join-column name="participant_id" />
+                </inverse-join-columns>
+            </join-table>
+        </many-to-many>
+        <many-to-many field="requests" target-entity="TaskManager\Projects\Domain\Entity\Request">
+            <cascade>
+                <cascade-persist />
+            </cascade>
+            <join-table name="project_requests">
+                <join-columns>
+                    <join-column name="project_id" />
+                </join-columns>
+                <inverse-join-columns>
+                    <join-column name="request_id" unique="true" />
                 </inverse-join-columns>
             </join-table>
         </many-to-many>
