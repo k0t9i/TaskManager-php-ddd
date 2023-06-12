@@ -6,6 +6,7 @@ namespace TaskManager\Tests\Projects\Domain\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Faker\Generator;
+use TaskManager\Projects\Domain\Collection\ParticipantCollection;
 use TaskManager\Projects\Domain\Entity\Project;
 use TaskManager\Projects\Domain\Entity\Request;
 use TaskManager\Projects\Domain\ValueObject\ActiveProjectStatus;
@@ -120,7 +121,7 @@ final class ProjectBuilder
             $this->information,
             $this->status,
             $this->owner,
-            new ArrayCollection($this->participants),
+            new ParticipantCollection($this->participants),
             new ArrayCollection($this->requests)
         );
     }

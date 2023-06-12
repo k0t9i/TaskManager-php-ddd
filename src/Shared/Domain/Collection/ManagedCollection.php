@@ -9,12 +9,12 @@ use TaskManager\Shared\Domain\Hashable;
 abstract class ManagedCollection implements ManagedCollectionInterface
 {
     /**
-     * @var array<array-key, Hashable> $items
+     * @var array<array-key, Hashable>
      */
     private array $items = [];
 
     /**
-     * @var array<array-key, Hashable> $items
+     * @var array<array-key, Hashable>
      */
     private array $snapshot = [];
 
@@ -67,7 +67,7 @@ abstract class ManagedCollection implements ManagedCollectionInterface
      */
     public function getItems(): array
     {
-        return $this->items;
+        return array_values($this->items);
     }
 
     /**
@@ -75,7 +75,7 @@ abstract class ManagedCollection implements ManagedCollectionInterface
      */
     public function getRemovedItems(): array
     {
-        return array_diff_key($this->snapshot, $this->items);
+        return array_values(array_diff_key($this->snapshot, $this->items));
     }
 
     public function flush(): void
@@ -102,7 +102,7 @@ abstract class ManagedCollection implements ManagedCollectionInterface
     {
         foreach ($items as $item) {
             if (!($item instanceof Hashable) || !is_a($item, $this->supportClass(), true)) {
-                throw new \LogicException('Invalid type ' . gettype($item));
+                throw new \LogicException('Invalid type '.gettype($item));
             }
         }
     }

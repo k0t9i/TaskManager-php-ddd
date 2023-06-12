@@ -54,11 +54,13 @@ final readonly class ManagedCollectionManager implements ManagedCollectionManage
         $reflectionObject = new \ReflectionObject($owner);
         $reflectionProperty = $reflectionObject->getProperty($propertyName);
         if (!$reflectionProperty->isInitialized($owner)) {
-            $className = $reflectionProperty->getType()->getName();
+            /** @var \ReflectionNamedType $type */
+            $type = $reflectionProperty->getType();
+            $className = $type->getName();
             if (!is_a($className, ManagedCollectionInterface::class, true)) {
-                throw new \LogicException('Invalid type ' . $className);
+                throw new \LogicException('Invalid type '.$className);
             }
-            $reflectionClass = new \ReflectionClass($reflectionProperty->getType()->getName());
+            $reflectionClass = new \ReflectionClass($type->getName());
             $reflectionProperty->setValue($owner, $reflectionClass->newInstanceWithoutConstructor());
         }
 

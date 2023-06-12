@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace TaskManager\Projects\Domain\ValueObject;
 
 use TaskManager\Shared\Domain\Equatable;
+use TaskManager\Shared\Domain\Hashable;
 
-final readonly class Participant implements Equatable
+final readonly class Participant implements Equatable, Hashable
 {
     public function __construct(
         public ProjectId $projectId,
@@ -19,5 +20,10 @@ final readonly class Participant implements Equatable
         return $other instanceof self
             && $other->projectId->equals($this->projectId)
             && $other->userId->equals($this->userId);
+    }
+
+    public function getHash(): string
+    {
+        return $this->userId->value;
     }
 }

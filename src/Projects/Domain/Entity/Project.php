@@ -6,6 +6,7 @@ namespace TaskManager\Projects\Domain\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use TaskManager\Projects\Domain\Collection\ParticipantCollection;
 use TaskManager\Projects\Domain\Event\ProjectInformationWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectOwnerWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectParticipantWasRemovedEvent;
@@ -13,10 +14,8 @@ use TaskManager\Projects\Domain\Event\ProjectStatusWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectWasCreatedEvent;
 use TaskManager\Projects\Domain\Event\RequestStatusWasChangedEvent;
 use TaskManager\Projects\Domain\Event\RequestWasCreatedEvent;
-use TaskManager\Projects\Domain\Exception\ProjectParticipantDoesNotExistException;
 use TaskManager\Projects\Domain\Exception\RequestDoesNotExistException;
 use TaskManager\Projects\Domain\Exception\UserAlreadyHasPendingRequestException;
-use TaskManager\Projects\Domain\Exception\UserIsAlreadyProjectParticipantException;
 use TaskManager\Projects\Domain\ValueObject\ActiveProjectStatus;
 use TaskManager\Projects\Domain\ValueObject\ClosedProjectStatus;
 use TaskManager\Projects\Domain\ValueObject\ConfirmedRequestStatus;
@@ -38,15 +37,14 @@ use TaskManager\Shared\Domain\Equatable;
 final class Project extends AggregateRoot
 {
     /**
-     * @param Collection<array-key, Participant> $participants
-     * @param Collection<array-key, Request>     $requests
+     * @param Collection<array-key, Request> $requests
      */
     public function __construct(
         private readonly ProjectId $id,
         private ProjectInformation $information,
         private ProjectStatus $status,
         private ProjectOwner $owner,
-        private Collection $participants,
+        public ParticipantCollection $participants,
         private Collection $requests,
     ) {
     }
@@ -62,7 +60,7 @@ final class Project extends AggregateRoot
             $information,
             $status,
             $owner,
-            new ArrayCollection(),
+            new ParticipantCollection(),
             new ArrayCollection()
         );
 
@@ -121,7 +119,7 @@ final class Project extends AggregateRoot
         $this->owner->ensureUserIsOwner($currentUserId);
 
         $this->owner->ensureUserIsNotOwner($owner->id);
-        $this->ensureUserIsNotParticipant($owner->id);
+        $this->participants->ensureUserIsNotParticipant($owner->id);
         // TODO add checks for task existence
 
         $this->owner = $owner;
@@ -156,7 +154,7 @@ final class Project extends AggregateRoot
     {
         $this->status->ensureAllowsModification();
         $this->owner->ensureUserIsNotOwner($userId);
-        $this->ensureUserIsNotParticipant($userId);
+        $this->participants->ensureUserIsNotParticipant($userId);
         $this->ensureUserDoesNotHavePendingRequest($userId);
 
         $request = Request::create($id, $userId);
@@ -184,6 +182,11 @@ final class Project extends AggregateRoot
         $this->changeRequestStatus($id, new RejectedRequestStatus(), $currentUserId);
     }
 
+    public function getId(): ProjectId
+    {
+        return $this->id;
+    }
+
     private function changeStatus(ProjectStatus $status, ProjectUserId $currentUserId): void
     {
         $this->status->ensureCanBeChangedTo($status);
@@ -202,34 +205,13 @@ final class Project extends AggregateRoot
         $this->status->ensureAllowsModification();
         // TODO add checks for task existence
 
-        $this->ensureUserIsParticipant($participantId);
-        $this->participants->removeElement($this->getParticipant($participantId));
+        $this->participants->ensureUserIsParticipant($participantId);
+        $this->participants->remove($participantId->value);
 
         $this->registerEvent(new ProjectParticipantWasRemovedEvent(
             $this->id->value,
             $participantId->value
         ));
-    }
-
-    private function ensureUserIsParticipant(ProjectUserId $userId): void
-    {
-        if (null === $this->getParticipant($userId)) {
-            throw new ProjectParticipantDoesNotExistException($userId->value);
-        }
-    }
-
-    private function ensureUserIsNotParticipant(ProjectUserId $userId): void
-    {
-        if (null !== $this->getParticipant($userId)) {
-            throw new UserIsAlreadyProjectParticipantException($userId->value);
-        }
-    }
-
-    private function getParticipant(ProjectUserId $userId): ?Participant
-    {
-        return $this->participants->findFirst(function ($key, Participant $participant) use ($userId) {
-            return $participant->userId->equals($userId);
-        });
     }
 
     private function changeRequestStatus(
@@ -247,7 +229,7 @@ final class Project extends AggregateRoot
         $request->changeStatus($status);
 
         if ($status->isConfirmed()) {
-            $this->participants->add(new Participant(
+            $this->participants->addOrUpdateElement(new Participant(
                 $this->id,
                 $request->getUserId()
             ));

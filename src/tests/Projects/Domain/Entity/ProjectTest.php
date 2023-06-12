@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace TaskManager\Tests\Projects\Domain\Entity;
 
-use Doctrine\Common\Collections\Collection;
 use Faker\Factory;
 use Faker\Generator;
 use PHPUnit\Framework\TestCase;
+use TaskManager\Projects\Domain\Collection\ParticipantCollection;
 use TaskManager\Projects\Domain\Entity\Project;
 use TaskManager\Projects\Domain\Entity\Request;
 use TaskManager\Projects\Domain\Event\ProjectInformationWasChangedEvent;
@@ -562,10 +562,10 @@ class ProjectTest extends TestCase
             $builder->getRequests()[0]->getId(),
             $builder->getOwner()->id
         );
-        /** @var Collection $participantCollection */
+        /** @var ParticipantCollection $participantCollection */
         $participantCollection = $reflection->getProperty('participants')->getValue($project);
         /** @var Participant[] $participants */
-        $participants = $participantCollection->toArray();
+        $participants = $participantCollection->getItems();
         $events = $project->releaseEvents();
 
         $this->assertCount(1, $events);
