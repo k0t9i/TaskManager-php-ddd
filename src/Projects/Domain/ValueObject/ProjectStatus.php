@@ -36,11 +36,6 @@ abstract class ProjectStatus extends Status
         throw new \LogicException(sprintf('Invalid project status "%s"', gettype($status)));
     }
 
-    public function isClosed(): bool
-    {
-        return self::STATUS_CLOSED === $this->getScalar();
-    }
-
     public function ensureCanBeChangedTo(self $status): void
     {
         if (!$this->canBeChangedTo($status)) {
