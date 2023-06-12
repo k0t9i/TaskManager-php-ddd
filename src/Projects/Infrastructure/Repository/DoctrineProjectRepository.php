@@ -7,6 +7,7 @@ namespace TaskManager\Projects\Infrastructure\Repository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectRepository;
 use TaskManager\Projects\Domain\Entity\Project;
+use TaskManager\Projects\Domain\Entity\Request;
 use TaskManager\Projects\Domain\Repository\ProjectRepositoryInterface;
 use TaskManager\Projects\Domain\ValueObject\Participant;
 use TaskManager\Projects\Domain\ValueObject\ProjectId;
@@ -38,8 +39,13 @@ final readonly class DoctrineProjectRepository implements ProjectRepositoryInter
             ->findBy([
                 'projectId' => $object->getId(),
             ]);
+        $requests = $this->entityManager->getRepository(Request::class)
+            ->findBy([
+                'projectId' => $object->getId(),
+            ]);
 
         $this->collectionManager->load($object, 'participants', $participants);
+        $this->collectionManager->load($object, 'requests', $requests);
 
         return $object;
     }
@@ -51,6 +57,7 @@ final readonly class DoctrineProjectRepository implements ProjectRepositoryInter
     {
         $this->entityManager->persist($project);
         $this->collectionManager->flush($project, 'participants');
+        $this->collectionManager->flush($project, 'requests');
         $this->entityManager->flush();
     }
 

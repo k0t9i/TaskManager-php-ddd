@@ -495,6 +495,7 @@ class ProjectTest extends TestCase
         $project = $builder
             ->withRequest(new Request(
                 new RequestId($this->faker->uuid()),
+                new ProjectId($this->faker->uuid()),
                 new ProjectUserId($this->faker->uuid()),
                 new PendingRequestStatus(),
                 new RequestChangeDate()
@@ -518,6 +519,7 @@ class ProjectTest extends TestCase
         $project = $builder
             ->withRequest(new Request(
                 new RequestId($this->faker->uuid()),
+                new ProjectId($this->faker->uuid()),
                 new ProjectUserId($this->faker->uuid()),
                 new PendingRequestStatus(),
                 new RequestChangeDate()
@@ -551,6 +553,7 @@ class ProjectTest extends TestCase
         $project = $builder
             ->withRequest(new Request(
                 new RequestId($this->faker->uuid()),
+                new ProjectId($this->faker->uuid()),
                 new ProjectUserId($this->faker->uuid()),
                 new PendingRequestStatus(),
                 new RequestChangeDate()
@@ -589,6 +592,7 @@ class ProjectTest extends TestCase
             ->withStatus(new ClosedProjectStatus())
             ->withRequest(new Request(
                 new RequestId($this->faker->uuid()),
+                new ProjectId($this->faker->uuid()),
                 new ProjectUserId($this->faker->uuid()),
                 new PendingRequestStatus(),
                 new RequestChangeDate()
@@ -609,6 +613,7 @@ class ProjectTest extends TestCase
         $project = $builder
             ->withRequest(new Request(
                 new RequestId($this->faker->uuid()),
+                new ProjectId($this->faker->uuid()),
                 new ProjectUserId($this->faker->uuid()),
                 new PendingRequestStatus(),
                 new RequestChangeDate()
@@ -630,6 +635,7 @@ class ProjectTest extends TestCase
         $project = $builder
             ->withRequest(new Request(
                 new RequestId($this->faker->uuid()),
+                new ProjectId($this->faker->uuid()),
                 new ProjectUserId($this->faker->uuid()),
                 new PendingRequestStatus(),
                 new RequestChangeDate()

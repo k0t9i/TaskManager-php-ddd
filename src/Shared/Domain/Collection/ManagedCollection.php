@@ -30,11 +30,13 @@ abstract class ManagedCollection implements ManagedCollectionInterface
 
     public function addOrUpdateElement(Hashable $element): void
     {
+        $this->ensureItemHasSupportedClass($element);
         $this->items[$element->getHash()] = $element;
     }
 
     public function removeElement(Hashable $element): void
     {
+        $this->ensureItemHasSupportedClass($element);
         $this->remove($element->getHash());
     }
 
@@ -45,6 +47,8 @@ abstract class ManagedCollection implements ManagedCollectionInterface
 
     public function elementExists(Hashable $element): bool
     {
+        $this->ensureItemHasSupportedClass($element);
+
         return $this->exists($element->getHash());
     }
 
@@ -101,9 +105,18 @@ abstract class ManagedCollection implements ManagedCollectionInterface
     private function ensureItemsAreValidType(array $items): void
     {
         foreach ($items as $item) {
-            if (!($item instanceof Hashable) || !is_a($item, $this->supportClass(), true)) {
+            if (!($item instanceof Hashable)) {
                 throw new \LogicException('Invalid type '.gettype($item));
             }
+
+            $this->ensureItemHasSupportedClass($item);
+        }
+    }
+
+    private function ensureItemHasSupportedClass(Hashable $item): void
+    {
+        if (!is_a($item, $this->supportClass(), true)) {
+            throw new \LogicException('Unsupported class '.get_class($item));
         }
     }
 

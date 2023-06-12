@@ -11,6 +11,7 @@ use TaskManager\Projects\Domain\Entity\Request;
 use TaskManager\Projects\Domain\Exception\InvalidProjectRequestStatusTransitionException;
 use TaskManager\Projects\Domain\ValueObject\ConfirmedRequestStatus;
 use TaskManager\Projects\Domain\ValueObject\PendingRequestStatus;
+use TaskManager\Projects\Domain\ValueObject\ProjectId;
 use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
 use TaskManager\Projects\Domain\ValueObject\RejectedRequestStatus;
 use TaskManager\Projects\Domain\ValueObject\RequestChangeDate;
@@ -29,11 +30,13 @@ class RequestTest extends TestCase
     public function testCreate(): void
     {
         $id = new RequestId($this->faker->uuid());
+        $projectId = new ProjectId($this->faker->uuid());
         $userId = new ProjectUserId($this->faker->uuid());
 
-        $request = Request::create($id, $userId);
+        $request = Request::create($id, $projectId, $userId);
 
         $this->assertEquals($id, $request->getId());
+        $this->assertEquals($projectId, $request->getProjectId());
         $this->assertEquals($userId, $request->getUserId());
         $this->assertInstanceOf(PendingRequestStatus::class, $request->getStatus());
     }
@@ -43,12 +46,14 @@ class RequestTest extends TestCase
         $userId = new ProjectUserId($this->faker->uuid());
         $pendingRequest = new Request(
             new RequestId($this->faker->uuid()),
+            new ProjectId($this->faker->uuid()),
             $userId,
             new PendingRequestStatus(),
             new RequestChangeDate()
         );
         $rejectedRequest = new Request(
             new RequestId($this->faker->uuid()),
+            new ProjectId($this->faker->uuid()),
             $userId,
             new RejectedRequestStatus(),
             new RequestChangeDate()
@@ -63,6 +68,7 @@ class RequestTest extends TestCase
     {
         $request = new Request(
             new RequestId($this->faker->uuid()),
+            new ProjectId($this->faker->uuid()),
             new ProjectUserId($this->faker->uuid()),
             new PendingRequestStatus(),
             new RequestChangeDate()
@@ -77,6 +83,7 @@ class RequestTest extends TestCase
     {
         $request = new Request(
             new RequestId($this->faker->uuid()),
+            new ProjectId($this->faker->uuid()),
             new ProjectUserId($this->faker->uuid()),
             new PendingRequestStatus(),
             new RequestChangeDate()
@@ -91,6 +98,7 @@ class RequestTest extends TestCase
     {
         $request = new Request(
             new RequestId($this->faker->uuid()),
+            new ProjectId($this->faker->uuid()),
             new ProjectUserId($this->faker->uuid()),
             new ConfirmedRequestStatus(),
             new RequestChangeDate()

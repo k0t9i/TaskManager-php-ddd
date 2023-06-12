@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace TaskManager\Projects\Domain\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use TaskManager\Projects\Domain\Collection\ParticipantCollection;
+use TaskManager\Projects\Domain\Collection\RequestCollection;
 use TaskManager\Projects\Domain\Event\ProjectInformationWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectOwnerWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectParticipantWasRemovedEvent;
@@ -15,7 +14,6 @@ use TaskManager\Projects\Domain\Event\ProjectWasCreatedEvent;
 use TaskManager\Projects\Domain\Event\RequestStatusWasChangedEvent;
 use TaskManager\Projects\Domain\Event\RequestWasCreatedEvent;
 use TaskManager\Projects\Domain\Exception\RequestDoesNotExistException;
-use TaskManager\Projects\Domain\Exception\UserAlreadyHasPendingRequestException;
 use TaskManager\Projects\Domain\ValueObject\ActiveProjectStatus;
 use TaskManager\Projects\Domain\ValueObject\ClosedProjectStatus;
 use TaskManager\Projects\Domain\ValueObject\ConfirmedRequestStatus;
@@ -36,16 +34,13 @@ use TaskManager\Shared\Domain\Equatable;
 
 final class Project extends AggregateRoot
 {
-    /**
-     * @param Collection<array-key, Request> $requests
-     */
     public function __construct(
         private readonly ProjectId $id,
         private ProjectInformation $information,
         private ProjectStatus $status,
         private ProjectOwner $owner,
-        public ParticipantCollection $participants,
-        private Collection $requests,
+        private ParticipantCollection $participants,
+        private RequestCollection $requests,
     ) {
     }
 
@@ -61,7 +56,7 @@ final class Project extends AggregateRoot
             $status,
             $owner,
             new ParticipantCollection(),
-            new ArrayCollection()
+            new RequestCollection()
         );
 
         $project->registerEvent(new ProjectWasCreatedEvent(
@@ -155,11 +150,11 @@ final class Project extends AggregateRoot
         $this->status->ensureAllowsModification();
         $this->owner->ensureUserIsNotOwner($userId);
         $this->participants->ensureUserIsNotParticipant($userId);
-        $this->ensureUserDoesNotHavePendingRequest($userId);
+        $this->requests->ensureUserDoesNotHavePendingRequest($userId, $this->id);
 
-        $request = Request::create($id, $userId);
+        $request = Request::create($id, $this->id, $userId);
 
-        $this->requests->add($request);
+        $this->requests->addOrUpdateElement($request);
 
         $this->registerEvent(new RequestWasCreatedEvent(
             $this->id->value,
@@ -221,11 +216,12 @@ final class Project extends AggregateRoot
     ): void {
         $this->status->ensureAllowsModification();
         $this->owner->ensureUserIsOwner($currentUserId);
-        $request = $this->getRequest($id);
-        if (null === $request) {
+        if (!$this->requests->exists($id->value)) {
             throw new RequestDoesNotExistException($id->value, $this->id->value);
         }
 
+        /** @var Request $request */
+        $request = $this->requests->get($id->value);
         $request->changeStatus($status);
 
         if ($status->isConfirmed()) {
@@ -242,23 +238,5 @@ final class Project extends AggregateRoot
             (string) $request->getStatus()->getScalar(),
             $request->getChangeDate()->getValue()
         ));
-    }
-
-    private function ensureUserDoesNotHavePendingRequest(ProjectUserId $userId): void
-    {
-        $request = $this->requests->findFirst(function ($key, Request $request) use ($userId) {
-            return $request->isPendingForUser($userId);
-        });
-
-        if (null !== $request) {
-            throw new UserAlreadyHasPendingRequestException($userId->value, $this->id->value);
-        }
-    }
-
-    private function getRequest(RequestId $requestId): ?Request
-    {
-        return $this->requests->findFirst(function ($key, Request $request) use ($requestId) {
-            return $request->getId()->equals($requestId);
-        });
     }
 }
