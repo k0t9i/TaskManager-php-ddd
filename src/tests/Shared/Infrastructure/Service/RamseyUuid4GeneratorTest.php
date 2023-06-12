@@ -22,6 +22,19 @@ class RamseyUuid4GeneratorTest extends TestCase
 
     public function testGenerate(): void
     {
+        set_error_handler(
+            static function ($errno, $errstr) {
+                restore_error_handler();
+                throw new \Exception($errstr, $errno);
+            },
+            E_DEPRECATED
+        );
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage(
+            'implements the Serializable interface, which is deprecated. Implement'.
+            ' __serialize() and __unserialize() instead (or in addition, if support for old PHP versions is necessary)'
+        );
+
         $result = $this->faker->regexify('.{255}');
         $generator = $this->getMockBuilder(UuidInterface::class)
             ->getMock();
