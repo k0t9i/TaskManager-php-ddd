@@ -24,6 +24,8 @@ doctrine:
             request_id: TaskManager\Projects\Infrastructure\Persistence\Doctrine\RequestIdType
             request_status: TaskManager\Projects\Infrastructure\Persistence\Doctrine\RequestStatusType
             request_change_date: TaskManager\Projects\Infrastructure\Persistence\Doctrine\RequestChangeDateType
+
+            task_id: TaskManager\Projects\Infrastructure\Persistence\Doctrine\TaskIdType
     orm:
         auto_generate_proxy_classes: true
         enable_lazy_ghost_objects: true

@@ -6,6 +6,7 @@ namespace TaskManager\Tests\Projects\Domain\Entity;
 
 use Faker\Generator;
 use TaskManager\Projects\Domain\Collection\ParticipantCollection;
+use TaskManager\Projects\Domain\Collection\ProjectTaskCollection;
 use TaskManager\Projects\Domain\Collection\RequestCollection;
 use TaskManager\Projects\Domain\Entity\Project;
 use TaskManager\Projects\Domain\Entity\Request;
@@ -18,6 +19,7 @@ use TaskManager\Projects\Domain\ValueObject\ProjectInformation;
 use TaskManager\Projects\Domain\ValueObject\ProjectName;
 use TaskManager\Projects\Domain\ValueObject\ProjectOwner;
 use TaskManager\Projects\Domain\ValueObject\ProjectStatus;
+use TaskManager\Projects\Domain\ValueObject\ProjectTask;
 use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
 
 final class ProjectBuilder
@@ -39,12 +41,17 @@ final class ProjectBuilder
      */
     private array $participants;
 
-    private ProjectInformation $information;
-
     /**
      * @var Request[]
      */
     private array $requests;
+
+    /**
+     * @var ProjectTask[]
+     */
+    private array $tasks;
+
+    private ProjectInformation $information;
 
     public function __construct(private readonly Generator $faker)
     {
@@ -112,6 +119,16 @@ final class ProjectBuilder
         return $this;
     }
 
+    public function withTask(ProjectTask $value, bool $reset = false): self
+    {
+        if ($reset) {
+            $this->tasks = [];
+        }
+        $this->tasks[] = $value;
+
+        return $this;
+    }
+
     public function build(): Project
     {
         $this->prepareData();
@@ -122,7 +139,8 @@ final class ProjectBuilder
             $this->status,
             $this->owner,
             new ParticipantCollection($this->participants),
-            new RequestCollection($this->requests)
+            new RequestCollection($this->requests),
+            new ProjectTaskCollection($this->tasks)
         );
     }
 
@@ -183,6 +201,14 @@ final class ProjectBuilder
         return $this->requests;
     }
 
+    /**
+     * @return ProjectTask[]
+     */
+    public function getTasks(): array
+    {
+        return $this->tasks;
+    }
+
     private function prepareData(): void
     {
         $this->id = $this->id ?? new ProjectId($this->faker->uuid());
@@ -198,5 +224,6 @@ final class ProjectBuilder
         $this->owner = $this->owner ?? new ProjectOwner(new ProjectUserId($this->faker->uuid()));
         $this->participants = $this->participants ?? [];
         $this->requests = $this->requests ?? [];
+        $this->tasks = $this->tasks ?? [];
     }
 }

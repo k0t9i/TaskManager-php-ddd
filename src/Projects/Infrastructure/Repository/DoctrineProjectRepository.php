@@ -11,13 +11,20 @@ use TaskManager\Projects\Domain\Entity\Request;
 use TaskManager\Projects\Domain\Repository\ProjectRepositoryInterface;
 use TaskManager\Projects\Domain\ValueObject\Participant;
 use TaskManager\Projects\Domain\ValueObject\ProjectId;
+use TaskManager\Projects\Domain\ValueObject\ProjectTask;
 use TaskManager\Shared\Infrastructure\Service\ManagedCollectionManager;
 
-final readonly class DoctrineProjectRepository implements ProjectRepositoryInterface
+final class DoctrineProjectRepository implements ProjectRepositoryInterface
 {
+    private array $collections = [
+        Participant::class => ['participants', 'projectId'],
+        Request::class => ['requests', 'projectId'],
+        ProjectTask::class => ['tasks', 'projectId'],
+    ];
+
     public function __construct(
-        private EntityManagerInterface $entityManager,
-        private ManagedCollectionManager $collectionManager
+        private readonly EntityManagerInterface $entityManager,
+        private readonly ManagedCollectionManager $collectionManager
     ) {
     }
 
@@ -35,17 +42,15 @@ final readonly class DoctrineProjectRepository implements ProjectRepositoryInter
             return $object;
         }
 
-        $participants = $this->entityManager->getRepository(Participant::class)
-            ->findBy([
-                'projectId' => $object->getId(),
-            ]);
-        $requests = $this->entityManager->getRepository(Request::class)
-            ->findBy([
-                'projectId' => $object->getId(),
-            ]);
+        foreach ($this->collections as $className => $metadata) {
+            [$propertyName, $fkName] = $metadata;
 
-        $this->collectionManager->load($object, 'participants', $participants);
-        $this->collectionManager->load($object, 'requests', $requests);
+            $items = $this->entityManager->getRepository($className)
+                ->findBy([
+                    $fkName => $object->getId(),
+                ]);
+            $this->collectionManager->load($object, $propertyName, $items);
+        }
 
         return $object;
     }
@@ -56,8 +61,13 @@ final readonly class DoctrineProjectRepository implements ProjectRepositoryInter
     public function save(Project $project): void
     {
         $this->entityManager->persist($project);
-        $this->collectionManager->flush($project, 'participants');
-        $this->collectionManager->flush($project, 'requests');
+
+        foreach ($this->collections as $metadata) {
+            [$propertyName] = $metadata;
+
+            $this->collectionManager->flush($project, $propertyName);
+        }
+
         $this->entityManager->flush();
     }
 

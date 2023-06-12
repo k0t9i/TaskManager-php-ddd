@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TaskManager\Projects\Domain\Entity;
 
 use TaskManager\Projects\Domain\Collection\ParticipantCollection;
+use TaskManager\Projects\Domain\Collection\ProjectTaskCollection;
 use TaskManager\Projects\Domain\Collection\RequestCollection;
 use TaskManager\Projects\Domain\Event\ProjectInformationWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectOwnerWasChangedEvent;
@@ -41,6 +42,7 @@ final class Project extends AggregateRoot
         private ProjectOwner $owner,
         private ParticipantCollection $participants,
         private RequestCollection $requests,
+        private ProjectTaskCollection $tasks
     ) {
     }
 
@@ -56,7 +58,8 @@ final class Project extends AggregateRoot
             $status,
             $owner,
             new ParticipantCollection(),
-            new RequestCollection()
+            new RequestCollection(),
+            new ProjectTaskCollection()
         );
 
         $project->registerEvent(new ProjectWasCreatedEvent(
@@ -115,7 +118,7 @@ final class Project extends AggregateRoot
 
         $this->owner->ensureUserIsNotOwner($owner->id);
         $this->participants->ensureUserIsNotParticipant($owner->id);
-        // TODO add checks for task existence
+        $this->tasks->ensureUserDoesNotHaveTask($this->owner->id, $this->id);
 
         $this->owner = $owner;
 
@@ -198,9 +201,9 @@ final class Project extends AggregateRoot
     private function removeParticipantInner(ProjectUserId $participantId): void
     {
         $this->status->ensureAllowsModification();
-        // TODO add checks for task existence
-
         $this->participants->ensureUserIsParticipant($participantId);
+        $this->tasks->ensureUserDoesNotHaveTask($participantId, $this->id);
+
         $this->participants->remove($participantId->value);
 
         $this->registerEvent(new ProjectParticipantWasRemovedEvent(

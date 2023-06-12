@@ -20,6 +20,7 @@ use TaskManager\Projects\Domain\Event\RequestWasCreatedEvent;
 use TaskManager\Projects\Domain\Exception\InvalidProjectStatusTransitionException;
 use TaskManager\Projects\Domain\Exception\ProjectModificationIsNotAllowedException;
 use TaskManager\Projects\Domain\Exception\ProjectParticipantDoesNotExistException;
+use TaskManager\Projects\Domain\Exception\ProjectUserHasTaskException;
 use TaskManager\Projects\Domain\Exception\RequestDoesNotExistException;
 use TaskManager\Projects\Domain\Exception\UserAlreadyHasPendingRequestException;
 use TaskManager\Projects\Domain\Exception\UserIsAlreadyProjectOwnerException;
@@ -37,11 +38,13 @@ use TaskManager\Projects\Domain\ValueObject\ProjectInformation;
 use TaskManager\Projects\Domain\ValueObject\ProjectName;
 use TaskManager\Projects\Domain\ValueObject\ProjectOwner;
 use TaskManager\Projects\Domain\ValueObject\ProjectStatus;
+use TaskManager\Projects\Domain\ValueObject\ProjectTask;
 use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
 use TaskManager\Projects\Domain\ValueObject\RejectedRequestStatus;
 use TaskManager\Projects\Domain\ValueObject\RequestChangeDate;
 use TaskManager\Projects\Domain\ValueObject\RequestId;
 use TaskManager\Projects\Domain\ValueObject\RequestStatus;
+use TaskManager\Projects\Domain\ValueObject\TaskId;
 
 class ProjectTest extends TestCase
 {
@@ -302,6 +305,25 @@ class ProjectTest extends TestCase
         $project->changeOwner(new ProjectOwner($otherUserId), $builder->getOwner()->id);
     }
 
+    public function testChangeOwnerWithTask(): void
+    {
+        $builder = new ProjectBuilder($this->faker);
+        $ownerId = new ProjectUserId($this->faker->uuid());
+        $otherUserId = new ProjectUserId($this->faker->uuid());
+        $project = $builder
+            ->withOwner(new ProjectOwner($ownerId))
+            ->withTask(new ProjectTask(
+                new ProjectId($this->faker->uuid()),
+                new TaskId($this->faker->uuid()),
+                $ownerId
+            ))
+            ->build();
+
+        $this->expectProjectUserHasTaskException($ownerId, $builder->getId());
+
+        $project->changeOwner(new ProjectOwner($otherUserId), $builder->getOwner()->id);
+    }
+
     public function testRemoveParticipant(): void
     {
         $builder = new ProjectBuilder($this->faker);
@@ -371,6 +393,27 @@ class ProjectTest extends TestCase
         $project->removeParticipant($otherUserId, $builder->getOwner()->id);
     }
 
+    public function testRemoveParticipantWithTask(): void
+    {
+        $builder = new ProjectBuilder($this->faker);
+        $participantId = new ProjectUserId($this->faker->uuid());
+        $project = $builder
+            ->withParticipant(new Participant(
+                new ProjectId($this->faker->uuid()),
+                $participantId
+            ))
+            ->withTask(new ProjectTask(
+                new ProjectId($this->faker->uuid()),
+                new TaskId($this->faker->uuid()),
+                $participantId
+            ))
+            ->build();
+
+        $this->expectProjectUserHasTaskException($participantId, $builder->getId());
+
+        $project->removeParticipant($participantId, $builder->getOwner()->id);
+    }
+
     public function testLeaveProject(): void
     {
         $builder = new ProjectBuilder($this->faker);
@@ -422,6 +465,27 @@ class ProjectTest extends TestCase
         $this->expectProjectParticipantDoesNotExistException($otherUserId);
 
         $project->leaveProject($otherUserId);
+    }
+
+    public function testLeaveProjectWithTask(): void
+    {
+        $builder = new ProjectBuilder($this->faker);
+        $participantId = new ProjectUserId($this->faker->uuid());
+        $project = $builder
+            ->withParticipant(new Participant(
+                new ProjectId($this->faker->uuid()),
+                $participantId
+            ))
+            ->withTask(new ProjectTask(
+                new ProjectId($this->faker->uuid()),
+                new TaskId($this->faker->uuid()),
+                $participantId
+            ))
+            ->build();
+
+        $this->expectProjectUserHasTaskException($participantId, $builder->getId());
+
+        $project->leaveProject($participantId);
     }
 
     public function testCreateRequest(): void
@@ -698,6 +762,16 @@ class ProjectTest extends TestCase
         $this->expectExceptionMessage(sprintf(
             'User "%s" is already project participant',
             $id->value
+        ));
+    }
+
+    private function expectProjectUserHasTaskException(ProjectUserId $userId, ProjectId $projectId): void
+    {
+        $this->expectException(ProjectUserHasTaskException::class);
+        $this->expectExceptionMessage(sprintf(
+            'User "%s" has task(s) in project "%s',
+            $userId->value,
+            $projectId->value
         ));
     }
 }
