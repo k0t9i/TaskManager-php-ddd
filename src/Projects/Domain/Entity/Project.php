@@ -193,6 +193,10 @@ final class Project extends AggregateRoot
     ): Task {
         $this->status->ensureAllowsModification();
         $this->ensureUserIsProjectUser($owner->id);
+        $this->information->ensureIsFinishDateGreaterThanTaskDates(
+            $information->startDate,
+            $information->finishDate
+        );
 
         return Task::create($id, $this->id, $information, $owner);
     }
