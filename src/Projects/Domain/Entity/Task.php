@@ -16,6 +16,8 @@ use TaskManager\Shared\Domain\Equatable;
 
 final class Task extends AggregateRoot
 {
+    private bool $isDraft = false;
+
     public function __construct(
         private readonly TaskId $id,
         private readonly ProjectId $projectId,
@@ -41,6 +43,7 @@ final class Task extends AggregateRoot
             $status,
             $owner
         );
+        $task->markAsDraft();
 
         $task->registerEvent(new TaskWasCreatedEvent(
             $id->value,
@@ -57,6 +60,11 @@ final class Task extends AggregateRoot
         return $task;
     }
 
+    private function markAsDraft(): void
+    {
+        $this->isDraft = true;
+    }
+
     public function equals(Equatable $other): bool
     {
         return $other instanceof self
@@ -64,6 +72,7 @@ final class Task extends AggregateRoot
             && $other->projectId->equals($this->projectId)
             && $other->information->equals($this->information)
             && $other->status->equals($this->status)
-            && $other->owner->equals($this->owner);
+            && $other->owner->equals($this->owner)
+            && $other->isDraft === $this->isDraft;
     }
 }
