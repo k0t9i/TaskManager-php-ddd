@@ -178,6 +178,11 @@ final class TaskBuilder
         return $this->owner;
     }
 
+    public function getInformation(): TaskInformation
+    {
+        return $this->information;
+    }
+
     private function prepareData(): void
     {
         $this->id = $this->id ?? new TaskId($this->faker->uuid());

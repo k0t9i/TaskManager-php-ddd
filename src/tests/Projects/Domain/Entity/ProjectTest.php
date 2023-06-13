@@ -46,7 +46,6 @@ use TaskManager\Projects\Domain\ValueObject\RequestChangeDate;
 use TaskManager\Projects\Domain\ValueObject\RequestId;
 use TaskManager\Projects\Domain\ValueObject\RequestStatus;
 use TaskManager\Projects\Domain\ValueObject\TaskId;
-use TaskManager\Projects\Domain\ValueObject\TaskInformation;
 use TaskManager\Projects\Domain\ValueObject\TaskOwner;
 
 class ProjectTest extends TestCase
@@ -732,13 +731,7 @@ class ProjectTest extends TestCase
 
         $task = $project->createTask(
             $taskBuilder->getId(),
-            new TaskInformation(
-                $taskBuilder->getName(),
-                $taskBuilder->getBrief(),
-                $taskBuilder->getDescription(),
-                $taskBuilder->getStartDate(),
-                $taskBuilder->getFinishDate(),
-            ),
+            $taskBuilder->getInformation(),
             new TaskOwner($builder->getOwner()->id)
         );
 
@@ -759,13 +752,7 @@ class ProjectTest extends TestCase
 
         $task = $project->createTask(
             $taskBuilder->getId(),
-            new TaskInformation(
-                $taskBuilder->getName(),
-                $taskBuilder->getBrief(),
-                $taskBuilder->getDescription(),
-                $taskBuilder->getStartDate(),
-                $taskBuilder->getFinishDate(),
-            ),
+            $taskBuilder->getInformation(),
             new TaskOwner($builder->getParticipants()[0]->userId)
         );
 
@@ -785,13 +772,7 @@ class ProjectTest extends TestCase
 
         $project->createTask(
             $taskBuilder->getId(),
-            new TaskInformation(
-                $taskBuilder->getName(),
-                $taskBuilder->getBrief(),
-                $taskBuilder->getDescription(),
-                $taskBuilder->getStartDate(),
-                $taskBuilder->getFinishDate(),
-            ),
+            $taskBuilder->getInformation(),
             new TaskOwner($builder->getOwner()->id)
         );
     }
@@ -808,16 +789,11 @@ class ProjectTest extends TestCase
 
         $project->createTask(
             $taskBuilder->getId(),
-            new TaskInformation(
-                $taskBuilder->getName(),
-                $taskBuilder->getBrief(),
-                $taskBuilder->getDescription(),
-                $taskBuilder->getStartDate(),
-                $taskBuilder->getFinishDate(),
-            ),
+            $taskBuilder->getInformation(),
             new TaskOwner($otherUserId)
         );
     }
+
     public function testAddProjectTaskForNonProjectUser(): void
     {
         $builder = new ProjectBuilder($this->faker);
