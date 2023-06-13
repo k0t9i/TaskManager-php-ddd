@@ -60,6 +60,11 @@ final class Task extends AggregateRoot
         return $task;
     }
 
+    public function undraft(): void
+    {
+        $this->isDraft = false;
+    }
+
     private function markAsDraft(): void
     {
         $this->isDraft = true;
