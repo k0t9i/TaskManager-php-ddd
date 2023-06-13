@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                          https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="TaskManager\Projects\Domain\Entity\Task" table="tasks">
+        <id name="id" type="task_id" length="36" />
+        <field name="projectId" column="project_id" type="project_id" length="36" />
+        <embedded name="information" class="TaskManager\Projects\Domain\ValueObject\TaskInformation" use-column-prefix="false" />
+        <field name="status" type="task_status" />
+        <embedded name="owner" class="TaskManager\Projects\Domain\ValueObject\TaskOwner" use-column-prefix="false" />
+        <field name="isDraft" column="is_draft" type="boolean" />
+    </entity>
+</doctrine-mapping>

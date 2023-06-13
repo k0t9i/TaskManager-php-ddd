@@ -26,6 +26,12 @@ doctrine:
             request_change_date: TaskManager\Projects\Infrastructure\Persistence\Doctrine\RequestChangeDateType
 
             task_id: TaskManager\Projects\Infrastructure\Persistence\Doctrine\TaskIdType
+            task_name: TaskManager\Projects\Infrastructure\Persistence\Doctrine\TaskNameType
+            task_brief: TaskManager\Projects\Infrastructure\Persistence\Doctrine\TaskBriefType
+            task_description: TaskManager\Projects\Infrastructure\Persistence\Doctrine\TaskDescriptionType
+            task_start_date: TaskManager\Projects\Infrastructure\Persistence\Doctrine\TaskStartDateType
+            task_finish_date: TaskManager\Projects\Infrastructure\Persistence\Doctrine\TaskFinishDateType
+            task_status: TaskManager\Projects\Infrastructure\Persistence\Doctrine\TaskStatusType
     orm:
         auto_generate_proxy_classes: true
         enable_lazy_ghost_objects: true

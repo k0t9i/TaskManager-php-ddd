@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                          https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <embeddable name="TaskManager\Projects\Domain\ValueObject\TaskInformation">
+        <field name="name" type="task_name" length="255" />
+        <field name="brief" type="task_brief" length="2000" />
+        <field name="description" type="task_description" length="4000" />
+        <field name="startDate" type="task_start_date" />
+        <field name="finishDate" type="task_finish_date" />
+    </embeddable>
+</doctrine-mapping>
