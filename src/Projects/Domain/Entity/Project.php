@@ -27,6 +27,7 @@ use TaskManager\Projects\Domain\ValueObject\ProjectInformation;
 use TaskManager\Projects\Domain\ValueObject\ProjectName;
 use TaskManager\Projects\Domain\ValueObject\ProjectOwner;
 use TaskManager\Projects\Domain\ValueObject\ProjectStatus;
+use TaskManager\Projects\Domain\ValueObject\ProjectTask;
 use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
 use TaskManager\Projects\Domain\ValueObject\RejectedRequestStatus;
 use TaskManager\Projects\Domain\ValueObject\RequestId;
@@ -190,12 +191,20 @@ final class Project extends AggregateRoot
         TaskOwner $owner
     ): Task {
         $this->status->ensureAllowsModification();
-
-        if (!$this->owner->userIsOwner($owner->id) && !$this->participants->exists($owner->id->value)) {
-            throw new ProjectUserDoesNotExistException($owner->id->value);
-        }
+        $this->ensureUserIsProjectUser($owner->id);
 
         return Task::create($id, $this->id, $information, $owner);
+    }
+
+    public function addProjectTask(TaskId $taskId, ProjectUserId $userId): void
+    {
+        $this->ensureUserIsProjectUser($userId);
+
+        $this->tasks->addOrUpdateElement(new ProjectTask(
+            $this->id,
+            $taskId,
+            $userId
+        ));
     }
 
     public function getId(): ProjectId
@@ -259,5 +268,12 @@ final class Project extends AggregateRoot
             (string) $request->getStatus()->getScalar(),
             $request->getChangeDate()->getValue()
         ));
+    }
+
+    private function ensureUserIsProjectUser(ProjectUserId $userId): void
+    {
+        if (!$this->owner->userIsOwner($userId) && !$this->participants->exists($userId->value)) {
+            throw new ProjectUserDoesNotExistException($userId->value);
+        }
     }
 }

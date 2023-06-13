@@ -21,7 +21,6 @@ use TaskManager\Projects\Domain\Event\RequestWasCreatedEvent;
 use TaskManager\Projects\Domain\Exception\InvalidProjectStatusTransitionException;
 use TaskManager\Projects\Domain\Exception\ProjectModificationIsNotAllowedException;
 use TaskManager\Projects\Domain\Exception\ProjectParticipantDoesNotExistException;
-use TaskManager\Projects\Domain\Exception\ProjectUserDoesNotExistException;
 use TaskManager\Projects\Domain\Exception\ProjectUserHasTaskException;
 use TaskManager\Projects\Domain\Exception\RequestDoesNotExistException;
 use TaskManager\Projects\Domain\Exception\UserAlreadyHasPendingRequestException;
@@ -771,20 +770,6 @@ class ProjectTest extends TestCase
         );
 
         $this->assertInstanceOf(Task::class, $task);
-
-        $task = $project->createTask(
-            $taskBuilder->getId(),
-            new TaskInformation(
-                $taskBuilder->getName(),
-                $taskBuilder->getBrief(),
-                $taskBuilder->getDescription(),
-                $taskBuilder->getStartDate(),
-                $taskBuilder->getFinishDate(),
-            ),
-            new TaskOwner($builder->getOwner()->id)
-        );
-
-        $this->assertInstanceOf(Task::class, $task);
     }
 
     public function testCreateTaskInClosedProject(): void
@@ -819,11 +804,7 @@ class ProjectTest extends TestCase
         $taskBuilder->build();
         $otherUserId = new ProjectUserId($this->faker->uuid());
 
-        $this->expectException(ProjectUserDoesNotExistException::class);
-        $this->expectExceptionMessage(sprintf(
-            'Project user "%s" doesn\'t exist',
-            $otherUserId->value
-        ));
+        $this->expectProjectUserDoesNotExistException($otherUserId);
 
         $project->createTask(
             $taskBuilder->getId(),
@@ -835,6 +816,19 @@ class ProjectTest extends TestCase
                 $taskBuilder->getFinishDate(),
             ),
             new TaskOwner($otherUserId)
+        );
+    }
+    public function testAddProjectTaskForNonProjectUser(): void
+    {
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder->build();
+        $otherUserId = new ProjectUserId($this->faker->uuid());
+
+        $this->expectProjectUserDoesNotExistException($otherUserId);
+
+        $project->addProjectTask(
+            new TaskId($this->faker->uuid()),
+            $otherUserId
         );
     }
 
@@ -890,6 +884,14 @@ class ProjectTest extends TestCase
             'User "%s" has task(s) in project "%s',
             $userId->value,
             $projectId->value
+        ));
+    }
+
+    private function expectProjectUserDoesNotExistException(ProjectUserId $userId): void
+    {
+        $this->expectExceptionMessage(sprintf(
+            'Project user "%s" doesn\'t exist',
+            $userId->value
         ));
     }
 }
