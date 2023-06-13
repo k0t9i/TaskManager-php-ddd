@@ -10,6 +10,7 @@ use PHPUnit\Framework\TestCase;
 use TaskManager\Projects\Domain\Collection\ParticipantCollection;
 use TaskManager\Projects\Domain\Entity\Project;
 use TaskManager\Projects\Domain\Entity\Request;
+use TaskManager\Projects\Domain\Entity\Task;
 use TaskManager\Projects\Domain\Event\ProjectInformationWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectOwnerWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectParticipantWasRemovedEvent;
@@ -20,6 +21,7 @@ use TaskManager\Projects\Domain\Event\RequestWasCreatedEvent;
 use TaskManager\Projects\Domain\Exception\InvalidProjectStatusTransitionException;
 use TaskManager\Projects\Domain\Exception\ProjectModificationIsNotAllowedException;
 use TaskManager\Projects\Domain\Exception\ProjectParticipantDoesNotExistException;
+use TaskManager\Projects\Domain\Exception\ProjectUserDoesNotExistException;
 use TaskManager\Projects\Domain\Exception\ProjectUserHasTaskException;
 use TaskManager\Projects\Domain\Exception\RequestDoesNotExistException;
 use TaskManager\Projects\Domain\Exception\UserAlreadyHasPendingRequestException;
@@ -45,6 +47,8 @@ use TaskManager\Projects\Domain\ValueObject\RequestChangeDate;
 use TaskManager\Projects\Domain\ValueObject\RequestId;
 use TaskManager\Projects\Domain\ValueObject\RequestStatus;
 use TaskManager\Projects\Domain\ValueObject\TaskId;
+use TaskManager\Projects\Domain\ValueObject\TaskInformation;
+use TaskManager\Projects\Domain\ValueObject\TaskOwner;
 
 class ProjectTest extends TestCase
 {
@@ -717,6 +721,120 @@ class ProjectTest extends TestCase
         $project->rejectRequest(
             $requestId,
             $builder->getOwner()->id
+        );
+    }
+
+    public function testCreateTaskForOwner(): void
+    {
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder->build();
+        $taskBuilder = new TaskBuilder($this->faker);
+        $taskBuilder->build();
+
+        $task = $project->createTask(
+            $taskBuilder->getId(),
+            new TaskInformation(
+                $taskBuilder->getName(),
+                $taskBuilder->getBrief(),
+                $taskBuilder->getDescription(),
+                $taskBuilder->getStartDate(),
+                $taskBuilder->getFinishDate(),
+            ),
+            new TaskOwner($builder->getOwner()->id)
+        );
+
+        $this->assertInstanceOf(Task::class, $task);
+    }
+
+    public function testCreateTaskForParticipant(): void
+    {
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder
+            ->withParticipant(new Participant(
+                new ProjectId($this->faker->uuid()),
+                new ProjectUserId($this->faker->uuid())
+            ))
+            ->build();
+        $taskBuilder = new TaskBuilder($this->faker);
+        $taskBuilder->build();
+
+        $task = $project->createTask(
+            $taskBuilder->getId(),
+            new TaskInformation(
+                $taskBuilder->getName(),
+                $taskBuilder->getBrief(),
+                $taskBuilder->getDescription(),
+                $taskBuilder->getStartDate(),
+                $taskBuilder->getFinishDate(),
+            ),
+            new TaskOwner($builder->getParticipants()[0]->userId)
+        );
+
+        $this->assertInstanceOf(Task::class, $task);
+
+        $task = $project->createTask(
+            $taskBuilder->getId(),
+            new TaskInformation(
+                $taskBuilder->getName(),
+                $taskBuilder->getBrief(),
+                $taskBuilder->getDescription(),
+                $taskBuilder->getStartDate(),
+                $taskBuilder->getFinishDate(),
+            ),
+            new TaskOwner($builder->getOwner()->id)
+        );
+
+        $this->assertInstanceOf(Task::class, $task);
+    }
+
+    public function testCreateTaskInClosedProject(): void
+    {
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder
+            ->withStatus(new ClosedProjectStatus())
+            ->build();
+        $taskBuilder = new TaskBuilder($this->faker);
+        $taskBuilder->build();
+
+        $this->expectProjectModificationIsNotAllowedException();
+
+        $project->createTask(
+            $taskBuilder->getId(),
+            new TaskInformation(
+                $taskBuilder->getName(),
+                $taskBuilder->getBrief(),
+                $taskBuilder->getDescription(),
+                $taskBuilder->getStartDate(),
+                $taskBuilder->getFinishDate(),
+            ),
+            new TaskOwner($builder->getOwner()->id)
+        );
+    }
+
+    public function testCreateTaskForNonProjectUser(): void
+    {
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder->build();
+        $taskBuilder = new TaskBuilder($this->faker);
+        $taskBuilder->build();
+        $otherUserId = new ProjectUserId($this->faker->uuid());
+
+        $this->expectException(ProjectUserDoesNotExistException::class);
+        $this->expectExceptionMessage(sprintf(
+            'Project user "%s" doesn\'t exist',
+            $otherUserId->value
+        ));
+
+        $project->createTask(
+            $taskBuilder->getId(),
+            new TaskInformation(
+                $taskBuilder->getName(),
+                $taskBuilder->getBrief(),
+                $taskBuilder->getDescription(),
+                $taskBuilder->getStartDate(),
+                $taskBuilder->getFinishDate(),
+            ),
+            new TaskOwner($otherUserId)
         );
     }
 

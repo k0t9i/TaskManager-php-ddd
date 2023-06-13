@@ -14,6 +14,7 @@ use TaskManager\Projects\Domain\Event\ProjectStatusWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectWasCreatedEvent;
 use TaskManager\Projects\Domain\Event\RequestStatusWasChangedEvent;
 use TaskManager\Projects\Domain\Event\RequestWasCreatedEvent;
+use TaskManager\Projects\Domain\Exception\ProjectUserDoesNotExistException;
 use TaskManager\Projects\Domain\Exception\RequestDoesNotExistException;
 use TaskManager\Projects\Domain\ValueObject\ActiveProjectStatus;
 use TaskManager\Projects\Domain\ValueObject\ClosedProjectStatus;
@@ -30,6 +31,9 @@ use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
 use TaskManager\Projects\Domain\ValueObject\RejectedRequestStatus;
 use TaskManager\Projects\Domain\ValueObject\RequestId;
 use TaskManager\Projects\Domain\ValueObject\RequestStatus;
+use TaskManager\Projects\Domain\ValueObject\TaskId;
+use TaskManager\Projects\Domain\ValueObject\TaskInformation;
+use TaskManager\Projects\Domain\ValueObject\TaskOwner;
 use TaskManager\Shared\Domain\Aggregate\AggregateRoot;
 use TaskManager\Shared\Domain\Equatable;
 
@@ -178,6 +182,20 @@ final class Project extends AggregateRoot
     public function rejectRequest(RequestId $id, ProjectUserId $currentUserId): void
     {
         $this->changeRequestStatus($id, new RejectedRequestStatus(), $currentUserId);
+    }
+
+    public function createTask(
+        TaskId $id,
+        TaskInformation $information,
+        TaskOwner $owner
+    ): Task {
+        $this->status->ensureAllowsModification();
+
+        if (!$this->owner->userIsOwner($owner->id) && !$this->participants->exists($owner->id->value)) {
+            throw new ProjectUserDoesNotExistException($owner->id->value);
+        }
+
+        return Task::create($id, $this->id, $information, $owner);
     }
 
     public function getId(): ProjectId
