@@ -11,6 +11,7 @@ use TaskManager\Projects\Domain\Event\ProjectInformationWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectOwnerWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectParticipantWasRemovedEvent;
 use TaskManager\Projects\Domain\Event\ProjectStatusWasChangedEvent;
+use TaskManager\Projects\Domain\Event\ProjectTaskWasCreatedEvent;
 use TaskManager\Projects\Domain\Event\ProjectWasCreatedEvent;
 use TaskManager\Projects\Domain\Event\RequestStatusWasChangedEvent;
 use TaskManager\Projects\Domain\Event\RequestWasCreatedEvent;
@@ -204,6 +205,12 @@ final class Project extends AggregateRoot
             $this->id,
             $taskId,
             $userId
+        ));
+
+        $this->registerEvent(new ProjectTaskWasCreatedEvent(
+            $this->id->value,
+            $taskId->value,
+            $userId->value
         ));
     }
 

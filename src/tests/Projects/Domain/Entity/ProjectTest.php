@@ -15,6 +15,7 @@ use TaskManager\Projects\Domain\Event\ProjectInformationWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectOwnerWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectParticipantWasRemovedEvent;
 use TaskManager\Projects\Domain\Event\ProjectStatusWasChangedEvent;
+use TaskManager\Projects\Domain\Event\ProjectTaskWasCreatedEvent;
 use TaskManager\Projects\Domain\Event\ProjectWasCreatedEvent;
 use TaskManager\Projects\Domain\Event\RequestStatusWasChangedEvent;
 use TaskManager\Projects\Domain\Event\RequestWasCreatedEvent;
@@ -792,6 +793,53 @@ class ProjectTest extends TestCase
             $taskBuilder->getInformation(),
             new TaskOwner($otherUserId)
         );
+    }
+
+    public function testAddProjectTaskForOwner(): void
+    {
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder->build();
+        $taskId = new TaskId($this->faker->uuid());
+
+        $project->addProjectTask(
+            $taskId,
+            $builder->getOwner()->id,
+        );
+        $events = $project->releaseEvents();
+
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(ProjectTaskWasCreatedEvent::class, $events[0]);
+        $this->assertEquals($builder->getId()->value, $events[0]->getAggregateId());
+        $this->assertEquals([
+            'taskId' => $taskId->value,
+            'ownerId' => $builder->getOwner()->id->value,
+        ], $events[0]->toPrimitives());
+    }
+
+    public function testAddProjectTaskForParticipant(): void
+    {
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder
+            ->withParticipant(new Participant(
+                new ProjectId($this->faker->uuid()),
+                new ProjectUserId($this->faker->uuid())
+            ))
+            ->build();
+        $taskId = new TaskId($this->faker->uuid());
+
+        $project->addProjectTask(
+            $taskId,
+            $builder->getParticipants()[0]->userId,
+        );
+        $events = $project->releaseEvents();
+
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(ProjectTaskWasCreatedEvent::class, $events[0]);
+        $this->assertEquals($builder->getId()->value, $events[0]->getAggregateId());
+        $this->assertEquals([
+            'taskId' => $taskId->value,
+            'ownerId' => $builder->getParticipants()[0]->userId->value,
+        ], $events[0]->toPrimitives());
     }
 
     public function testAddProjectTaskForNonProjectUser(): void
