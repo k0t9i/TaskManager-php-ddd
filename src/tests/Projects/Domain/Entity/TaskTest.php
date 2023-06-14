@@ -9,10 +9,13 @@ use Faker\Generator;
 use PHPUnit\Framework\TestCase;
 use TaskManager\Projects\Domain\Entity\Task;
 use TaskManager\Projects\Domain\Event\TaskInformationWasChangedEvent;
+use TaskManager\Projects\Domain\Event\TaskStatusWasChangedEvent;
 use TaskManager\Projects\Domain\Event\TaskWasCreatedEvent;
+use TaskManager\Projects\Domain\Exception\InvalidTaskStatusTransitionException;
 use TaskManager\Projects\Domain\Exception\TaskModificationIsNotAllowedException;
 use TaskManager\Projects\Domain\Exception\TaskStartDateIsGreaterThanFinishDateException;
 use TaskManager\Projects\Domain\Exception\UserIsNotTaskOwnerException;
+use TaskManager\Projects\Domain\ValueObject\ActiveTaskStatus;
 use TaskManager\Projects\Domain\ValueObject\ClosedTaskStatus;
 use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
 use TaskManager\Projects\Domain\ValueObject\TaskFinishDate;
@@ -216,6 +219,66 @@ class TaskTest extends TestCase
             $newInfoBuilder->getFinishDate(),
             $otherUserId
         );
+    }
+
+    public function testCloseTask(): void
+    {
+        $builder = new TaskBuilder($this->faker);
+        $task = $builder->build();
+
+        $task->close($builder->getOwner()->id);
+        $events = $task->releaseEvents();
+
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(TaskStatusWasChangedEvent::class, $events[0]);
+        $this->assertEquals($builder->getId()->value, $events[0]->getAggregateId());
+        $this->assertEquals([
+            'status' => TaskStatus::STATUS_CLOSED,
+        ], $events[0]->toPrimitives());
+    }
+
+    public function testActivateTask(): void
+    {
+        $builder = new TaskBuilder($this->faker);
+        $task = $builder
+            ->withStatus(new ClosedTaskStatus())
+            ->build();
+
+        $task->activate($builder->getOwner()->id);
+        $events = $task->releaseEvents();
+
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(TaskStatusWasChangedEvent::class, $events[0]);
+        $this->assertEquals($builder->getId()->value, $events[0]->getAggregateId());
+        $this->assertEquals([
+            'status' => TaskStatus::STATUS_ACTIVE,
+        ], $events[0]->toPrimitives());
+    }
+
+    public function testChangeToInvalidStatus(): void
+    {
+        $builder = new TaskBuilder($this->faker);
+        $task = $builder->build();
+
+        $this->expectException(InvalidTaskStatusTransitionException::class);
+        $this->expectExceptionMessage(sprintf(
+            'Task status "%s" cannot be changed to "%s"',
+            ActiveTaskStatus::class,
+            ActiveTaskStatus::class
+        ));
+
+        $task->activate($builder->getOwner()->id);
+    }
+
+    public function testChangeStatusByNonOwner(): void
+    {
+        $builder = new TaskBuilder($this->faker);
+        $otherUserId = new ProjectUserId($this->faker->uuid());
+        $task = $builder->build();
+
+        $this->expectUserIsNotTaskOwnerException($otherUserId->value);
+
+        $task->close($otherUserId);
     }
 
     private function expectTaskModificationIsNotAllowedException(): void

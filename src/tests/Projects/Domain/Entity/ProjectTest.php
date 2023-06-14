@@ -20,6 +20,7 @@ use TaskManager\Projects\Domain\Event\ProjectWasCreatedEvent;
 use TaskManager\Projects\Domain\Event\RequestStatusWasChangedEvent;
 use TaskManager\Projects\Domain\Event\RequestWasCreatedEvent;
 use TaskManager\Projects\Domain\Event\TaskInformationWasChangedEvent;
+use TaskManager\Projects\Domain\Event\TaskStatusWasChangedEvent;
 use TaskManager\Projects\Domain\Exception\InvalidProjectStatusTransitionException;
 use TaskManager\Projects\Domain\Exception\ProjectModificationIsNotAllowedException;
 use TaskManager\Projects\Domain\Exception\ProjectParticipantDoesNotExistException;
@@ -36,6 +37,7 @@ use TaskManager\Projects\Domain\Exception\UserIsNotProjectOwnerException;
 use TaskManager\Projects\Domain\Exception\UserIsNotTaskOwnerException;
 use TaskManager\Projects\Domain\ValueObject\ActiveProjectStatus;
 use TaskManager\Projects\Domain\ValueObject\ClosedProjectStatus;
+use TaskManager\Projects\Domain\ValueObject\ClosedTaskStatus;
 use TaskManager\Projects\Domain\ValueObject\ConfirmedRequestStatus;
 use TaskManager\Projects\Domain\ValueObject\Participant;
 use TaskManager\Projects\Domain\ValueObject\PendingRequestStatus;
@@ -56,6 +58,7 @@ use TaskManager\Projects\Domain\ValueObject\TaskFinishDate;
 use TaskManager\Projects\Domain\ValueObject\TaskId;
 use TaskManager\Projects\Domain\ValueObject\TaskOwner;
 use TaskManager\Projects\Domain\ValueObject\TaskStartDate;
+use TaskManager\Projects\Domain\ValueObject\TaskStatus;
 
 class ProjectTest extends TestCase
 {
@@ -1127,11 +1130,7 @@ class ProjectTest extends TestCase
             ->build();
         $otherUserId = new ProjectUserId($this->faker->uuid());
 
-        $this->expectException(UserIsNotTaskOwnerException::class);
-        $this->expectExceptionMessage(sprintf(
-            'User "%s" is not task owner',
-            $otherUserId->value
-        ));
+        $this->expectUserIsNotTaskOwnerException($otherUserId->value);
 
         $project->changeTaskInformation(
             $task,
@@ -1142,6 +1141,174 @@ class ProjectTest extends TestCase
             $newTaskInfoBuilder->getFinishDate(),
             $otherUserId
         );
+    }
+
+    public function testActivateTask(): void
+    {
+        $taskBuilder = new TaskBuilder($this->faker);
+        $task = $taskBuilder
+            ->withStatus(new ClosedTaskStatus())
+            ->build();
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder
+            ->withTask(new ProjectTask(
+                new ProjectId($this->faker->uuid()),
+                $taskBuilder->getId(),
+                new ProjectUserId($this->faker->uuid())
+            ))
+            ->build();
+
+        $project->activateTask($task, $builder->getOwner()->id);
+        $events = $task->releaseEvents();
+
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(TaskStatusWasChangedEvent::class, $events[0]);
+        $this->assertEquals($taskBuilder->getId()->value, $events[0]->getAggregateId());
+        $this->assertEquals([
+            'status' => TaskStatus::STATUS_ACTIVE,
+        ], $events[0]->toPrimitives());
+    }
+
+    public function testActivateTaskInClosedProject(): void
+    {
+        $taskBuilder = new TaskBuilder($this->faker);
+        $task = $taskBuilder
+            ->withStatus(new ClosedTaskStatus())
+            ->build();
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder
+            ->withStatus(new ClosedProjectStatus())
+            ->withTask(new ProjectTask(
+                new ProjectId($this->faker->uuid()),
+                $taskBuilder->getId(),
+                new ProjectUserId($this->faker->uuid())
+            ))
+            ->build();
+
+        $this->expectProjectModificationIsNotAllowedException();
+
+        $project->activateTask($task, $builder->getOwner()->id);
+    }
+
+    public function testActivateNonExistingTask(): void
+    {
+        $taskBuilder = new TaskBuilder($this->faker);
+        $task = $taskBuilder
+            ->withStatus(new ClosedTaskStatus())
+            ->build();
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder
+            ->withTask(new ProjectTask(
+                new ProjectId($this->faker->uuid()),
+                new TaskId($this->faker->uuid()),
+                new ProjectUserId($this->faker->uuid())
+            ))
+            ->build();
+
+        $this->expectProjectTaskDoesNotExistException($task->getId()->value);
+
+        $project->activateTask($task, $builder->getOwner()->id);
+    }
+
+    public function testActivateTaskByNonOwner(): void
+    {
+        $taskBuilder = new TaskBuilder($this->faker);
+        $task = $taskBuilder
+            ->withStatus(new ClosedTaskStatus())
+            ->build();
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder
+            ->withTask(new ProjectTask(
+                new ProjectId($this->faker->uuid()),
+                $task->getId(),
+                new ProjectUserId($this->faker->uuid())
+            ))
+            ->build();
+        $otherUserId = new ProjectUserId($this->faker->uuid());
+
+        $this->expectUserIsNotTaskOwnerException($otherUserId->value);
+
+        $project->activateTask($task, $otherUserId);
+    }
+
+    public function testCloseTask(): void
+    {
+        $taskBuilder = new TaskBuilder($this->faker);
+        $task = $taskBuilder->build();
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder
+            ->withTask(new ProjectTask(
+                new ProjectId($this->faker->uuid()),
+                $taskBuilder->getId(),
+                new ProjectUserId($this->faker->uuid())
+            ))
+            ->build();
+
+        $project->closeTask($task, $builder->getOwner()->id);
+        $events = $task->releaseEvents();
+
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(TaskStatusWasChangedEvent::class, $events[0]);
+        $this->assertEquals($taskBuilder->getId()->value, $events[0]->getAggregateId());
+        $this->assertEquals([
+            'status' => TaskStatus::STATUS_CLOSED,
+        ], $events[0]->toPrimitives());
+    }
+
+    public function testCloseTaskInClosedProject(): void
+    {
+        $taskBuilder = new TaskBuilder($this->faker);
+        $task = $taskBuilder->build();
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder
+            ->withStatus(new ClosedProjectStatus())
+            ->withTask(new ProjectTask(
+                new ProjectId($this->faker->uuid()),
+                $taskBuilder->getId(),
+                new ProjectUserId($this->faker->uuid())
+            ))
+            ->build();
+
+        $this->expectProjectModificationIsNotAllowedException();
+
+        $project->closeTask($task, $builder->getOwner()->id);
+    }
+
+    public function testCloseNonExistingTask(): void
+    {
+        $taskBuilder = new TaskBuilder($this->faker);
+        $task = $taskBuilder->build();
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder
+            ->withTask(new ProjectTask(
+                new ProjectId($this->faker->uuid()),
+                new TaskId($this->faker->uuid()),
+                new ProjectUserId($this->faker->uuid())
+            ))
+            ->build();
+
+        $this->expectProjectTaskDoesNotExistException($task->getId()->value);
+
+        $project->closeTask($task, $builder->getOwner()->id);
+    }
+
+    public function testCloseTaskByNonOwner(): void
+    {
+        $taskBuilder = new TaskBuilder($this->faker);
+        $task = $taskBuilder->build();
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder
+            ->withTask(new ProjectTask(
+                new ProjectId($this->faker->uuid()),
+                $task->getId(),
+                new ProjectUserId($this->faker->uuid())
+            ))
+            ->build();
+        $otherUserId = new ProjectUserId($this->faker->uuid());
+
+        $this->expectUserIsNotTaskOwnerException($otherUserId->value);
+
+        $project->closeTask($task, $otherUserId);
     }
 
     private function expectProjectModificationIsNotAllowedException(): void
@@ -1232,12 +1399,21 @@ class ProjectTest extends TestCase
         ));
     }
 
-    public function expectProjectTaskDoesNotExistException(string $taskId): void
+    private function expectProjectTaskDoesNotExistException(string $taskId): void
     {
         $this->expectException(ProjectTaskDoesNotExistException::class);
         $this->expectExceptionMessage(sprintf(
             'Project task "%s" doesn\'t exist',
             $taskId
+        ));
+    }
+
+    private function expectUserIsNotTaskOwnerException(string $userId): void
+    {
+        $this->expectException(UserIsNotTaskOwnerException::class);
+        $this->expectExceptionMessage(sprintf(
+            'User "%s" is not task owner',
+            $userId
         ));
     }
 }

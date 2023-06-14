@@ -102,7 +102,7 @@ final class Project extends AggregateRoot
         );
 
         if (!$this->information->equals($information)) {
-            //TODO change all project task start and finish dates
+            // TODO change all project task start and finish dates
             $this->information = $information;
 
             $this->registerEvent(new ProjectInformationWasChangedEvent(
@@ -122,7 +122,7 @@ final class Project extends AggregateRoot
     public function close(ProjectUserId $currentUserId): void
     {
         $this->changeStatus(new ClosedProjectStatus(), $currentUserId);
-        //TODO close all project task
+        // TODO close all project task
     }
 
     public function changeOwner(ProjectOwner $owner, ProjectUserId $currentUserId): void
@@ -241,9 +241,37 @@ final class Project extends AggregateRoot
         }
     }
 
+    public function activateTask(Task $task, ProjectUserId $currentUserId): void
+    {
+        $this->status->ensureAllowsModification();
+        $this->tasks->ensureProjectTaskExits($task->getId());
+
+        try {
+            $task->activate($currentUserId);
+        } catch (UserIsNotTaskOwnerException $e) {
+            if (!$this->owner->userIsOwner($currentUserId)) {
+                throw $e;
+            }
+        }
+    }
+
+    public function closeTask(Task $task, ProjectUserId $currentUserId): void
+    {
+        $this->status->ensureAllowsModification();
+        $this->tasks->ensureProjectTaskExits($task->getId());
+
+        try {
+            $task->close($currentUserId);
+        } catch (UserIsNotTaskOwnerException $e) {
+            if (!$this->owner->userIsOwner($currentUserId)) {
+                throw $e;
+            }
+        }
+    }
+
     public function addProjectTask(TaskId $taskId, ProjectUserId $userId): void
     {
-        //TODO check for status
+        // TODO check for status
         $this->ensureUserIsProjectUser($userId);
 
         $this->tasks->addOrUpdateElement(new ProjectTask(

@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace TaskManager\Projects\Domain\Entity;
 
 use TaskManager\Projects\Domain\Event\TaskInformationWasChangedEvent;
+use TaskManager\Projects\Domain\Event\TaskStatusWasChangedEvent;
 use TaskManager\Projects\Domain\Event\TaskWasCreatedEvent;
 use TaskManager\Projects\Domain\ValueObject\ActiveTaskStatus;
+use TaskManager\Projects\Domain\ValueObject\ClosedTaskStatus;
 use TaskManager\Projects\Domain\ValueObject\ProjectId;
 use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
 use TaskManager\Projects\Domain\ValueObject\TaskBrief;
@@ -104,6 +106,16 @@ final class Task extends AggregateRoot
         $this->owner->ensureUserIsOwner($currentUserId);
     }
 
+    public function activate(ProjectUserId $currentUserId): void
+    {
+        $this->changeStatus(new ActiveTaskStatus(), $currentUserId);
+    }
+
+    public function close(ProjectUserId $currentUserId): void
+    {
+        $this->changeStatus(new ClosedTaskStatus(), $currentUserId);
+    }
+
     public function undraft(): void
     {
         $this->isDraft = false;
@@ -117,6 +129,21 @@ final class Task extends AggregateRoot
     private function markAsDraft(): void
     {
         $this->isDraft = true;
+    }
+
+    private function changeStatus(TaskStatus $status, ProjectUserId $currentUserId): void
+    {
+        $this->status->ensureCanBeChangedTo($status);
+
+        $this->status = $status;
+
+        $this->registerEvent(new TaskStatusWasChangedEvent(
+            $this->id->value,
+            (string) $status->getScalar()
+        ));
+
+        // this check must be at the end of the method
+        $this->owner->ensureUserIsOwner($currentUserId);
     }
 
     public function equals(Equatable $other): bool
