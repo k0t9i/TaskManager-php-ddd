@@ -102,6 +102,7 @@ final class Project extends AggregateRoot
         );
 
         if (!$this->information->equals($information)) {
+            //TODO change all project task start and finish dates
             $this->information = $information;
 
             $this->registerEvent(new ProjectInformationWasChangedEvent(
@@ -121,6 +122,7 @@ final class Project extends AggregateRoot
     public function close(ProjectUserId $currentUserId): void
     {
         $this->changeStatus(new ClosedProjectStatus(), $currentUserId);
+        //TODO close all project task
     }
 
     public function changeOwner(ProjectOwner $owner, ProjectUserId $currentUserId): void
@@ -241,6 +243,7 @@ final class Project extends AggregateRoot
 
     public function addProjectTask(TaskId $taskId, ProjectUserId $userId): void
     {
+        //TODO check for status
         $this->ensureUserIsProjectUser($userId);
 
         $this->tasks->addOrUpdateElement(new ProjectTask(
