@@ -4,12 +4,19 @@ declare(strict_types=1);
 
 namespace TaskManager\Projects\Domain\Entity;
 
+use TaskManager\Projects\Domain\Event\TaskInformationWasChangedEvent;
 use TaskManager\Projects\Domain\Event\TaskWasCreatedEvent;
 use TaskManager\Projects\Domain\ValueObject\ActiveTaskStatus;
 use TaskManager\Projects\Domain\ValueObject\ProjectId;
+use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
+use TaskManager\Projects\Domain\ValueObject\TaskBrief;
+use TaskManager\Projects\Domain\ValueObject\TaskDescription;
+use TaskManager\Projects\Domain\ValueObject\TaskFinishDate;
 use TaskManager\Projects\Domain\ValueObject\TaskId;
 use TaskManager\Projects\Domain\ValueObject\TaskInformation;
+use TaskManager\Projects\Domain\ValueObject\TaskName;
 use TaskManager\Projects\Domain\ValueObject\TaskOwner;
+use TaskManager\Projects\Domain\ValueObject\TaskStartDate;
 use TaskManager\Projects\Domain\ValueObject\TaskStatus;
 use TaskManager\Shared\Domain\Aggregate\AggregateRoot;
 use TaskManager\Shared\Domain\Equatable;
@@ -60,9 +67,51 @@ final class Task extends AggregateRoot
         return $task;
     }
 
+    public function changeInformation(
+        ?TaskName $name,
+        ?TaskBrief $brief,
+        ?TaskDescription $description,
+        ?TaskStartDate $startDate,
+        ?TaskFinishDate $finishDate,
+        ProjectUserId $currentUserId
+    ): void {
+        $this->status->ensureAllowsModification();
+
+        $information = new TaskInformation(
+            $name ?? $this->information->name,
+            $brief ?? $this->information->brief,
+            $description ?? $this->information->description,
+            $startDate ?? $this->information->startDate,
+            $finishDate ?? $this->information->finishDate,
+        );
+
+        $information->ensureFinishDateGreaterOrEqualStartDate();
+
+        if (!$this->information->equals($information)) {
+            $this->information = $information;
+
+            $this->registerEvent(new TaskInformationWasChangedEvent(
+                $this->id->value,
+                $information->name->value,
+                $information->brief->value,
+                $information->description->value,
+                $information->startDate->getValue(),
+                $information->finishDate->getValue()
+            ));
+        }
+
+        // this check must be at the end of the method
+        $this->owner->ensureUserIsOwner($currentUserId);
+    }
+
     public function undraft(): void
     {
         $this->isDraft = false;
+    }
+
+    public function getId(): TaskId
+    {
+        return $this->id;
     }
 
     private function markAsDraft(): void

@@ -19,9 +19,11 @@ use TaskManager\Projects\Domain\Event\ProjectTaskWasCreatedEvent;
 use TaskManager\Projects\Domain\Event\ProjectWasCreatedEvent;
 use TaskManager\Projects\Domain\Event\RequestStatusWasChangedEvent;
 use TaskManager\Projects\Domain\Event\RequestWasCreatedEvent;
+use TaskManager\Projects\Domain\Event\TaskInformationWasChangedEvent;
 use TaskManager\Projects\Domain\Exception\InvalidProjectStatusTransitionException;
 use TaskManager\Projects\Domain\Exception\ProjectModificationIsNotAllowedException;
 use TaskManager\Projects\Domain\Exception\ProjectParticipantDoesNotExistException;
+use TaskManager\Projects\Domain\Exception\ProjectTaskDoesNotExistException;
 use TaskManager\Projects\Domain\Exception\ProjectUserDoesNotExistException;
 use TaskManager\Projects\Domain\Exception\ProjectUserHasTaskException;
 use TaskManager\Projects\Domain\Exception\RequestDoesNotExistException;
@@ -31,6 +33,7 @@ use TaskManager\Projects\Domain\Exception\UserAlreadyHasPendingRequestException;
 use TaskManager\Projects\Domain\Exception\UserIsAlreadyProjectOwnerException;
 use TaskManager\Projects\Domain\Exception\UserIsAlreadyProjectParticipantException;
 use TaskManager\Projects\Domain\Exception\UserIsNotProjectOwnerException;
+use TaskManager\Projects\Domain\Exception\UserIsNotTaskOwnerException;
 use TaskManager\Projects\Domain\ValueObject\ActiveProjectStatus;
 use TaskManager\Projects\Domain\ValueObject\ClosedProjectStatus;
 use TaskManager\Projects\Domain\ValueObject\ConfirmedRequestStatus;
@@ -927,6 +930,220 @@ class ProjectTest extends TestCase
         );
     }
 
+    public function testChangeTaskInformation(): void
+    {
+        $taskBuilder = new TaskBuilder($this->faker);
+        $task = $taskBuilder->build();
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder
+            ->withFinishDate(new ProjectFinishDate('01-02-2023'))
+            ->withTask(new ProjectTask(
+                new ProjectId($this->faker->uuid()),
+                $taskBuilder->getId(),
+                new ProjectUserId($this->faker->uuid())
+            ))
+            ->build();
+        $newTaskInfoBuilder = new TaskBuilder($this->faker);
+        $newTaskInfoBuilder
+            ->withStartDate(new TaskStartDate('01-01-2023'))
+            ->withFinishDate(new TaskFinishDate('02-01-2023'))
+            ->build();
+
+        $project->changeTaskInformation(
+            $task,
+            $newTaskInfoBuilder->getName(),
+            $newTaskInfoBuilder->getBrief(),
+            $newTaskInfoBuilder->getDescription(),
+            $newTaskInfoBuilder->getStartDate(),
+            $newTaskInfoBuilder->getFinishDate(),
+            $builder->getOwner()->id
+        );
+        $events = $task->releaseEvents();
+
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(TaskInformationWasChangedEvent::class, $events[0]);
+        $this->assertEquals($taskBuilder->getId()->value, $events[0]->getAggregateId());
+        $this->assertEquals([
+            'name' => $newTaskInfoBuilder->getName(),
+            'brief' => $newTaskInfoBuilder->getBrief(),
+            'description' => $newTaskInfoBuilder->getDescription(),
+            'startDate' => $newTaskInfoBuilder->getStartDate(),
+            'finishDate' => $newTaskInfoBuilder->getFinishDate(),
+        ], $events[0]->toPrimitives());
+    }
+
+    public function testChangeTaskInformationInClosedProject(): void
+    {
+        $taskBuilder = new TaskBuilder($this->faker);
+        $task = $taskBuilder->build();
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder
+            ->withStatus(new ClosedProjectStatus())
+            ->withFinishDate(new ProjectFinishDate('01-02-2023'))
+            ->withTask(new ProjectTask(
+                new ProjectId($this->faker->uuid()),
+                $taskBuilder->getId(),
+                new ProjectUserId($this->faker->uuid())
+            ))
+            ->build();
+        $newTaskInfoBuilder = new TaskBuilder($this->faker);
+        $newTaskInfoBuilder
+            ->withStartDate(new TaskStartDate('01-01-2023'))
+            ->withFinishDate(new TaskFinishDate('02-01-2023'))
+            ->build();
+
+        $this->expectProjectModificationIsNotAllowedException();
+
+        $project->changeTaskInformation(
+            $task,
+            $newTaskInfoBuilder->getName(),
+            $newTaskInfoBuilder->getBrief(),
+            $newTaskInfoBuilder->getDescription(),
+            $newTaskInfoBuilder->getStartDate(),
+            $newTaskInfoBuilder->getFinishDate(),
+            $builder->getOwner()->id
+        );
+    }
+
+    public function testChangeTaskInformationForNonExistingProjectTask(): void
+    {
+        $taskBuilder = new TaskBuilder($this->faker);
+        $task = $taskBuilder->build();
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder
+            ->withFinishDate(new ProjectFinishDate('01-02-2023'))
+            ->withTask(new ProjectTask(
+                new ProjectId($this->faker->uuid()),
+                new TaskId($this->faker->uuid()),
+                new ProjectUserId($this->faker->uuid())
+            ))
+            ->build();
+        $newTaskInfoBuilder = new TaskBuilder($this->faker);
+        $newTaskInfoBuilder
+            ->withStartDate(new TaskStartDate('01-01-2023'))
+            ->withFinishDate(new TaskFinishDate('02-01-2023'))
+            ->build();
+
+        $this->expectProjectTaskDoesNotExistException($task->getId()->value);
+
+        $project->changeTaskInformation(
+            $task,
+            $newTaskInfoBuilder->getName(),
+            $newTaskInfoBuilder->getBrief(),
+            $newTaskInfoBuilder->getDescription(),
+            $newTaskInfoBuilder->getStartDate(),
+            $newTaskInfoBuilder->getFinishDate(),
+            $builder->getOwner()->id
+        );
+    }
+
+    public function testChangeTaskInformationWithStartDateGreaterThanProjectFinishDate(): void
+    {
+        $taskBuilder = new TaskBuilder($this->faker);
+        $task = $taskBuilder->build();
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder
+            ->withFinishDate(new ProjectFinishDate('01-02-2023'))
+            ->withTask(new ProjectTask(
+                new ProjectId($this->faker->uuid()),
+                $task->getId(),
+                new ProjectUserId($this->faker->uuid())
+            ))
+            ->build();
+        $newTaskInfoBuilder = new TaskBuilder($this->faker);
+        $newTaskInfoBuilder
+            ->withStartDate(new TaskStartDate('01-03-2023'))
+            ->withFinishDate(new TaskFinishDate('02-01-2023'))
+            ->build();
+
+        $this->expectTaskStartDateIsGreaterThanProjectFinishDateException(
+            $newTaskInfoBuilder->getStartDate()->getValue(),
+            $builder->getFinishDate()->getValue()
+        );
+
+        $project->changeTaskInformation(
+            $task,
+            $newTaskInfoBuilder->getName(),
+            $newTaskInfoBuilder->getBrief(),
+            $newTaskInfoBuilder->getDescription(),
+            $newTaskInfoBuilder->getStartDate(),
+            $newTaskInfoBuilder->getFinishDate(),
+            $builder->getOwner()->id
+        );
+    }
+
+    public function testChangeTaskInformationWithFinishDateGreaterThanProjectFinishDate(): void
+    {
+        $taskBuilder = new TaskBuilder($this->faker);
+        $task = $taskBuilder->build();
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder
+            ->withFinishDate(new ProjectFinishDate('01-02-2023'))
+            ->withTask(new ProjectTask(
+                new ProjectId($this->faker->uuid()),
+                $task->getId(),
+                new ProjectUserId($this->faker->uuid())
+            ))
+            ->build();
+        $newTaskInfoBuilder = new TaskBuilder($this->faker);
+        $newTaskInfoBuilder
+            ->withStartDate(new TaskStartDate('01-01-2023'))
+            ->withFinishDate(new TaskFinishDate('02-03-2023'))
+            ->build();
+
+        $this->expectTaskFinishDateIsGreaterThanProjectFinishDateException(
+            $newTaskInfoBuilder->getFinishDate()->getValue(),
+            $builder->getFinishDate()->getValue()
+        );
+
+        $project->changeTaskInformation(
+            $task,
+            $newTaskInfoBuilder->getName(),
+            $newTaskInfoBuilder->getBrief(),
+            $newTaskInfoBuilder->getDescription(),
+            $newTaskInfoBuilder->getStartDate(),
+            $newTaskInfoBuilder->getFinishDate(),
+            $builder->getOwner()->id
+        );
+    }
+
+    public function testChangeTaskInformationByNonOwner(): void
+    {
+        $taskBuilder = new TaskBuilder($this->faker);
+        $task = $taskBuilder->build();
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder
+            ->withFinishDate(new ProjectFinishDate('01-02-2023'))
+            ->withTask(new ProjectTask(
+                new ProjectId($this->faker->uuid()),
+                $task->getId(),
+                new ProjectUserId($this->faker->uuid())
+            ))
+            ->build();
+        $newTaskInfoBuilder = new TaskBuilder($this->faker);
+        $newTaskInfoBuilder
+            ->withStartDate(new TaskStartDate('01-01-2023'))
+            ->withFinishDate(new TaskFinishDate('02-01-2023'))
+            ->build();
+        $otherUserId = new ProjectUserId($this->faker->uuid());
+
+        $this->expectException(UserIsNotTaskOwnerException::class);
+        $this->expectExceptionMessage(sprintf(
+            'User "%s" is not task owner',
+            $otherUserId->value
+        ));
+
+        $project->changeTaskInformation(
+            $task,
+            $newTaskInfoBuilder->getName(),
+            $newTaskInfoBuilder->getBrief(),
+            $newTaskInfoBuilder->getDescription(),
+            $newTaskInfoBuilder->getStartDate(),
+            $newTaskInfoBuilder->getFinishDate(),
+            $otherUserId
+        );
+    }
+
     private function expectProjectModificationIsNotAllowedException(): void
     {
         $this->expectException(ProjectModificationIsNotAllowedException::class);
@@ -1012,6 +1229,15 @@ class ProjectTest extends TestCase
             'Task finish date "%s" is greater than project finish date "%s"',
             $finishDate,
             $projectFinishDate
+        ));
+    }
+
+    public function expectProjectTaskDoesNotExistException(string $taskId): void
+    {
+        $this->expectException(ProjectTaskDoesNotExistException::class);
+        $this->expectExceptionMessage(sprintf(
+            'Project task "%s" doesn\'t exist',
+            $taskId
         ));
     }
 }

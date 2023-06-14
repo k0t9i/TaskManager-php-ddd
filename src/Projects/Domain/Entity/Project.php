@@ -17,6 +17,7 @@ use TaskManager\Projects\Domain\Event\RequestStatusWasChangedEvent;
 use TaskManager\Projects\Domain\Event\RequestWasCreatedEvent;
 use TaskManager\Projects\Domain\Exception\ProjectUserDoesNotExistException;
 use TaskManager\Projects\Domain\Exception\RequestDoesNotExistException;
+use TaskManager\Projects\Domain\Exception\UserIsNotTaskOwnerException;
 use TaskManager\Projects\Domain\ValueObject\ActiveProjectStatus;
 use TaskManager\Projects\Domain\ValueObject\ClosedProjectStatus;
 use TaskManager\Projects\Domain\ValueObject\ConfirmedRequestStatus;
@@ -33,9 +34,14 @@ use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
 use TaskManager\Projects\Domain\ValueObject\RejectedRequestStatus;
 use TaskManager\Projects\Domain\ValueObject\RequestId;
 use TaskManager\Projects\Domain\ValueObject\RequestStatus;
+use TaskManager\Projects\Domain\ValueObject\TaskBrief;
+use TaskManager\Projects\Domain\ValueObject\TaskDescription;
+use TaskManager\Projects\Domain\ValueObject\TaskFinishDate;
 use TaskManager\Projects\Domain\ValueObject\TaskId;
 use TaskManager\Projects\Domain\ValueObject\TaskInformation;
+use TaskManager\Projects\Domain\ValueObject\TaskName;
 use TaskManager\Projects\Domain\ValueObject\TaskOwner;
+use TaskManager\Projects\Domain\ValueObject\TaskStartDate;
 use TaskManager\Shared\Domain\Aggregate\AggregateRoot;
 use TaskManager\Shared\Domain\Equatable;
 
@@ -199,6 +205,38 @@ final class Project extends AggregateRoot
         );
 
         return Task::create($id, $this->id, $information, $owner);
+    }
+
+    public function changeTaskInformation(
+        Task $task,
+        ?TaskName $name,
+        ?TaskBrief $brief,
+        ?TaskDescription $description,
+        ?TaskStartDate $startDate,
+        ?TaskFinishDate $finishDate,
+        ProjectUserId $currentUserId
+    ): void {
+        $this->status->ensureAllowsModification();
+        $this->tasks->ensureProjectTaskExits($task->getId());
+        $this->information->ensureIsFinishDateGreaterThanTaskDates(
+            $startDate,
+            $finishDate
+        );
+
+        try {
+            $task->changeInformation(
+                $name,
+                $brief,
+                $description,
+                $startDate,
+                $finishDate,
+                $currentUserId
+            );
+        } catch (UserIsNotTaskOwnerException $e) {
+            if (!$this->owner->userIsOwner($currentUserId)) {
+                throw $e;
+            }
+        }
     }
 
     public function addProjectTask(TaskId $taskId, ProjectUserId $userId): void
