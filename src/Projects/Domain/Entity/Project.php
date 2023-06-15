@@ -271,7 +271,7 @@ final class Project extends AggregateRoot
 
     public function addProjectTask(TaskId $taskId, ProjectUserId $userId): void
     {
-        // TODO check for status
+        $this->status->ensureAllowsModification();;
         $this->ensureUserIsProjectUser($userId);
 
         $this->tasks->addOrUpdateElement(new ProjectTask(

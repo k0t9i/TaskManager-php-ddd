@@ -933,6 +933,21 @@ class ProjectTest extends TestCase
         );
     }
 
+    public function testAddProjectTaskInClosedProject(): void
+    {
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder
+            ->withStatus(new ClosedProjectStatus())
+            ->build();
+
+        $this->expectProjectModificationIsNotAllowedException();
+
+        $project->addProjectTask(
+            new TaskId($this->faker->uuid()),
+            $builder->getOwner()->id
+        );
+    }
+
     public function testChangeTaskInformation(): void
     {
         $taskBuilder = new TaskBuilder($this->faker);
