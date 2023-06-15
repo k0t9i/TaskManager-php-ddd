@@ -126,6 +126,11 @@ final class Task extends AggregateRoot
         return $this->id;
     }
 
+    public function getProjectId(): ProjectId
+    {
+        return $this->projectId;
+    }
+
     private function markAsDraft(): void
     {
         $this->isDraft = true;
