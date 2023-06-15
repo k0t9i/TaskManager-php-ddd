@@ -15,6 +15,7 @@ use TaskManager\Projects\Domain\Event\ProjectInformationWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectOwnerWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectParticipantWasRemovedEvent;
 use TaskManager\Projects\Domain\Event\ProjectStatusWasChangedEvent;
+use TaskManager\Projects\Domain\Event\ProjectTaskFinishDateWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectTaskWasCreatedEvent;
 use TaskManager\Projects\Domain\Event\ProjectWasCreatedEvent;
 use TaskManager\Projects\Domain\Event\RequestStatusWasChangedEvent;
@@ -98,7 +99,15 @@ class ProjectTest extends TestCase
             new ProjectFinishDate(),
         );
 
-        $project = $builder->build();
+        $ownerId = new ProjectUserId($this->faker->uuid());
+        $project = $builder
+            ->withOwner(new ProjectOwner($ownerId))
+            ->withTask(new ProjectTask(
+                new ProjectId($this->faker->uuid()),
+                new TaskId($this->faker->uuid()),
+                $ownerId
+            ))
+            ->build();
 
         $project->changeInformation(
             $newInformation->name,
@@ -108,14 +117,20 @@ class ProjectTest extends TestCase
         );
 
         $events = $project->releaseEvents();
-        $this->assertCount(1, $events);
-        $this->assertInstanceOf(ProjectInformationWasChangedEvent::class, $events[0]);
+        $this->assertCount(2, $events);
+        $this->assertInstanceOf(ProjectTaskFinishDateWasChangedEvent::class, $events[0]);
         $this->assertEquals($builder->getId()->value, $events[0]->getAggregateId());
+        $this->assertEquals([
+            'taskId' => $builder->getTasks()[0]->taskId->value,
+            'finishDate' => $newInformation->finishDate->getValue(),
+        ], $events[0]->toPrimitives());
+        $this->assertInstanceOf(ProjectInformationWasChangedEvent::class, $events[1]);
+        $this->assertEquals($builder->getId()->value, $events[1]->getAggregateId());
         $this->assertEquals([
             'name' => $newInformation->name->value,
             'description' => $newInformation->description->value,
             'finishDate' => $newInformation->finishDate->getValue(),
-        ], $events[0]->toPrimitives());
+        ], $events[1]->toPrimitives());
 
         $project->changeInformation(
             null,

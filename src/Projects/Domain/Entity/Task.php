@@ -22,6 +22,7 @@ use TaskManager\Projects\Domain\ValueObject\TaskStartDate;
 use TaskManager\Projects\Domain\ValueObject\TaskStatus;
 use TaskManager\Shared\Domain\Aggregate\AggregateRoot;
 use TaskManager\Shared\Domain\Equatable;
+use TaskManager\Shared\Domain\ValueObject\DateTime;
 
 final class Task extends AggregateRoot
 {
@@ -119,6 +120,11 @@ final class Task extends AggregateRoot
     public function undraft(): void
     {
         $this->isDraft = false;
+    }
+
+    public function limitDates(DateTime $date): void
+    {
+        $this->information = $this->information->limitDates($date);
     }
 
     public function getId(): TaskId

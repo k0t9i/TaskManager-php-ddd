@@ -19,8 +19,10 @@ use TaskManager\Projects\Domain\ValueObject\ActiveTaskStatus;
 use TaskManager\Projects\Domain\ValueObject\ClosedTaskStatus;
 use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
 use TaskManager\Projects\Domain\ValueObject\TaskFinishDate;
+use TaskManager\Projects\Domain\ValueObject\TaskInformation;
 use TaskManager\Projects\Domain\ValueObject\TaskStartDate;
 use TaskManager\Projects\Domain\ValueObject\TaskStatus;
+use TaskManager\Shared\Domain\ValueObject\DateTime;
 
 class TaskTest extends TestCase
 {
@@ -279,6 +281,44 @@ class TaskTest extends TestCase
         $this->expectUserIsNotTaskOwnerException($otherUserId->value);
 
         $task->close($otherUserId);
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testLimitDates(): void
+    {
+        $startDate = '01-02-2023';
+        $finishDate = '05-02-2023';
+        $dateAfter = '10-02-2023';
+        $dateBetween = '03-02-2023';
+        $dateBefore = '10-01-2023';
+        $builder = new TaskBuilder($this->faker);
+        $builder
+            ->withStartDate(new TaskStartDate($startDate))
+            ->withFinishDate(new TaskFinishDate($finishDate))
+            ->build();
+        $task = $builder->build();
+        $reflectionObject = new \ReflectionObject($task);
+        $reflectionProperty = $reflectionObject->getProperty('information');
+
+        $task->limitDates(new DateTime($dateAfter));
+        /** @var TaskInformation $information */
+        $information = $reflectionProperty->getValue($task);
+        $this->assertEquals(new TaskFinishDate($finishDate), $information->finishDate);
+        $this->assertEquals(new TaskStartDate($startDate), $information->startDate);
+
+        $task->limitDates(new DateTime($dateBetween));
+        /** @var TaskInformation $information */
+        $information = $reflectionProperty->getValue($task);
+        $this->assertEquals(new TaskFinishDate($dateBetween), $information->finishDate);
+        $this->assertEquals(new TaskStartDate($startDate), $information->startDate);
+
+        $task->limitDates(new DateTime($dateBefore));
+        /** @var TaskInformation $information */
+        $information = $reflectionProperty->getValue($task);
+        $this->assertEquals(new TaskFinishDate($dateBefore), $information->finishDate);
+        $this->assertEquals(new TaskStartDate($dateBefore), $information->startDate);
     }
 
     private function expectTaskModificationIsNotAllowedException(): void

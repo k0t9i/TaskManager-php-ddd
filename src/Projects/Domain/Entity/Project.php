@@ -11,6 +11,7 @@ use TaskManager\Projects\Domain\Event\ProjectInformationWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectOwnerWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectParticipantWasRemovedEvent;
 use TaskManager\Projects\Domain\Event\ProjectStatusWasChangedEvent;
+use TaskManager\Projects\Domain\Event\ProjectTaskFinishDateWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectTaskWasCreatedEvent;
 use TaskManager\Projects\Domain\Event\ProjectWasCreatedEvent;
 use TaskManager\Projects\Domain\Event\RequestStatusWasChangedEvent;
@@ -102,7 +103,16 @@ final class Project extends AggregateRoot
         );
 
         if (!$this->information->equals($information)) {
-            // TODO change all project task start and finish dates
+            if (!$information->finishDate->equals($this->information->finishDate)) {
+                /** @var ProjectTask $task */
+                foreach ($this->tasks->getItems() as $task) {
+                    $this->registerEvent(new ProjectTaskFinishDateWasChangedEvent(
+                        $this->id->value,
+                        $task->taskId->value,
+                        $information->finishDate->getValue()
+                    ));
+                }
+            }
             $this->information = $information;
 
             $this->registerEvent(new ProjectInformationWasChangedEvent(
@@ -271,7 +281,7 @@ final class Project extends AggregateRoot
 
     public function addProjectTask(TaskId $taskId, ProjectUserId $userId): void
     {
-        $this->status->ensureAllowsModification();;
+        $this->status->ensureAllowsModification();
         $this->ensureUserIsProjectUser($userId);
 
         $this->tasks->addOrUpdateElement(new ProjectTask(

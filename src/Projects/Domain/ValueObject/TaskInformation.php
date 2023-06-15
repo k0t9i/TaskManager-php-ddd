@@ -6,6 +6,7 @@ namespace TaskManager\Projects\Domain\ValueObject;
 
 use TaskManager\Projects\Domain\Exception\TaskStartDateIsGreaterThanFinishDateException;
 use TaskManager\Shared\Domain\Equatable;
+use TaskManager\Shared\Domain\ValueObject\DateTime;
 
 final readonly class TaskInformation implements Equatable
 {
@@ -23,6 +24,26 @@ final readonly class TaskInformation implements Equatable
         if ($this->startDate->isGreaterThan($this->finishDate)) {
             throw new TaskStartDateIsGreaterThanFinishDateException($this->startDate->getValue(), $this->finishDate->getValue());
         }
+    }
+
+    public function limitDates(DateTime $date): self
+    {
+        $newStartDate = $this->startDate;
+        if ($newStartDate->isGreaterThan($date)) {
+            $newStartDate = new TaskStartDate($date->getValue());
+        }
+        $newFinishDate = $this->finishDate;
+        if ($newFinishDate->isGreaterThan($date)) {
+            $newFinishDate = new TaskFinishDate($date->getValue());
+        }
+
+        return new TaskInformation(
+            $this->name,
+            $this->brief,
+            $this->description,
+            $newStartDate,
+            $newFinishDate,
+        );
     }
 
     public function equals(Equatable $other): bool
