@@ -223,7 +223,7 @@ class TaskTest extends TestCase
         );
     }
 
-    public function testCloseTask(): void
+    public function testClose(): void
     {
         $builder = new TaskBuilder($this->faker);
         $task = $builder->build();
@@ -239,7 +239,7 @@ class TaskTest extends TestCase
         ], $events[0]->toPrimitives());
     }
 
-    public function testActivateTask(): void
+    public function testActivate(): void
     {
         $builder = new TaskBuilder($this->faker);
         $task = $builder
@@ -281,6 +281,22 @@ class TaskTest extends TestCase
         $this->expectUserIsNotTaskOwnerException($otherUserId->value);
 
         $task->close($otherUserId);
+    }
+
+    public function testCloseAsNeeded(): void
+    {
+        $builder = new TaskBuilder($this->faker);
+        $task = $builder->build();
+
+        $task->closeAsNeeded();
+        $events = $task->releaseEvents();
+
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(TaskStatusWasChangedEvent::class, $events[0]);
+        $this->assertEquals($builder->getId()->value, $events[0]->getAggregateId());
+        $this->assertEquals([
+            'status' => TaskStatus::STATUS_CLOSED,
+        ], $events[0]->toPrimitives());
     }
 
     /**

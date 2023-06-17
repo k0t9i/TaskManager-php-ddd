@@ -12,6 +12,7 @@ use TaskManager\Projects\Domain\Event\ProjectOwnerWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectParticipantWasRemovedEvent;
 use TaskManager\Projects\Domain\Event\ProjectStatusWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectTaskFinishDateWasChangedEvent;
+use TaskManager\Projects\Domain\Event\ProjectTaskWasClosedEvent;
 use TaskManager\Projects\Domain\Event\ProjectTaskWasCreatedEvent;
 use TaskManager\Projects\Domain\Event\ProjectWasCreatedEvent;
 use TaskManager\Projects\Domain\Event\RequestStatusWasChangedEvent;
@@ -132,7 +133,13 @@ final class Project extends AggregateRoot
     public function close(ProjectUserId $currentUserId): void
     {
         $this->changeStatus(new ClosedProjectStatus(), $currentUserId);
-        // TODO close all project task
+        /** @var ProjectTask $task */
+        foreach ($this->tasks->getItems() as $task) {
+            $this->registerEvent(new ProjectTaskWasClosedEvent(
+                $this->id->value,
+                $task->taskId->value,
+            ));
+        }
     }
 
     public function changeOwner(ProjectOwner $owner, ProjectUserId $currentUserId): void

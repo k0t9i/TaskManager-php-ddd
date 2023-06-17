@@ -16,6 +16,7 @@ use TaskManager\Projects\Domain\Event\ProjectOwnerWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectParticipantWasRemovedEvent;
 use TaskManager\Projects\Domain\Event\ProjectStatusWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectTaskFinishDateWasChangedEvent;
+use TaskManager\Projects\Domain\Event\ProjectTaskWasClosedEvent;
 use TaskManager\Projects\Domain\Event\ProjectTaskWasCreatedEvent;
 use TaskManager\Projects\Domain\Event\ProjectWasCreatedEvent;
 use TaskManager\Projects\Domain\Event\RequestStatusWasChangedEvent;
@@ -211,17 +212,30 @@ class ProjectTest extends TestCase
     public function testCloseProject(): void
     {
         $builder = new ProjectBuilder($this->faker);
-        $project = $builder->build();
+        $ownerId = new ProjectUserId($this->faker->uuid());
+        $project = $builder
+            ->withOwner(new ProjectOwner($ownerId))
+            ->withTask(new ProjectTask(
+                new ProjectId($this->faker->uuid()),
+                new TaskId($this->faker->uuid()),
+                $ownerId
+            ))
+            ->build();
 
         $project->close($builder->getOwner()->id);
         $events = $project->releaseEvents();
 
-        $this->assertCount(1, $events);
+        $this->assertCount(2, $events);
         $this->assertInstanceOf(ProjectStatusWasChangedEvent::class, $events[0]);
         $this->assertEquals($builder->getId()->value, $events[0]->getAggregateId());
         $this->assertEquals([
             'status' => ProjectStatus::STATUS_CLOSED,
         ], $events[0]->toPrimitives());
+        $this->assertInstanceOf(ProjectTaskWasClosedEvent::class, $events[1]);
+        $this->assertEquals($builder->getId()->value, $events[1]->getAggregateId());
+        $this->assertEquals([
+            'taskId' => $builder->getTasks()[0]->taskId->value,
+        ], $events[1]->toPrimitives());
     }
 
     public function testActivateProject(): void

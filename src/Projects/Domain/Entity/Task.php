@@ -117,6 +117,11 @@ final class Task extends AggregateRoot
         $this->changeStatus(new ClosedTaskStatus(), $currentUserId);
     }
 
+    public function closeAsNeeded(): void
+    {
+        $this->changeStatus(new ClosedTaskStatus(), $this->owner->id);
+    }
+
     public function undraft(): void
     {
         $this->isDraft = false;
