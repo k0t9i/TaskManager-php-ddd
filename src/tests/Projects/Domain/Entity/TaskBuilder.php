@@ -108,17 +108,26 @@ final class TaskBuilder
         return $this;
     }
 
+    /**
+     * @throws \ReflectionException
+     */
     public function build(): Task
     {
         $this->prepareData();
 
-        return new Task(
+        $reflectionClass = new \ReflectionClass(Task::class);
+        $constructor = $reflectionClass->getConstructor();
+        $constructor->setAccessible(true);
+        $task = $reflectionClass->newInstanceWithoutConstructor();
+        $constructor->invokeArgs($task, [
             $this->id,
             $this->projectId,
             $this->information,
             $this->status,
-            $this->owner
-        );
+            $this->owner,
+        ]);
+
+        return $task;
     }
 
     public function buildViaCreate(): Task

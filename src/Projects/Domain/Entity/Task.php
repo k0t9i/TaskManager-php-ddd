@@ -28,7 +28,7 @@ final class Task extends AggregateRoot
 {
     private bool $isDraft = false;
 
-    public function __construct(
+    private function __construct(
         private readonly TaskId $id,
         private readonly ProjectId $projectId,
         private TaskInformation $information,
@@ -46,7 +46,7 @@ final class Task extends AggregateRoot
         $information->ensureFinishDateGreaterOrEqualStartDate();
 
         $status = new ActiveTaskStatus();
-        $task = new Task(
+        $task = new self(
             $id,
             $projectId,
             $information,

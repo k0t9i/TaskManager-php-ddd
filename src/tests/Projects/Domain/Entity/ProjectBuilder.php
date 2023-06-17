@@ -129,19 +129,28 @@ final class ProjectBuilder
         return $this;
     }
 
+    /**
+     * @throws \ReflectionException
+     */
     public function build(): Project
     {
         $this->prepareData();
 
-        return new Project(
+        $reflectionClass = new \ReflectionClass(Project::class);
+        $constructor = $reflectionClass->getConstructor();
+        $constructor->setAccessible(true);
+        $project = $reflectionClass->newInstanceWithoutConstructor();
+        $constructor->invokeArgs($project, [
             $this->id,
             $this->information,
             $this->status,
             $this->owner,
             new ParticipantCollection($this->participants),
             new RequestCollection($this->requests),
-            new ProjectTaskCollection($this->tasks)
-        );
+            new ProjectTaskCollection($this->tasks),
+        ]);
+
+        return $project;
     }
 
     public function buildViaCreate(): Project

@@ -49,7 +49,7 @@ use TaskManager\Shared\Domain\Equatable;
 
 final class Project extends AggregateRoot
 {
-    public function __construct(
+    private function __construct(
         private readonly ProjectId $id,
         private ProjectInformation $information,
         private ProjectStatus $status,
