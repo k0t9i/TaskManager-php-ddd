@@ -2,14 +2,16 @@
 
 declare(strict_types=1);
 
-namespace TaskManager\Projects\Domain\ValueObject;
+namespace TaskManager\Projects\Domain\Entity;
 
+use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
+use TaskManager\Shared\Domain\Aggregate\AggregateRoot;
 use TaskManager\Shared\Domain\Equatable;
 
-final readonly class ProjectUser implements Equatable
+final class ProjectUser extends AggregateRoot
 {
     public function __construct(
-        public ProjectUserId $id
+        public readonly ProjectUserId $id
     ) {
     }
 

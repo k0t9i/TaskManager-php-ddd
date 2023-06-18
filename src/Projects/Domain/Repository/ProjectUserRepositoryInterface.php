@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TaskManager\Projects\Domain\Repository;
 
-use TaskManager\Projects\Domain\ValueObject\ProjectUser;
+use TaskManager\Projects\Domain\Entity\ProjectUser;
 use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
 
 interface ProjectUserRepositoryInterface

@@ -3,7 +3,7 @@
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
                           https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
-    <entity name="TaskManager\Projects\Domain\ValueObject\ProjectUser" table="project_users">
+    <entity name="TaskManager\Projects\Domain\Entity\ProjectUser" table="project_users">
         <id name="id" type="project_user_id" length="36" />
     </entity>
 </doctrine-mapping>

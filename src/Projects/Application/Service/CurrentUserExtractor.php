@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace TaskManager\Projects\Application\Service;
 
+use TaskManager\Projects\Domain\Entity\ProjectUser;
 use TaskManager\Projects\Domain\Repository\ProjectUserRepositoryInterface;
-use TaskManager\Projects\Domain\ValueObject\ProjectUser;
 use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
 use TaskManager\Shared\Application\Service\AuthenticatorServiceInterface;
 use TaskManager\Shared\Domain\Exception\UserDoesNotExistException;

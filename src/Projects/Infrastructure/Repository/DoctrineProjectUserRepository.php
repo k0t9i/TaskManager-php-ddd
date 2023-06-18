@@ -6,8 +6,8 @@ namespace TaskManager\Projects\Infrastructure\Repository;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectRepository;
+use TaskManager\Projects\Domain\Entity\ProjectUser;
 use TaskManager\Projects\Domain\Repository\ProjectUserRepositoryInterface;
-use TaskManager\Projects\Domain\ValueObject\ProjectUser;
 use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
 
 final readonly class DoctrineProjectUserRepository implements ProjectUserRepositoryInterface
