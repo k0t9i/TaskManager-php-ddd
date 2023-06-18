@@ -286,6 +286,36 @@ final class Project extends AggregateRoot
         }
     }
 
+    public function createTaskLink(Task $task, TaskId $linkedTaskId, ProjectUserId $currentUserId): void
+    {
+        $this->status->ensureAllowsModification();
+        $this->tasks->ensureProjectTaskExists($task->getId());
+        $this->tasks->ensureProjectTaskExists($linkedTaskId);
+
+        try {
+            $task->createLink($linkedTaskId, $currentUserId);
+        } catch (UserIsNotTaskOwnerException $e) {
+            if (!$this->owner->userIsOwner($currentUserId)) {
+                throw $e;
+            }
+        }
+    }
+
+    public function deleteTaskLink(Task $task, TaskId $linkedTaskId, ProjectUserId $currentUserId): void
+    {
+        $this->status->ensureAllowsModification();
+        $this->tasks->ensureProjectTaskExists($task->getId());
+        $this->tasks->ensureProjectTaskExists($linkedTaskId);
+
+        try {
+            $task->deleteLink($linkedTaskId, $currentUserId);
+        } catch (UserIsNotTaskOwnerException $e) {
+            if (!$this->owner->userIsOwner($currentUserId)) {
+                throw $e;
+            }
+        }
+    }
+
     public function addProjectTask(TaskId $taskId, ProjectUserId $userId): void
     {
         $this->status->ensureAllowsModification();

@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace TaskManager\Projects\Domain\Entity;
 
+use TaskManager\Projects\Domain\Collection\TaskLinkCollection;
 use TaskManager\Projects\Domain\Event\TaskInformationWasChangedEvent;
+use TaskManager\Projects\Domain\Event\TaskLinkWasCreated;
+use TaskManager\Projects\Domain\Event\TaskLinkWasDeleted;
 use TaskManager\Projects\Domain\Event\TaskStatusWasChangedEvent;
 use TaskManager\Projects\Domain\Event\TaskWasCreatedEvent;
 use TaskManager\Projects\Domain\ValueObject\ActiveTaskStatus;
@@ -16,6 +19,7 @@ use TaskManager\Projects\Domain\ValueObject\TaskDescription;
 use TaskManager\Projects\Domain\ValueObject\TaskFinishDate;
 use TaskManager\Projects\Domain\ValueObject\TaskId;
 use TaskManager\Projects\Domain\ValueObject\TaskInformation;
+use TaskManager\Projects\Domain\ValueObject\TaskLink;
 use TaskManager\Projects\Domain\ValueObject\TaskName;
 use TaskManager\Projects\Domain\ValueObject\TaskOwner;
 use TaskManager\Projects\Domain\ValueObject\TaskStartDate;
@@ -33,7 +37,8 @@ final class Task extends AggregateRoot
         private readonly ProjectId $projectId,
         private TaskInformation $information,
         private TaskStatus $status,
-        private TaskOwner $owner
+        private TaskOwner $owner,
+        private TaskLinkCollection $links
     ) {
     }
 
@@ -51,7 +56,8 @@ final class Task extends AggregateRoot
             $projectId,
             $information,
             $status,
-            $owner
+            $owner,
+            new TaskLinkCollection()
         );
         $task->markAsDraft();
 
@@ -115,6 +121,46 @@ final class Task extends AggregateRoot
     public function close(ProjectUserId $currentUserId): void
     {
         $this->changeStatus(new ClosedTaskStatus(), $currentUserId);
+    }
+
+    public function createLink(
+        TaskId $linkedTaskId,
+        ProjectUserId $currentUserId
+    ): void {
+        $this->status->ensureAllowsModification();
+
+        $link = new TaskLink($this->id, $linkedTaskId);
+        $this->links->ensureTaskLinkDoesNotExist($link);
+
+        $this->links->addOrUpdateElement($link);
+
+        $this->registerEvent(new TaskLinkWasCreated(
+            $this->id->value,
+            $linkedTaskId->value
+        ));
+
+        // this check must be at the end of the method
+        $this->owner->ensureUserIsOwner($currentUserId);
+    }
+
+    public function deleteLink(
+        TaskId $linkedTaskId,
+        ProjectUserId $currentUserId
+    ): void {
+        $this->status->ensureAllowsModification();
+
+        $link = new TaskLink($this->id, $linkedTaskId);
+        $this->links->ensureTaskLinkExists($link);
+
+        $this->links->remove($link->getHash());
+
+        $this->registerEvent(new TaskLinkWasDeleted(
+            $this->id->value,
+            $linkedTaskId->value
+        ));
+
+        // this check must be at the end of the method
+        $this->owner->ensureUserIsOwner($currentUserId);
     }
 
     public function closeAsNeeded(): void

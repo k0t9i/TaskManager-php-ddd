@@ -22,6 +22,8 @@ use TaskManager\Projects\Domain\Event\ProjectWasCreatedEvent;
 use TaskManager\Projects\Domain\Event\RequestStatusWasChangedEvent;
 use TaskManager\Projects\Domain\Event\RequestWasCreatedEvent;
 use TaskManager\Projects\Domain\Event\TaskInformationWasChangedEvent;
+use TaskManager\Projects\Domain\Event\TaskLinkWasCreated;
+use TaskManager\Projects\Domain\Event\TaskLinkWasDeleted;
 use TaskManager\Projects\Domain\Event\TaskStatusWasChangedEvent;
 use TaskManager\Projects\Domain\Exception\InvalidProjectStatusTransitionException;
 use TaskManager\Projects\Domain\Exception\ProjectModificationIsNotAllowedException;
@@ -58,6 +60,7 @@ use TaskManager\Projects\Domain\ValueObject\RequestId;
 use TaskManager\Projects\Domain\ValueObject\RequestStatus;
 use TaskManager\Projects\Domain\ValueObject\TaskFinishDate;
 use TaskManager\Projects\Domain\ValueObject\TaskId;
+use TaskManager\Projects\Domain\ValueObject\TaskLink;
 use TaskManager\Projects\Domain\ValueObject\TaskOwner;
 use TaskManager\Projects\Domain\ValueObject\TaskStartDate;
 use TaskManager\Projects\Domain\ValueObject\TaskStatus;
@@ -1353,6 +1356,277 @@ class ProjectTest extends TestCase
         $this->expectUserIsNotTaskOwnerException($otherUserId->value);
 
         $project->closeTask($task, $otherUserId);
+    }
+
+    public function testCreateTaskLink(): void
+    {
+        $linkedTaskId = new TaskId($this->faker->uuid());
+        $taskBuilder = new TaskBuilder($this->faker);
+        $task = $taskBuilder->build();
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder
+            ->withTask(new ProjectTask(
+                new ProjectId($this->faker->uuid()),
+                $linkedTaskId,
+                new ProjectUserId($this->faker->uuid())
+            ))
+            ->withTask(new ProjectTask(
+                new ProjectId($this->faker->uuid()),
+                $taskBuilder->getId(),
+                new ProjectUserId($this->faker->uuid())
+            ))
+            ->build();
+
+        $project->createTaskLink($task, $linkedTaskId, $builder->getOwner()->id);
+        $events = $task->releaseEvents();
+
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(TaskLinkWasCreated::class, $events[0]);
+        $this->assertEquals($taskBuilder->getId()->value, $events[0]->getAggregateId());
+        $this->assertEquals([
+            'linkedTaskId' => $linkedTaskId->value,
+        ], $events[0]->toPrimitives());
+    }
+
+    public function testCreateTaskLinkInClosedProject(): void
+    {
+        $linkedTaskId = new TaskId($this->faker->uuid());
+        $taskBuilder = new TaskBuilder($this->faker);
+        $task = $taskBuilder->build();
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder
+            ->withStatus(new ClosedProjectStatus())
+            ->withTask(new ProjectTask(
+                new ProjectId($this->faker->uuid()),
+                $linkedTaskId,
+                new ProjectUserId($this->faker->uuid())
+            ))
+            ->withTask(new ProjectTask(
+                new ProjectId($this->faker->uuid()),
+                $taskBuilder->getId(),
+                new ProjectUserId($this->faker->uuid())
+            ))
+            ->build();
+
+        $this->expectProjectModificationIsNotAllowedException();
+
+        $project->createTaskLink($task, $linkedTaskId, $builder->getOwner()->id);
+    }
+
+    public function testCreateTaskLinkFromNonExistingProjectTask(): void
+    {
+        $linkedTaskId = new TaskId($this->faker->uuid());
+        $taskBuilder = new TaskBuilder($this->faker);
+        $task = $taskBuilder->build();
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder
+            ->withTask(new ProjectTask(
+                new ProjectId($this->faker->uuid()),
+                $linkedTaskId,
+                new ProjectUserId($this->faker->uuid())
+            ))
+            ->build();
+
+        $this->expectProjectTaskDoesNotExistException($task->getId()->value);
+
+        $project->createTaskLink($task, $linkedTaskId, $builder->getOwner()->id);
+    }
+
+    public function testCreateTaskLinkToNonExistingProjectTask(): void
+    {
+        $linkedTaskId = new TaskId($this->faker->uuid());
+        $taskBuilder = new TaskBuilder($this->faker);
+        $task = $taskBuilder->build();
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder
+            ->withTask(new ProjectTask(
+                new ProjectId($this->faker->uuid()),
+                $task->getId(),
+                new ProjectUserId($this->faker->uuid())
+            ))
+            ->build();
+
+        $this->expectProjectTaskDoesNotExistException($linkedTaskId->value);
+
+        $project->createTaskLink($task, $linkedTaskId, $builder->getOwner()->id);
+    }
+
+    public function testCreateTaskLinkByNonOwner(): void
+    {
+        $linkedTaskId = new TaskId($this->faker->uuid());
+        $taskBuilder = new TaskBuilder($this->faker);
+        $task = $taskBuilder->build();
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder
+            ->withTask(new ProjectTask(
+                new ProjectId($this->faker->uuid()),
+                $linkedTaskId,
+                new ProjectUserId($this->faker->uuid())
+            ))
+            ->withTask(new ProjectTask(
+                new ProjectId($this->faker->uuid()),
+                $taskBuilder->getId(),
+                new ProjectUserId($this->faker->uuid())
+            ))
+            ->build();
+        $otherUserId = new ProjectUserId($this->faker->uuid());
+
+        $this->expectUserIsNotTaskOwnerException($otherUserId->value);
+
+        $project->createTaskLink($task, $linkedTaskId, $otherUserId);
+    }
+
+    public function testDeleteTaskLink(): void
+    {
+        $taskId = new TaskId($this->faker->uuid());
+        $linkedTaskId = new TaskId($this->faker->uuid());
+        $taskBuilder = new TaskBuilder($this->faker);
+        $task = $taskBuilder
+            ->withId($taskId)
+            ->withTaskLink(new TaskLink(
+                $taskId,
+                $linkedTaskId
+            ))
+            ->build();
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder
+            ->withTask(new ProjectTask(
+                new ProjectId($this->faker->uuid()),
+                $linkedTaskId,
+                new ProjectUserId($this->faker->uuid())
+            ))
+            ->withTask(new ProjectTask(
+                new ProjectId($this->faker->uuid()),
+                $taskBuilder->getId(),
+                new ProjectUserId($this->faker->uuid())
+            ))
+            ->build();
+
+        $project->deleteTaskLink($task, $linkedTaskId, $builder->getOwner()->id);
+        $events = $task->releaseEvents();
+
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(TaskLinkWasDeleted::class, $events[0]);
+        $this->assertEquals($taskBuilder->getId()->value, $events[0]->getAggregateId());
+        $this->assertEquals([
+            'linkedTaskId' => $linkedTaskId->value,
+        ], $events[0]->toPrimitives());
+    }
+
+    public function testDeleteTaskLinkInClosedProject(): void
+    {
+        $taskId = new TaskId($this->faker->uuid());
+        $linkedTaskId = new TaskId($this->faker->uuid());
+        $taskBuilder = new TaskBuilder($this->faker);
+        $task = $taskBuilder
+            ->withId($taskId)
+            ->withTaskLink(new TaskLink(
+                $taskId,
+                $linkedTaskId
+            ))
+            ->build();
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder
+            ->withStatus(new ClosedProjectStatus())
+            ->withTask(new ProjectTask(
+                new ProjectId($this->faker->uuid()),
+                $linkedTaskId,
+                new ProjectUserId($this->faker->uuid())
+            ))
+            ->withTask(new ProjectTask(
+                new ProjectId($this->faker->uuid()),
+                $taskBuilder->getId(),
+                new ProjectUserId($this->faker->uuid())
+            ))
+            ->build();
+
+        $this->expectProjectModificationIsNotAllowedException();
+
+        $project->deleteTaskLink($task, $linkedTaskId, $builder->getOwner()->id);
+    }
+
+    public function testDeleteTaskLinkFromNonExistingProjectTask(): void
+    {
+        $taskId = new TaskId($this->faker->uuid());
+        $linkedTaskId = new TaskId($this->faker->uuid());
+        $taskBuilder = new TaskBuilder($this->faker);
+        $task = $taskBuilder
+            ->withId($taskId)
+            ->withTaskLink(new TaskLink(
+                $taskId,
+                $linkedTaskId
+            ))
+            ->build();
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder
+            ->withTask(new ProjectTask(
+                new ProjectId($this->faker->uuid()),
+                $linkedTaskId,
+                new ProjectUserId($this->faker->uuid())
+            ))
+            ->build();
+
+        $this->expectProjectTaskDoesNotExistException($task->getId()->value);
+
+        $project->deleteTaskLink($task, $linkedTaskId, $builder->getOwner()->id);
+    }
+
+    public function testDeleteTaskLinkToNonExistingProjectTask(): void
+    {
+        $taskId = new TaskId($this->faker->uuid());
+        $linkedTaskId = new TaskId($this->faker->uuid());
+        $taskBuilder = new TaskBuilder($this->faker);
+        $task = $taskBuilder
+            ->withId($taskId)
+            ->withTaskLink(new TaskLink(
+                $taskId,
+                $linkedTaskId
+            ))
+            ->build();
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder
+            ->withTask(new ProjectTask(
+                new ProjectId($this->faker->uuid()),
+                $task->getId(),
+                new ProjectUserId($this->faker->uuid())
+            ))
+            ->build();
+
+        $this->expectProjectTaskDoesNotExistException($linkedTaskId->value);
+
+        $project->deleteTaskLink($task, $linkedTaskId, $builder->getOwner()->id);
+    }
+
+    public function testDeleteTaskLinkByNonOwner(): void
+    {
+        $taskId = new TaskId($this->faker->uuid());
+        $linkedTaskId = new TaskId($this->faker->uuid());
+        $taskBuilder = new TaskBuilder($this->faker);
+        $task = $taskBuilder
+            ->withId($taskId)
+            ->withTaskLink(new TaskLink(
+                $taskId,
+                $linkedTaskId
+            ))
+            ->build();
+        $builder = new ProjectBuilder($this->faker);
+        $project = $builder
+            ->withTask(new ProjectTask(
+                new ProjectId($this->faker->uuid()),
+                $linkedTaskId,
+                new ProjectUserId($this->faker->uuid())
+            ))
+            ->withTask(new ProjectTask(
+                new ProjectId($this->faker->uuid()),
+                $taskBuilder->getId(),
+                new ProjectUserId($this->faker->uuid())
+            ))
+            ->build();
+        $otherUserId = new ProjectUserId($this->faker->uuid());
+
+        $this->expectUserIsNotTaskOwnerException($otherUserId->value);
+
+        $project->deleteTaskLink($task, $linkedTaskId, $otherUserId);
     }
 
     private function expectProjectModificationIsNotAllowedException(): void

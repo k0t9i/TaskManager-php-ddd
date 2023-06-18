@@ -9,17 +9,24 @@ use Faker\Generator;
 use PHPUnit\Framework\TestCase;
 use TaskManager\Projects\Domain\Entity\Task;
 use TaskManager\Projects\Domain\Event\TaskInformationWasChangedEvent;
+use TaskManager\Projects\Domain\Event\TaskLinkWasCreated;
+use TaskManager\Projects\Domain\Event\TaskLinkWasDeleted;
 use TaskManager\Projects\Domain\Event\TaskStatusWasChangedEvent;
 use TaskManager\Projects\Domain\Event\TaskWasCreatedEvent;
 use TaskManager\Projects\Domain\Exception\InvalidTaskStatusTransitionException;
+use TaskManager\Projects\Domain\Exception\TaskLinkAlreadyExistsException;
+use TaskManager\Projects\Domain\Exception\TaskLinkDoesNotExistException;
 use TaskManager\Projects\Domain\Exception\TaskModificationIsNotAllowedException;
+use TaskManager\Projects\Domain\Exception\TasksOfTaskLinkAreEqualException;
 use TaskManager\Projects\Domain\Exception\TaskStartDateIsGreaterThanFinishDateException;
 use TaskManager\Projects\Domain\Exception\UserIsNotTaskOwnerException;
 use TaskManager\Projects\Domain\ValueObject\ActiveTaskStatus;
 use TaskManager\Projects\Domain\ValueObject\ClosedTaskStatus;
 use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
 use TaskManager\Projects\Domain\ValueObject\TaskFinishDate;
+use TaskManager\Projects\Domain\ValueObject\TaskId;
 use TaskManager\Projects\Domain\ValueObject\TaskInformation;
+use TaskManager\Projects\Domain\ValueObject\TaskLink;
 use TaskManager\Projects\Domain\ValueObject\TaskStartDate;
 use TaskManager\Projects\Domain\ValueObject\TaskStatus;
 use TaskManager\Shared\Domain\ValueObject\DateTime;
@@ -335,6 +342,163 @@ class TaskTest extends TestCase
         $information = $reflectionProperty->getValue($task);
         $this->assertEquals(new TaskFinishDate($dateBefore), $information->finishDate);
         $this->assertEquals(new TaskStartDate($dateBefore), $information->startDate);
+    }
+
+    public function testCreateLink(): void
+    {
+        $linkedTaskId = new TaskId($this->faker->uuid());
+        $builder = new TaskBuilder($this->faker);
+        $task = $builder->build();
+
+        $task->createLink($linkedTaskId, $builder->getOwner()->id);
+        $events = $task->releaseEvents();
+
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(TaskLinkWasCreated::class, $events[0]);
+        $this->assertEquals($builder->getId()->value, $events[0]->getAggregateId());
+        $this->assertEquals([
+            'linkedTaskId' => $linkedTaskId->value,
+        ], $events[0]->toPrimitives());
+    }
+
+    public function testCreateLinkInClosedTask(): void
+    {
+        $linkedTaskId = new TaskId($this->faker->uuid());
+        $builder = new TaskBuilder($this->faker);
+        $task = $builder
+            ->withStatus(new ClosedTaskStatus())
+            ->build();
+
+        $this->expectTaskModificationIsNotAllowedException();
+
+        $task->createLink($linkedTaskId, $builder->getOwner()->id);
+    }
+
+    public function testCreateLinkToItself(): void
+    {
+        $builder = new TaskBuilder($this->faker);
+        $task = $builder->build();
+
+        $this->expectException(TasksOfTaskLinkAreEqualException::class);
+        $this->expectExceptionMessage(sprintf(
+            'Link task "%s" to itself is forbidden',
+            $task->getId()->value
+        ));
+
+        $task->createLink($task->getId(), $builder->getOwner()->id);
+    }
+
+    public function testCreateAlreadyExistingLink(): void
+    {
+        $taskId = new TaskId($this->faker->uuid());
+        $linkedTaskId = new TaskId($this->faker->uuid());
+        $builder = new TaskBuilder($this->faker);
+        $task = $builder
+            ->withId($taskId)
+            ->withTaskLink(new TaskLink(
+                $taskId,
+                $linkedTaskId
+            ))
+            ->build();
+
+        $this->expectException(TaskLinkAlreadyExistsException::class);
+        $this->expectExceptionMessage(sprintf(
+            'Link from task "%s" to task "%s" already exists',
+            $linkedTaskId->value,
+            $taskId->value
+        ));
+
+        $task->createLink($linkedTaskId, $builder->getOwner()->id);
+    }
+
+    public function testCreateLinkByNonOwner(): void
+    {
+        $linkedTaskId = new TaskId($this->faker->uuid());
+        $otherUserId = new ProjectUserId($this->faker->uuid());
+        $builder = new TaskBuilder($this->faker);
+        $task = $builder->build();
+
+        $this->expectUserIsNotTaskOwnerException($otherUserId->value);
+
+        $task->createLink($linkedTaskId, $otherUserId);
+    }
+
+    public function testDeleteLink(): void
+    {
+        $taskId = new TaskId($this->faker->uuid());
+        $linkedTaskId = new TaskId($this->faker->uuid());
+        $builder = new TaskBuilder($this->faker);
+        $task = $builder
+            ->withId($taskId)
+            ->withTaskLink(new TaskLink(
+                $taskId,
+                $linkedTaskId
+            ))
+            ->build();
+
+        $task->deleteLink($linkedTaskId, $builder->getOwner()->id);
+        $events = $task->releaseEvents();
+
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(TaskLinkWasDeleted::class, $events[0]);
+        $this->assertEquals($builder->getId()->value, $events[0]->getAggregateId());
+        $this->assertEquals([
+            'linkedTaskId' => $linkedTaskId->value,
+        ], $events[0]->toPrimitives());
+    }
+
+    public function testDeleteLinkInClosedTask(): void
+    {
+        $taskId = new TaskId($this->faker->uuid());
+        $linkedTaskId = new TaskId($this->faker->uuid());
+        $builder = new TaskBuilder($this->faker);
+        $task = $builder
+            ->withId($taskId)
+            ->withTaskLink(new TaskLink(
+                $taskId,
+                $linkedTaskId
+            ))
+            ->withStatus(new ClosedTaskStatus())
+            ->build();
+
+        $this->expectTaskModificationIsNotAllowedException();
+
+        $task->deleteLink($linkedTaskId, $builder->getOwner()->id);
+    }
+
+    public function testCreatNonExistingLink(): void
+    {
+        $linkedTaskId = new TaskId($this->faker->uuid());
+        $builder = new TaskBuilder($this->faker);
+        $task = $builder->build();
+
+        $this->expectException(TaskLinkDoesNotExistException::class);
+        $this->expectExceptionMessage(sprintf(
+            'Link from task "%s" to task "%s" doesn\'t exist',
+            $linkedTaskId->value,
+            $task->getId()->value
+        ));
+
+        $task->deleteLink($linkedTaskId, $builder->getOwner()->id);
+    }
+
+    public function testDeleteLinkByNonOwner(): void
+    {
+        $taskId = new TaskId($this->faker->uuid());
+        $linkedTaskId = new TaskId($this->faker->uuid());
+        $otherUserId = new ProjectUserId($this->faker->uuid());
+        $builder = new TaskBuilder($this->faker);
+        $task = $builder
+            ->withId($taskId)
+            ->withTaskLink(new TaskLink(
+                $taskId,
+                $linkedTaskId
+            ))
+            ->build();
+
+        $this->expectUserIsNotTaskOwnerException($otherUserId->value);
+
+        $task->deleteLink($linkedTaskId, $otherUserId);
     }
 
     private function expectTaskModificationIsNotAllowedException(): void

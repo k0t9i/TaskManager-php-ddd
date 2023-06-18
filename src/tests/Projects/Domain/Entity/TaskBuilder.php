@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TaskManager\Tests\Projects\Domain\Entity;
 
 use Faker\Generator;
+use TaskManager\Projects\Domain\Collection\TaskLinkCollection;
 use TaskManager\Projects\Domain\Entity\Task;
 use TaskManager\Projects\Domain\ValueObject\ActiveTaskStatus;
 use TaskManager\Projects\Domain\ValueObject\ProjectId;
@@ -14,6 +15,7 @@ use TaskManager\Projects\Domain\ValueObject\TaskDescription;
 use TaskManager\Projects\Domain\ValueObject\TaskFinishDate;
 use TaskManager\Projects\Domain\ValueObject\TaskId;
 use TaskManager\Projects\Domain\ValueObject\TaskInformation;
+use TaskManager\Projects\Domain\ValueObject\TaskLink;
 use TaskManager\Projects\Domain\ValueObject\TaskName;
 use TaskManager\Projects\Domain\ValueObject\TaskOwner;
 use TaskManager\Projects\Domain\ValueObject\TaskStartDate;
@@ -38,6 +40,11 @@ final class TaskBuilder
     private TaskStatus $status;
 
     private TaskOwner $owner;
+
+    /**
+     * @var TaskLink[]
+     */
+    private array $links;
 
     private TaskInformation $information;
 
@@ -108,6 +115,16 @@ final class TaskBuilder
         return $this;
     }
 
+    public function withTaskLink(TaskLink $value, bool $reset = false): self
+    {
+        if ($reset) {
+            $this->links = [];
+        }
+        $this->links[] = $value;
+
+        return $this;
+    }
+
     /**
      * @throws \ReflectionException
      */
@@ -125,6 +142,7 @@ final class TaskBuilder
             $this->information,
             $this->status,
             $this->owner,
+            new TaskLinkCollection($this->links),
         ]);
 
         return $task;
@@ -187,6 +205,14 @@ final class TaskBuilder
         return $this->owner;
     }
 
+    /**
+     * @return TaskLink[]
+     */
+    public function getLinks(): array
+    {
+        return $this->links;
+    }
+
     public function getInformation(): TaskInformation
     {
         return $this->information;
@@ -210,5 +236,6 @@ final class TaskBuilder
         );
         $this->status = $this->status ?? new ActiveTaskStatus();
         $this->owner = $this->owner ?? new TaskOwner(new ProjectUserId($this->faker->uuid()));
+        $this->links = $this->links ?? [];
     }
 }
