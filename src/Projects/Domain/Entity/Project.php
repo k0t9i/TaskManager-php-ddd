@@ -236,7 +236,7 @@ final class Project extends AggregateRoot
         ProjectUserId $currentUserId
     ): void {
         $this->status->ensureAllowsModification();
-        $this->tasks->ensureProjectTaskExits($task->getId());
+        $this->tasks->ensureProjectTaskExists($task->getId());
         $this->information->ensureIsFinishDateGreaterThanTaskDates(
             $startDate,
             $finishDate
@@ -261,7 +261,7 @@ final class Project extends AggregateRoot
     public function activateTask(Task $task, ProjectUserId $currentUserId): void
     {
         $this->status->ensureAllowsModification();
-        $this->tasks->ensureProjectTaskExits($task->getId());
+        $this->tasks->ensureProjectTaskExists($task->getId());
 
         try {
             $task->activate($currentUserId);
@@ -275,7 +275,7 @@ final class Project extends AggregateRoot
     public function closeTask(Task $task, ProjectUserId $currentUserId): void
     {
         $this->status->ensureAllowsModification();
-        $this->tasks->ensureProjectTaskExits($task->getId());
+        $this->tasks->ensureProjectTaskExists($task->getId());
 
         try {
             $task->close($currentUserId);

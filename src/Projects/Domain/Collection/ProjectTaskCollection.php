@@ -24,7 +24,7 @@ final class ProjectTaskCollection extends ManagedCollection
         }
     }
 
-    public function ensureProjectTaskExits(TaskId $id): void
+    public function ensureProjectTaskExists(TaskId $id): void
     {
         if (!$this->exists($id->value)) {
             throw new ProjectTaskDoesNotExistException($id->value);
