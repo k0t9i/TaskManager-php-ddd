@@ -1,0 +1,81 @@
+nelmio_api_doc:
+    use_validation_groups: true
+    areas:
+        default:
+            with_annotation: true
+    documentation:
+        info:
+            title: Task Manager
+            description: Task Manager system using Clean Architecture, DDD and CQRS
+            version: 1.0.0
+        components:
+            securitySchemes:
+                Bearer:
+                    type: http
+                    scheme: bearer
+                    bearerFormat: JWT
+            schemas:
+                objectId:
+                    type: object
+                    properties:
+                        id:
+                            type: string
+                            format: uuid
+                            example: 123e4567-e89b-12d3-a456-426614174000
+            responses:
+                createObject:
+                    description: 'Returns the ID of the newly created object.'
+                    content:
+                        application/json:
+                            schema:
+                                ref: '#/components/schemas/objectId'
+                login:
+                    description: 'Returns JWT token.'
+                    content:
+                        application/json:
+                            schema:
+                                type: object
+                                properties:
+                                    token:
+                                        type: string
+                generic200:
+                    description: 'Successful operation'
+                generic201:
+                    description: 'Successfully created'
+                generic401:
+                    description: 'Unauthorized'
+                generic403:
+                    description: 'Invalid operation'
+                generic404:
+                    description: 'Not found'
+                generic422:
+                    description: 'Validation exception'
+            parameters:
+                projectId:
+                    name: id
+                    in: path
+                    description: 'Project ID'
+                    required: true
+                    schema:
+                        ref: '#/components/schemas/objectId/properties/id'
+                requestId:
+                    name: requestId
+                    in: path
+                    description: 'Request ID'
+                    required: true
+                    schema:
+                        ref: '#/components/schemas/objectId/properties/id'
+                taskId:
+                    name: id
+                    in: path
+                    description: 'Task ID'
+                    required: true
+                    schema:
+                        ref: '#/components/schemas/objectId/properties/id'
+                linkedTaskId:
+                    name: id
+                    in: path
+                    description: 'Linked task ID'
+                    required: true
+                    schema:
+                        ref: '#/components/schemas/objectId/properties/id'

@@ -52,7 +52,7 @@ services:
 
     TaskManager\Shared\Infrastructure\Service\LexikJwtAuthenticatorService:
         arguments:
-            $path: '^/api/(?!.*(security)|(test)).*$'
+            $path: '^/api/(?!.*(security)|(test)|(doc)).*$'
 
     TaskManager\Shared\Infrastructure\Service\ExceptionListener:
         tags:
