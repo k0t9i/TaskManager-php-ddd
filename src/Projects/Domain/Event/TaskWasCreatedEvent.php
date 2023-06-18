@@ -18,9 +18,10 @@ final class TaskWasCreatedEvent extends DomainEvent
         public readonly string $finishDate,
         public readonly string $status,
         public readonly string $ownerId,
+        string $performerId,
         string $occurredOn = null
     ) {
-        parent::__construct($id, $occurredOn);
+        parent::__construct($id, $performerId, $occurredOn);
     }
 
     public static function getEventName(): string
@@ -28,8 +29,12 @@ final class TaskWasCreatedEvent extends DomainEvent
         return 'task.created';
     }
 
-    public static function fromPrimitives(string $aggregateId, array $body, string $occurredOn): static
-    {
+    public static function fromPrimitives(
+        string $aggregateId,
+        array $body,
+        string $performerId,
+        string $occurredOn
+    ): static {
         return new self(
             $aggregateId,
             $body['projectId'],
@@ -40,6 +45,7 @@ final class TaskWasCreatedEvent extends DomainEvent
             $body['finishDate'],
             $body['status'],
             $body['ownerId'],
+            $performerId,
             $occurredOn
         );
     }

@@ -37,7 +37,8 @@ class UserWasCreatedEventTest extends TestCase
             $email,
             $firstname,
             $lastname,
-            $password
+            $password,
+            $this->faker->regexify('.{255}'),
         );
 
         $this->assertEquals($expected, $event->toPrimitives());
@@ -48,6 +49,7 @@ class UserWasCreatedEventTest extends TestCase
         $aggregateId = $this->faker->regexify('.{255}');
         $event = new UserWasCreatedEvent(
             $aggregateId,
+            $this->faker->regexify('.{255}'),
             $this->faker->regexify('.{255}'),
             $this->faker->regexify('.{255}'),
             $this->faker->regexify('.{255}'),
@@ -65,6 +67,7 @@ class UserWasCreatedEventTest extends TestCase
         $lastname = $this->faker->regexify('.{255}');
         $password = $this->faker->regexify('.{255}');
         $occurredOn = $this->faker->regexify('.{255}');
+        $performerId = $this->faker->regexify('.{255}');
         $primitives = [
             'email' => $email,
             'firstname' => $firstname,
@@ -77,12 +80,13 @@ class UserWasCreatedEventTest extends TestCase
             $firstname,
             $lastname,
             $password,
+            $performerId,
             $occurredOn
         );
 
         $this->assertEquals(
             $expectedEvent,
-            UserWasCreatedEvent::fromPrimitives($aggregateId, $primitives, $occurredOn)
+            UserWasCreatedEvent::fromPrimitives($aggregateId, $primitives, $performerId, $occurredOn)
         );
     }
 
@@ -95,9 +99,25 @@ class UserWasCreatedEventTest extends TestCase
             $this->faker->regexify('.{255}'),
             $this->faker->regexify('.{255}'),
             $this->faker->regexify('.{255}'),
+            $this->faker->regexify('.{255}'),
             $occurredOn
         );
 
         $this->assertEquals($occurredOn, $event->getOccurredOn());
+    }
+
+    public function testGetPerformerId(): void
+    {
+        $performerId = $this->faker->regexify('.{255}');
+        $event = new UserWasCreatedEvent(
+            $this->faker->regexify('.{255}'),
+            $this->faker->regexify('.{255}'),
+            $this->faker->regexify('.{255}'),
+            $this->faker->regexify('.{255}'),
+            $this->faker->regexify('.{255}'),
+            $performerId
+        );
+
+        $this->assertEquals($performerId, $event->getPerformerId());
     }
 }

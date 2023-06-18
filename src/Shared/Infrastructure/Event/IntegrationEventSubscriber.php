@@ -28,6 +28,7 @@ final readonly class IntegrationEventSubscriber implements IntegrationEventSubsc
             $domainEvent = $domainEventClass::fromPrimitives(
                 $event->getAggregateId(),
                 $event->getBody(),
+                $event->getPerformerId(),
                 $event->getOccurredOn()
             );
 

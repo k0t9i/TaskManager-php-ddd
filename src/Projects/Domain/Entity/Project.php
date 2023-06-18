@@ -82,6 +82,7 @@ final class Project extends AggregateRoot
             $information->description->value,
             $information->finishDate->getValue(),
             (string) $status->getScalar(),
+            $owner->id->value,
             $owner->id->value
         ));
 
@@ -110,7 +111,8 @@ final class Project extends AggregateRoot
                     $this->registerEvent(new ProjectTaskFinishDateWasChangedEvent(
                         $this->id->value,
                         $task->taskId->value,
-                        $information->finishDate->getValue()
+                        $information->finishDate->getValue(),
+                        $currentUserId->value
                     ));
                 }
             }
@@ -120,7 +122,8 @@ final class Project extends AggregateRoot
                 $this->id->value,
                 $information->name->value,
                 $information->description->value,
-                $information->finishDate->getValue()
+                $information->finishDate->getValue(),
+                $currentUserId->value
             ));
         }
     }
@@ -138,6 +141,7 @@ final class Project extends AggregateRoot
             $this->registerEvent(new ProjectTaskWasClosedEvent(
                 $this->id->value,
                 $task->taskId->value,
+                $currentUserId->value
             ));
         }
     }
@@ -155,7 +159,8 @@ final class Project extends AggregateRoot
 
         $this->registerEvent(new ProjectOwnerWasChangedEvent(
             $this->id->value,
-            $this->owner->id->value
+            $this->owner->id->value,
+            $currentUserId->value
         ));
     }
 
@@ -171,31 +176,32 @@ final class Project extends AggregateRoot
     public function removeParticipant(ProjectUserId $participantId, ProjectUserId $currentUserId): void
     {
         $this->owner->ensureUserIsOwner($currentUserId);
-        $this->removeParticipantInner($participantId);
+        $this->removeParticipantInner($participantId, $currentUserId);
     }
 
     public function leaveProject(ProjectUserId $participantId): void
     {
-        $this->removeParticipantInner($participantId);
+        $this->removeParticipantInner($participantId, $participantId);
     }
 
-    public function createRequest(RequestId $id, ProjectUserId $userId): Request
+    public function createRequest(RequestId $id, ProjectUserId $currentUserId): Request
     {
         $this->status->ensureAllowsModification();
-        $this->owner->ensureUserIsNotOwner($userId);
-        $this->participants->ensureUserIsNotParticipant($userId);
-        $this->requests->ensureUserDoesNotHavePendingRequest($userId, $this->id);
+        $this->owner->ensureUserIsNotOwner($currentUserId);
+        $this->participants->ensureUserIsNotParticipant($currentUserId);
+        $this->requests->ensureUserDoesNotHavePendingRequest($currentUserId, $this->id);
 
-        $request = Request::create($id, $this->id, $userId);
+        $request = Request::create($id, $this->id, $currentUserId);
 
         $this->requests->addOrUpdateElement($request);
 
         $this->registerEvent(new RequestWasCreatedEvent(
             $this->id->value,
             $id->value,
-            $userId->value,
+            $currentUserId->value,
             (string) $request->getStatus()->getScalar(),
-            $request->getChangeDate()->getValue()
+            $request->getChangeDate()->getValue(),
+            $currentUserId->value
         ));
 
         return $request;
@@ -330,7 +336,8 @@ final class Project extends AggregateRoot
         $this->registerEvent(new ProjectTaskWasCreatedEvent(
             $this->id->value,
             $taskId->value,
-            $userId->value
+            $userId->value,
+            $this->owner->id->value
         ));
     }
 
@@ -348,11 +355,12 @@ final class Project extends AggregateRoot
 
         $this->registerEvent(new ProjectStatusWasChangedEvent(
             $this->id->value,
-            (string) $status->getScalar()
+            (string) $status->getScalar(),
+            $currentUserId->value
         ));
     }
 
-    private function removeParticipantInner(ProjectUserId $participantId): void
+    private function removeParticipantInner(ProjectUserId $participantId, ProjectUserId $performerId): void
     {
         $this->status->ensureAllowsModification();
         $this->participants->ensureUserIsParticipant($participantId);
@@ -362,7 +370,8 @@ final class Project extends AggregateRoot
 
         $this->registerEvent(new ProjectParticipantWasRemovedEvent(
             $this->id->value,
-            $participantId->value
+            $participantId->value,
+            $performerId->value
         ));
     }
 
@@ -393,7 +402,8 @@ final class Project extends AggregateRoot
             $request->getId()->value,
             $request->getUserId()->value,
             (string) $request->getStatus()->getScalar(),
-            $request->getChangeDate()->getValue()
+            $request->getChangeDate()->getValue(),
+            $currentUserId->value
         ));
     }
 

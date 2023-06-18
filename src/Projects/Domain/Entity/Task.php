@@ -70,6 +70,7 @@ final class Task extends AggregateRoot
             $information->startDate->getValue(),
             $information->finishDate->getValue(),
             (string) $status->getScalar(),
+            $owner->id->value,
             $owner->id->value
         ));
 
@@ -105,7 +106,8 @@ final class Task extends AggregateRoot
                 $information->brief->value,
                 $information->description->value,
                 $information->startDate->getValue(),
-                $information->finishDate->getValue()
+                $information->finishDate->getValue(),
+                $currentUserId->value
             ));
         }
 
@@ -136,7 +138,8 @@ final class Task extends AggregateRoot
 
         $this->registerEvent(new TaskLinkWasCreated(
             $this->id->value,
-            $linkedTaskId->value
+            $linkedTaskId->value,
+            $currentUserId->value
         ));
 
         // this check must be at the end of the method
@@ -156,7 +159,8 @@ final class Task extends AggregateRoot
 
         $this->registerEvent(new TaskLinkWasDeleted(
             $this->id->value,
-            $linkedTaskId->value
+            $linkedTaskId->value,
+            $currentUserId->value
         ));
 
         // this check must be at the end of the method
@@ -217,7 +221,8 @@ final class Task extends AggregateRoot
 
         $this->registerEvent(new TaskStatusWasChangedEvent(
             $this->id->value,
-            (string) $status->getScalar()
+            (string) $status->getScalar(),
+            $currentUserId->value
         ));
 
         // this check must be at the end of the method

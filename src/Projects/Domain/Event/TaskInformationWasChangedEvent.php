@@ -15,9 +15,10 @@ final class TaskInformationWasChangedEvent extends DomainEvent
         public readonly string $description,
         public readonly string $startDate,
         public readonly string $finishDate,
+        string $performerId,
         string $occurredOn = null
     ) {
-        parent::__construct($id, $occurredOn);
+        parent::__construct($id, $performerId, $occurredOn);
     }
 
     public static function getEventName(): string
@@ -25,8 +26,12 @@ final class TaskInformationWasChangedEvent extends DomainEvent
         return 'task.informationChanged';
     }
 
-    public static function fromPrimitives(string $aggregateId, array $body, string $occurredOn): static
-    {
+    public static function fromPrimitives(
+        string $aggregateId,
+        array $body,
+        string $performerId,
+        string $occurredOn
+    ): static {
         return new self(
             $aggregateId,
             $body['name'],
@@ -34,6 +39,7 @@ final class TaskInformationWasChangedEvent extends DomainEvent
             $body['description'],
             $body['startDate'],
             $body['finishDate'],
+            $performerId,
             $occurredOn
         );
     }

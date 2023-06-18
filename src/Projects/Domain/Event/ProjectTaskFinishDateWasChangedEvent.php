@@ -12,9 +12,10 @@ final class ProjectTaskFinishDateWasChangedEvent extends DomainEvent
         string $id,
         public readonly string $taskId,
         public readonly string $finishDate,
+        string $performerId,
         string $occurredOn = null
     ) {
-        parent::__construct($id, $occurredOn);
+        parent::__construct($id, $performerId, $occurredOn);
     }
 
     public static function getEventName(): string
@@ -22,12 +23,17 @@ final class ProjectTaskFinishDateWasChangedEvent extends DomainEvent
         return 'projectTask.finishDateChanged';
     }
 
-    public static function fromPrimitives(string $aggregateId, array $body, string $occurredOn): static
-    {
+    public static function fromPrimitives(
+        string $aggregateId,
+        array $body,
+        string $performerId,
+        string $occurredOn
+    ): static {
         return new self(
             $aggregateId,
             $body['taskId'],
             $body['finishDate'],
+            $performerId,
             $occurredOn
         );
     }

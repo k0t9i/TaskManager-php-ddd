@@ -33,7 +33,8 @@ final class User extends AggregateRoot
             $result->email->value,
             $result->profile->firstname->value,
             $result->profile->lastname->value,
-            $result->profile->password->value
+            $result->profile->password->value,
+            $result->id->value
         ));
 
         return $result;
@@ -55,6 +56,7 @@ final class User extends AggregateRoot
                 $this->profile->firstname->value,
                 $this->profile->lastname->value,
                 $this->profile->password->value,
+                $this->id->value
             ));
         }
     }

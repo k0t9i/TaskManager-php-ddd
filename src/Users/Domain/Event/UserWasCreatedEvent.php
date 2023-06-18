@@ -14,9 +14,10 @@ final class UserWasCreatedEvent extends DomainEvent
         public readonly string $firstname,
         public readonly string $lastname,
         public readonly string $password,
+        string $performerId,
         string $occurredOn = null
     ) {
-        parent::__construct($id, $occurredOn);
+        parent::__construct($id, $performerId, $occurredOn);
     }
 
     public static function getEventName(): string
@@ -24,14 +25,19 @@ final class UserWasCreatedEvent extends DomainEvent
         return 'user.created';
     }
 
-    public static function fromPrimitives(string $aggregateId, array $body, string $occurredOn): static
-    {
+    public static function fromPrimitives(
+        string $aggregateId,
+        array $body,
+        string $performerId,
+        string $occurredOn
+    ): static {
         return new self(
             $aggregateId,
             $body['email'],
             $body['firstname'],
             $body['lastname'],
             $body['password'],
+            $performerId,
             $occurredOn
         );
     }

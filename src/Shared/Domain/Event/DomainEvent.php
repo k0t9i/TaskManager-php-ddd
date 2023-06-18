@@ -12,6 +12,7 @@ abstract class DomainEvent implements DomainEventInterface
 
     public function __construct(
         private readonly string $aggregateId,
+        private readonly string $performerId,
         string $occurredOn = null
     ) {
         $this->occurredOn = $occurredOn ?: (new DateTime())->getValue();
@@ -27,9 +28,8 @@ abstract class DomainEvent implements DomainEventInterface
         return $this->occurredOn;
     }
 
-    abstract public static function getEventName(): string;
-
-    abstract public static function fromPrimitives(string $aggregateId, array $body, string $occurredOn): static;
-
-    abstract public function toPrimitives(): array;
+    public function getPerformerId(): string
+    {
+        return $this->performerId;
+    }
 }

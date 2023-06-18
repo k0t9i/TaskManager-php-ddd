@@ -55,6 +55,7 @@ class TaskTest extends TestCase
         $this->assertCount(1, $events);
         $this->assertInstanceOf(TaskWasCreatedEvent::class, $events[0]);
         $this->assertEquals($builder->getId()->value, $events[0]->getAggregateId());
+        $this->assertEquals($builder->getOwner()->id->value, $events[0]->getPerformerId());
         $this->assertEquals([
             'projectId' => $builder->getProjectId(),
             'name' => $builder->getName(),
@@ -105,6 +106,7 @@ class TaskTest extends TestCase
         $this->assertCount(1, $events);
         $this->assertInstanceOf(TaskInformationWasChangedEvent::class, $events[0]);
         $this->assertEquals($builder->getId()->value, $events[0]->getAggregateId());
+        $this->assertEquals($builder->getOwner()->id->value, $events[0]->getPerformerId());
         $this->assertEquals([
             'name' => $newInfoBuilder->getName(),
             'brief' => $newInfoBuilder->getBrief(),
@@ -150,6 +152,7 @@ class TaskTest extends TestCase
         $this->assertCount(1, $events);
         $this->assertInstanceOf(TaskInformationWasChangedEvent::class, $events[0]);
         $this->assertEquals($builder->getId()->value, $events[0]->getAggregateId());
+        $this->assertEquals($builder->getOwner()->id->value, $events[0]->getPerformerId());
         $this->assertEquals([
             'name' => $builder->getName(),
             'brief' => $newInfoBuilder->getBrief(),
@@ -242,6 +245,7 @@ class TaskTest extends TestCase
         $this->assertCount(1, $events);
         $this->assertInstanceOf(TaskStatusWasChangedEvent::class, $events[0]);
         $this->assertEquals($builder->getId()->value, $events[0]->getAggregateId());
+        $this->assertEquals($builder->getOwner()->id->value, $events[0]->getPerformerId());
         $this->assertEquals([
             'status' => TaskStatus::STATUS_CLOSED,
         ], $events[0]->toPrimitives());
@@ -260,6 +264,7 @@ class TaskTest extends TestCase
         $this->assertCount(1, $events);
         $this->assertInstanceOf(TaskStatusWasChangedEvent::class, $events[0]);
         $this->assertEquals($builder->getId()->value, $events[0]->getAggregateId());
+        $this->assertEquals($builder->getOwner()->id->value, $events[0]->getPerformerId());
         $this->assertEquals([
             'status' => TaskStatus::STATUS_ACTIVE,
         ], $events[0]->toPrimitives());
@@ -302,6 +307,7 @@ class TaskTest extends TestCase
         $this->assertCount(1, $events);
         $this->assertInstanceOf(TaskStatusWasChangedEvent::class, $events[0]);
         $this->assertEquals($builder->getId()->value, $events[0]->getAggregateId());
+        $this->assertEquals($builder->getOwner()->id->value, $events[0]->getPerformerId());
         $this->assertEquals([
             'status' => TaskStatus::STATUS_CLOSED,
         ], $events[0]->toPrimitives());
@@ -357,6 +363,7 @@ class TaskTest extends TestCase
         $this->assertCount(1, $events);
         $this->assertInstanceOf(TaskLinkWasCreated::class, $events[0]);
         $this->assertEquals($builder->getId()->value, $events[0]->getAggregateId());
+        $this->assertEquals($builder->getOwner()->id->value, $events[0]->getPerformerId());
         $this->assertEquals([
             'linkedTaskId' => $linkedTaskId->value,
         ], $events[0]->toPrimitives());
@@ -443,6 +450,7 @@ class TaskTest extends TestCase
         $this->assertCount(1, $events);
         $this->assertInstanceOf(TaskLinkWasDeleted::class, $events[0]);
         $this->assertEquals($builder->getId()->value, $events[0]->getAggregateId());
+        $this->assertEquals($builder->getOwner()->id->value, $events[0]->getPerformerId());
         $this->assertEquals([
             'linkedTaskId' => $linkedTaskId->value,
         ], $events[0]->toPrimitives());

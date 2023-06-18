@@ -11,9 +11,10 @@ final class ProjectOwnerWasChangedEvent extends DomainEvent
     public function __construct(
         string $id,
         public readonly string $ownerId,
+        string $performerId,
         string $occurredOn = null
     ) {
-        parent::__construct($id, $occurredOn);
+        parent::__construct($id, $performerId, $occurredOn);
     }
 
     public static function getEventName(): string
@@ -21,9 +22,13 @@ final class ProjectOwnerWasChangedEvent extends DomainEvent
         return 'project.ownerChanged';
     }
 
-    public static function fromPrimitives(string $aggregateId, array $body, string $occurredOn): static
-    {
-        return new self($aggregateId, $body['ownerId'], $occurredOn);
+    public static function fromPrimitives(
+        string $aggregateId,
+        array $body,
+        string $performerId,
+        string $occurredOn
+    ): static {
+        return new self($aggregateId, $body['ownerId'], $performerId, $occurredOn);
     }
 
     public function toPrimitives(): array

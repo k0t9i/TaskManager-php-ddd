@@ -13,10 +13,15 @@ final class ProjectUserWasCreatedEvent extends DomainEvent
         return 'user.created';
     }
 
-    public static function fromPrimitives(string $aggregateId, array $body, string $occurredOn): static
-    {
+    public static function fromPrimitives(
+        string $aggregateId,
+        array $body,
+        string $performerId,
+        string $occurredOn
+    ): static {
         return new self(
             $aggregateId,
+            $performerId,
             $occurredOn
         );
     }

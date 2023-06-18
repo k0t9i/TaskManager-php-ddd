@@ -46,6 +46,7 @@ class UserTest extends TestCase
         $this->assertCount(1, $events);
         $this->assertInstanceOf(UserWasCreatedEvent::class, $events[0]);
         $this->assertEquals($id->value, $events[0]->getAggregateId());
+        $this->assertEquals($id->value, $events[0]->getPerformerId());
         $this->assertEquals([
             'email' => $email->value,
             'firstname' => $profile->firstname->value,
@@ -103,6 +104,7 @@ class UserTest extends TestCase
         $this->assertCount(1, $events);
         $this->assertInstanceOf(UserProfileWasChangedEvent::class, $events[0]);
         $this->assertEquals($id->value, $events[0]->getAggregateId());
+        $this->assertEquals($id->value, $events[0]->getPerformerId());
         $this->assertEquals([
             'firstname' => $newProfile->firstname->value,
             'lastname' => $newProfile->lastname->value,
