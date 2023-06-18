@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                          https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="TaskManager\Projects\Domain\ValueObject\TaskLink" table="task_links">
+        <id name="taskId" column="task_id" type="task_id" length="36" />
+        <id name="linkedTaskId" column="linked_task_id" type="task_id" length="36" />
+    </entity>
+</doctrine-mapping>

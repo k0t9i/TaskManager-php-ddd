@@ -9,24 +9,43 @@ use Doctrine\Persistence\ObjectRepository;
 use TaskManager\Projects\Domain\Entity\Task;
 use TaskManager\Projects\Domain\Repository\TaskRepositoryInterface;
 use TaskManager\Projects\Domain\ValueObject\TaskId;
+use TaskManager\Projects\Domain\ValueObject\TaskLink;
+use TaskManager\Shared\Infrastructure\Service\ManagedCollectionManager;
 
 final readonly class DoctrineTaskRepository implements TaskRepositoryInterface
 {
     public function __construct(
-        private EntityManagerInterface $entityManager
+        private EntityManagerInterface $entityManager,
+        private readonly ManagedCollectionManager $collectionManager
     ) {
     }
 
+    /**
+     * @throws \ReflectionException
+     */
     public function findById(TaskId $id): ?Task
     {
-        return $this->getRepository()->findOneBy([
+        /** @var Task $object */
+        $object = $this->getRepository()->findOneBy([
             'id' => $id,
         ]);
+
+        $items = $this->entityManager->getRepository(TaskLink::class)
+            ->findBy([
+                'taskId' => $object->getId(),
+            ]);
+        $this->collectionManager->load($object, 'links', $items);
+
+        return $object;
     }
 
+    /**
+     * @throws \ReflectionException
+     */
     public function save(Task $task): void
     {
         $this->entityManager->persist($task);
+        $this->collectionManager->flush($task, 'links');
         $this->entityManager->flush();
     }
 
