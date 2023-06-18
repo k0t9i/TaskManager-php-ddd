@@ -7,6 +7,7 @@ namespace TaskManager\Tests\Projects\Domain\Entity;
 use Faker\Factory;
 use Faker\Generator;
 use PHPUnit\Framework\TestCase;
+use TaskManager\Projects\Domain\Collection\TaskLinkCollection;
 use TaskManager\Projects\Domain\Entity\Task;
 use TaskManager\Projects\Domain\Event\TaskInformationWasChangedEvent;
 use TaskManager\Projects\Domain\Event\TaskLinkWasCreated;
@@ -466,7 +467,7 @@ class TaskTest extends TestCase
         $task->deleteLink($linkedTaskId, $builder->getOwner()->id);
     }
 
-    public function testCreatNonExistingLink(): void
+    public function testDeleteNonExistingLink(): void
     {
         $linkedTaskId = new TaskId($this->faker->uuid());
         $builder = new TaskBuilder($this->faker);
@@ -499,6 +500,85 @@ class TaskTest extends TestCase
         $this->expectUserIsNotTaskOwnerException($otherUserId->value);
 
         $task->deleteLink($linkedTaskId, $otherUserId);
+    }
+
+    public function testCreateBackLink(): void
+    {
+        $linkedTaskId = new TaskId($this->faker->uuid());
+        $builder = new TaskBuilder($this->faker);
+        $task = $builder->build();
+        $reflectionObject = new \ReflectionObject($task);
+        $reflectionProperty = $reflectionObject->getProperty('links');
+        /** @var TaskLinkCollection $links */
+        $links = $reflectionProperty->getValue($task);
+
+        $task->createBackLink($linkedTaskId);
+
+        $this->assertCount(1, $links->getItems());
+        /** @var TaskLink $link */
+        $link = $links->get($linkedTaskId->value);
+        $this->assertEquals($linkedTaskId->value, $link->linkedTaskId);
+    }
+
+    public function testCreateAlreadyExistingBackLink(): void
+    {
+        $taskId = new TaskId($this->faker->uuid());
+        $linkedTaskId = new TaskId($this->faker->uuid());
+        $builder = new TaskBuilder($this->faker);
+        $task = $builder
+            ->withId($taskId)
+            ->withTaskLink(new TaskLink(
+                $taskId,
+                $linkedTaskId
+            ))
+            ->build();
+
+        $this->expectException(TaskLinkAlreadyExistsException::class);
+        $this->expectExceptionMessage(sprintf(
+            'Link from task "%s" to task "%s" already exists',
+            $linkedTaskId->value,
+            $taskId->value
+        ));
+
+        $task->createBackLink($linkedTaskId);
+    }
+
+    public function testDeleteBackLink(): void
+    {
+        $taskId = new TaskId($this->faker->uuid());
+        $linkedTaskId = new TaskId($this->faker->uuid());
+        $builder = new TaskBuilder($this->faker);
+        $task = $builder
+            ->withId($taskId)
+            ->withTaskLink(new TaskLink(
+                $taskId,
+                $linkedTaskId
+            ))
+            ->build();
+        $reflectionObject = new \ReflectionObject($task);
+        $reflectionProperty = $reflectionObject->getProperty('links');
+        /** @var TaskLinkCollection $links */
+        $links = $reflectionProperty->getValue($task);
+
+        $task->deleteBackLink($linkedTaskId);
+
+        $this->assertCount(0, $links->getItems());
+    }
+
+    public function testDeleteNonExistingBackLink(): void
+    {
+        $linkedTaskId = new TaskId($this->faker->uuid());
+        $builder = new TaskBuilder($this->faker);
+        $task = $builder->build();
+
+        $this->expectException(TaskLinkDoesNotExistException::class);
+        $this->expectExceptionMessage(sprintf(
+            'Link from task "%s" to task "%s" doesn\'t exist',
+            $linkedTaskId->value,
+            $task->getId()->value
+        ));
+
+        $task->deleteBackLink($linkedTaskId);
     }
 
     private function expectTaskModificationIsNotAllowedException(): void

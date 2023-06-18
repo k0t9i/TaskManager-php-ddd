@@ -178,6 +178,22 @@ final class Task extends AggregateRoot
         $this->information = $this->information->limitDates($date);
     }
 
+    public function createBackLink(TaskId $linkedTaskId): void
+    {
+        $link = new TaskLink($this->id, $linkedTaskId);
+        $this->links->ensureTaskLinkDoesNotExist($link);
+
+        $this->links->addOrUpdateElement($link);
+    }
+
+    public function deleteBackLink(TaskId $linkedTaskId): void
+    {
+        $link = new TaskLink($this->id, $linkedTaskId);
+        $this->links->ensureTaskLinkExists($link);
+
+        $this->links->remove($link->getHash());
+    }
+
     public function getId(): TaskId
     {
         return $this->id;
