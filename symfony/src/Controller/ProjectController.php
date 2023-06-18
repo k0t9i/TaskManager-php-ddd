@@ -15,10 +15,12 @@ use TaskManager\Projects\Application\Command\CloseProjectCommand;
 use TaskManager\Projects\Application\Command\ConfirmRequestCommand;
 use TaskManager\Projects\Application\Command\CreateProjectCommand;
 use TaskManager\Projects\Application\Command\CreateRequestCommand;
+use TaskManager\Projects\Application\Command\CreateTaskCommand;
 use TaskManager\Projects\Application\Command\LeaveCommand;
 use TaskManager\Projects\Application\Command\RejectRequestCommand;
 use TaskManager\Projects\Application\Command\RemoveParticipantCommand;
 use TaskManager\Projects\Infrastructure\Service\DTO\ProjectInformationDTO;
+use TaskManager\Projects\Infrastructure\Service\DTO\TaskInformationDTO;
 use TaskManager\Shared\Application\Bus\Command\CommandBusInterface;
 use TaskManager\Shared\Application\Service\UuidGeneratorInterface;
 
@@ -149,5 +151,23 @@ final readonly class ProjectController
         $this->commandBus->dispatch($command);
 
         return new JsonResponse();
+    }
+
+    #[Route('/{id}/tasks/', name: 'createTask', methods: ['POST'])]
+    public function createTask(string $id, TaskInformationDTO $dto): JsonResponse
+    {
+        $command = new CreateTaskCommand(
+            $this->uuidGenerator->generate(),
+            $id,
+            $dto->name,
+            $dto->brief,
+            $dto->description,
+            $dto->startDate,
+            $dto->finishDate
+        );
+
+        $this->commandBus->dispatch($command);
+
+        return new JsonResponse(['id' => $command->id], Response::HTTP_CREATED);
     }
 }
