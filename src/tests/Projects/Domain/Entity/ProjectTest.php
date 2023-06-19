@@ -13,6 +13,7 @@ use TaskManager\Projects\Domain\Entity\Request;
 use TaskManager\Projects\Domain\Entity\Task;
 use TaskManager\Projects\Domain\Event\ProjectInformationWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectOwnerWasChangedEvent;
+use TaskManager\Projects\Domain\Event\ProjectParticipantWasAddedEvent;
 use TaskManager\Projects\Domain\Event\ProjectParticipantWasRemovedEvent;
 use TaskManager\Projects\Domain\Event\ProjectStatusWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectTaskFinishDateWasChangedEvent;
@@ -692,7 +693,7 @@ class ProjectTest extends TestCase
         $participants = $participantCollection->getItems();
         $events = $project->releaseEvents();
 
-        $this->assertCount(1, $events);
+        $this->assertCount(2, $events);
         $this->assertInstanceOf(RequestStatusWasChangedEvent::class, $events[0]);
         $this->assertEquals($builder->getId()->value, $events[0]->getAggregateId());
         $this->assertEquals($builder->getOwner()->id->value, $events[0]->getPerformerId());
@@ -702,6 +703,12 @@ class ProjectTest extends TestCase
             'status' => RequestStatus::STATUS_CONFIRMED,
             'changeDate' => $builder->getRequests()[0]->getChangeDate()->getValue(),
         ], $events[0]->toPrimitives());
+        $this->assertInstanceOf(ProjectParticipantWasAddedEvent::class, $events[1]);
+        $this->assertEquals($builder->getId()->value, $events[1]->getAggregateId());
+        $this->assertEquals($builder->getOwner()->id->value, $events[1]->getPerformerId());
+        $this->assertEquals([
+            'participantId' => $builder->getRequests()[0]->getUserId()->value,
+        ], $events[1]->toPrimitives());
         $this->assertInstanceOf(ConfirmedRequestStatus::class, $builder->getRequests()[0]->getStatus());
         $this->assertCount(1, $participants);
         $this->assertEquals($builder->getRequests()[0]->getUserId(), $participants[0]->userId);

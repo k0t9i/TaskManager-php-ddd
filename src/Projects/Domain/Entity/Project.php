@@ -9,6 +9,7 @@ use TaskManager\Projects\Domain\Collection\ProjectTaskCollection;
 use TaskManager\Projects\Domain\Collection\RequestCollection;
 use TaskManager\Projects\Domain\Event\ProjectInformationWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectOwnerWasChangedEvent;
+use TaskManager\Projects\Domain\Event\ProjectParticipantWasAddedEvent;
 use TaskManager\Projects\Domain\Event\ProjectParticipantWasRemovedEvent;
 use TaskManager\Projects\Domain\Event\ProjectStatusWasChangedEvent;
 use TaskManager\Projects\Domain\Event\ProjectTaskFinishDateWasChangedEvent;
@@ -209,7 +210,18 @@ final class Project extends AggregateRoot
 
     public function confirmRequest(RequestId $id, ProjectUserId $currentUserId): void
     {
-        $this->changeRequestStatus($id, new ConfirmedRequestStatus(), $currentUserId);
+        $request = $this->changeRequestStatus($id, new ConfirmedRequestStatus(), $currentUserId);
+
+        $this->participants->addOrUpdateElement(new Participant(
+            $this->id,
+            $request->getUserId()
+        ));
+
+        $this->registerEvent(new ProjectParticipantWasAddedEvent(
+            $this->id->value,
+            $request->getUserId()->value,
+            $currentUserId->value
+        ));
     }
 
     public function rejectRequest(RequestId $id, ProjectUserId $currentUserId): void
@@ -379,7 +391,7 @@ final class Project extends AggregateRoot
         RequestId $id,
         RequestStatus $status,
         ProjectUserId $currentUserId
-    ): void {
+    ): Request {
         $this->status->ensureAllowsModification();
         $this->owner->ensureUserIsOwner($currentUserId);
         if (!$this->requests->exists($id->value)) {
@@ -390,13 +402,6 @@ final class Project extends AggregateRoot
         $request = $this->requests->get($id->value);
         $request->changeStatus($status);
 
-        if ($status->isConfirmed()) {
-            $this->participants->addOrUpdateElement(new Participant(
-                $this->id,
-                $request->getUserId()
-            ));
-        }
-
         $this->registerEvent(new RequestStatusWasChangedEvent(
             $this->id->value,
             $request->getId()->value,
@@ -405,6 +410,8 @@ final class Project extends AggregateRoot
             $request->getChangeDate()->getValue(),
             $currentUserId->value
         ));
+
+        return $request;
     }
 
     private function ensureUserIsProjectUser(ProjectUserId $userId): void
