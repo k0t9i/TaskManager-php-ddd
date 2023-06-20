@@ -53,7 +53,11 @@ class DomainEventMapperTest extends TestCase
 
         $service = new DomainEventMapper($events);
 
-        $this->assertEquals($expected, $service->getEventMap());
+        $this->assertEquals($expected[TestEvent::getEventName()], $service->getEventClasses(TestEvent::getEventName()));
+        $this->assertEquals(
+            $expected[AnotherTestEvent::getEventName()],
+            $service->getEventClasses(AnotherTestEvent::getEventName())
+        );
     }
 
     public function testCreateWithInvalidValue(): void

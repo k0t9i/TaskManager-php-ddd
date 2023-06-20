@@ -6,5 +6,8 @@ namespace TaskManager\Shared\Infrastructure\Service;
 
 interface DomainEventMapperInterface
 {
-    public function getEventMap(): array;
+    /**
+     * @return array<array-key, class-string>
+     */
+    public function getEventClasses(string $eventName): array;
 }

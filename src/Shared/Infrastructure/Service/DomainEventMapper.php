@@ -15,9 +15,12 @@ final class DomainEventMapper implements DomainEventMapperInterface
         $this->indexMap();
     }
 
-    public function getEventMap(): array
+    /**
+     * @return array<array-key, class-string>
+     */
+    public function getEventClasses(string $eventName): array
     {
-        return $this->map;
+        return $this->map[$eventName] ?? [];
     }
 
     private function indexMap(): void
