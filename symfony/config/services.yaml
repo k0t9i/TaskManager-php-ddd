@@ -59,3 +59,7 @@ services:
             - { name: kernel.event_listener, event: kernel.exception, method: onException }
         arguments:
             $environment: '%env(string:APP_ENV)%'
+
+    Ramsey\Uuid\UuidFactory: ~
+
+    Ramsey\Uuid\UuidFactoryInterface: '@Ramsey\Uuid\UuidFactory'

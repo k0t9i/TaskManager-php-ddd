@@ -7,6 +7,7 @@ namespace TaskManager\Tests\Shared\Infrastructure\Service;
 use Faker\Factory;
 use Faker\Generator;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\UuidFactoryInterface;
 use Ramsey\Uuid\UuidInterface;
 use TaskManager\Shared\Infrastructure\Service\RamseyUuid4Generator;
 
@@ -41,8 +42,13 @@ class RamseyUuid4GeneratorTest extends TestCase
         $generator->expects(self::once())
             ->method('toString')
             ->willReturn($result);
+        $factory = $this->getMockBuilder(UuidFactoryInterface::class)
+            ->getMock();
+        $factory->expects(self::once())
+            ->method('uuid4')
+            ->willReturn($generator);
 
-        $object = new RamseyUuid4Generator($generator);
+        $object = new RamseyUuid4Generator($factory);
 
         $this->assertEquals($object->generate(), $result);
     }
