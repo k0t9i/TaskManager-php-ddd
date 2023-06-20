@@ -7,6 +7,7 @@ doctrine:
         port: '%env(resolve:DATABASE_PORT)%'
         driver: '%env(resolve:DATABASE_DRIVER)%'
         server_version: '%env(resolve:DATABASE_VERSION)%'
+        platform_service: TaskManager\Shared\Infrastructure\Persistence\Doctrine\CustomPostgreSQLPlatform
         types:
             user_id: TaskManager\Users\Infrastructure\Persistence\Doctrine\UserIdType
             user_email: TaskManager\Users\Infrastructure\Persistence\Doctrine\UserEmailType
