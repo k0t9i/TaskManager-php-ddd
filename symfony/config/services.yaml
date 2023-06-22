@@ -71,3 +71,5 @@ services:
     Ramsey\Uuid\UuidFactory: ~
 
     Ramsey\Uuid\UuidFactoryInterface: '@Ramsey\Uuid\UuidFactory'
+
+    Symfony\Component\Messenger\Handler\HandlersLocatorInterface: '@domainEvent.bus.messenger.handlers_locator'
