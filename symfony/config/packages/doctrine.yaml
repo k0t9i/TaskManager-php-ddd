@@ -51,6 +51,12 @@ doctrine:
                 is_bundle: false
                 prefix: TaskManager\Users\Domain
                 alias: TaskManagerUsers
+            TaskManagerProjections:
+                type: xml
+                dir: '%kernel.project_dir%/../src/Projections/Infrastructure/Persistence/Doctrine'
+                is_bundle: false
+                prefix: TaskManager\Projections\Domain
+                alias: TaskManagerProjections
 
 when@test:
     doctrine:
