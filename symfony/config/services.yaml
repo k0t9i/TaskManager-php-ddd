@@ -72,4 +72,11 @@ services:
 
     Ramsey\Uuid\UuidFactoryInterface: '@Ramsey\Uuid\UuidFactory'
 
+    # For development purposes only: app domains pretend to be microservices
     Symfony\Component\Messenger\Handler\HandlersLocatorInterface: '@domainEvent.bus.messenger.handlers_locator'
+
+    TaskManager\Projections\Domain\Service\EventStreamFactory:
+        autowire: false
+        # For development purposes only: app domains pretend to be microservices
+        arguments:
+            $streamFilter: '@TaskManager\Projections\Domain\Service\SimulateMicroserviceEventStreamFilter'
