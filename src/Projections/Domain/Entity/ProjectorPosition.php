@@ -13,7 +13,7 @@ final class ProjectorPosition
     ) {
     }
 
-    public function adjustPosition(\DateTime $position): void
+    public function adjustPosition(?\DateTime $position): void
     {
         $this->position = $position;
     }

@@ -25,11 +25,13 @@ final class ProjectorPositionHandler implements ProjectorPositionHandlerInterfac
         return $position->getPosition();
     }
 
-    public function storePosition(ProjectorInterface $projector, \DateTimeImmutable $position): void
+    public function storePosition(ProjectorInterface $projector, ?\DateTimeImmutable $position): void
     {
         $positionObject = $this->getPositionInternal($projector);
 
-        $positionObject->adjustPosition(\DateTime::createFromImmutable($position));
+        $positionObject->adjustPosition(
+            null !== $position ? \DateTime::createFromImmutable($position) : null
+        );
     }
 
     public function isBroken(ProjectorInterface $projector): bool
@@ -51,6 +53,7 @@ final class ProjectorPositionHandler implements ProjectorPositionHandlerInterfac
         foreach ($this->positions as $position) {
             $this->repository->save($position);
         }
+        $this->positions = [];
     }
 
     private function getProjectorName(ProjectorInterface $projector): string
