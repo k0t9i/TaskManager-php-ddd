@@ -31,4 +31,6 @@ interface ManagedCollectionInterface
     public function getRemovedItems(): array;
 
     public function flush(): void;
+
+    public function findFirst(callable $callback = null): ?Hashable;
 }

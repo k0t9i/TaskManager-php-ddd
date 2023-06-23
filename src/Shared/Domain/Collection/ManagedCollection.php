@@ -87,6 +87,17 @@ abstract class ManagedCollection implements ManagedCollectionInterface
         $this->takeSnapshot();
     }
 
+    public function findFirst(callable $callback = null): ?Hashable
+    {
+        foreach ($this->items as $key => $item) {
+            if (null === $callback || true === call_user_func($callback, $key, $item)) {
+                return $item;
+            }
+        }
+
+        return null;
+    }
+
     private function takeSnapshot(): void
     {
         $this->snapshot = $this->items;
