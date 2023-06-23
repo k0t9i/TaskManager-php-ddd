@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace TaskManager\Projections\Domain\Repository;
+namespace TaskManager\Projections\Infrastructure\Repository;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectRepository;
 use TaskManager\Projections\Domain\Entity\ProjectListProjection;
+use TaskManager\Projections\Domain\Repository\ProjectListProjectionRepositoryInterface;
 
 final readonly class DoctrineProjectListProjectionRepository implements ProjectListProjectionRepositoryInterface
 {
