@@ -26,13 +26,16 @@ final readonly class DoctrineEventRepository implements EventRepositoryInterface
     /**
      * @return Event[]
      */
-    public function findOrderedFromLastTime(\DateTimeImmutable $lastDatetime): array
+    public function findOrderedFromLastTime(?\DateTimeImmutable $lastDatetime): array
     {
         $criteria = new Criteria();
-        $criteria->where(Criteria::expr()->gt('occurredOn', $lastDatetime))
-            ->orderBy([
-                'occurredOn' => 'ASC',
-            ]);
+
+        if (null !== $lastDatetime) {
+            $criteria->where(Criteria::expr()->gt('occurredOn', $lastDatetime));
+        }
+        $criteria->orderBy([
+            'occurredOn' => 'ASC',
+        ]);
 
         return $this->getRepository()->matching($criteria)->toArray();
     }

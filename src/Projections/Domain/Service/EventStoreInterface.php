@@ -6,5 +6,5 @@ namespace TaskManager\Projections\Domain\Service;
 
 interface EventStoreInterface
 {
-    public function getStream(\DateTimeImmutable $lastDatetime): EventStreamInterface;
+    public function getStream(?\DateTimeImmutable $lastDatetime): EventStreamInterface;
 }

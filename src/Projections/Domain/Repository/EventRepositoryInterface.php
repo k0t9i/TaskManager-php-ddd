@@ -11,7 +11,7 @@ interface EventRepositoryInterface
     /**
      * @return Event[]
      */
-    public function findOrderedFromLastTime(\DateTimeImmutable $lastDatetime): array;
+    public function findOrderedFromLastTime(?\DateTimeImmutable $lastDatetime): array;
 
     public function save(Event $event): void;
 }

@@ -16,7 +16,7 @@ final readonly class EventStore implements EventStoreInterface
     ) {
     }
 
-    public function getStream(\DateTimeImmutable $lastDatetime): EventStreamInterface
+    public function getStream(?\DateTimeImmutable $lastDatetime): EventStreamInterface
     {
         $events = $this->repository->findOrderedFromLastTime($lastDatetime);
 
