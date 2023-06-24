@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                          https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="TaskManager\Projections\Domain\Entity\ProjectProjection" table="project_projections">
+        <id name="id" length="36" />
+        <id name="userId" column="user_id" length="36" />
+        <field name="name" length="4000" />
+        <field name="description" length="4000" />
+        <field name="finishDate" column="finish_date" type="datetime" />
+        <field name="ownerId" column="owner_id" length="36" />
+        <field name="status" type="integer" />
+    </entity>
+</doctrine-mapping>
