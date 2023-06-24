@@ -9,4 +9,6 @@ use TaskManager\Shared\Domain\Event\DomainEventInterface;
 interface EventStreamInterface
 {
     public function next(): ?DomainEventInterface;
+
+    public function eventCount(): int;
 }

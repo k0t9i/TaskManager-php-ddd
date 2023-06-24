@@ -29,6 +29,10 @@ final readonly class Projectionist implements ProjectionistInterface
             $position = $this->positionHandler->getPosition($projector);
             $stream = $this->eventStore->getStream($position);
 
+            if (0 === $stream->eventCount()) {
+                continue;
+            }
+
             while (null !== $event = $stream->next()) {
                 $position = new \DateTimeImmutable($event->getOccurredOn());
                 try {

@@ -27,4 +27,9 @@ final class EventStream implements EventStreamInterface
     {
         return $this->events[$this->cursor++] ?? null;
     }
+
+    public function eventCount(): int
+    {
+        return count($this->events);
+    }
 }
