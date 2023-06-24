@@ -5,7 +5,7 @@
                           https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
     <entity name="TaskManager\Projections\Domain\Entity\ProjectListProjection" table="project_list_projections">
         <id name="id" length="36" />
-        <field name="userId" column="user_id" length="36" />
+        <id name="userId" column="user_id" length="36" />
         <field name="name" length="4000" />
         <field name="finishDate" column="finish_date" type="datetime" />
         <field name="ownerId" column="owner_id" length="36" />
