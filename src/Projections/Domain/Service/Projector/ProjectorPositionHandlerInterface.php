@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskManager\Projections\Domain\Service;
+namespace TaskManager\Projections\Domain\Service\Projector;
 
 interface ProjectorPositionHandlerInterface
 {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskManager\Projections\Domain\Service;
+namespace TaskManager\Projections\Domain\Service\EventStore;
 
 use TaskManager\Projections\Domain\DTO\EventStreamInfoDTO;
 use TaskManager\Projections\Domain\Repository\EventRepositoryInterface;

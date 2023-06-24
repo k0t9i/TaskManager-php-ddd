@@ -46,7 +46,7 @@ services:
                 - { name: messenger.message_handler, bus: integrationEvent.bus }
         TaskManager\Shared\Domain\Event\DomainEventInterface:
             tags: [ 'task_manager.domain_event' ]
-        TaskManager\Projections\Domain\Service\ProjectorInterface:
+        TaskManager\Projections\Domain\Service\Projector\ProjectorInterface:
             tags: [ 'task_manager.projector' ]
 
     # @see ArrayArgumentLoaderCompilerPass adds class names of all services, tagged with target value, as an argument
@@ -74,15 +74,15 @@ services:
 
     Ramsey\Uuid\UuidFactoryInterface: '@Ramsey\Uuid\UuidFactory'
 
-    TaskManager\Projections\Domain\Service\Projectionist:
+    TaskManager\Projections\Domain\Service\Projector\Projectionist:
         arguments:
             - !tagged task_manager.projector
 
     # For development purposes only: app domains pretend to be microservices
     Symfony\Component\Messenger\Handler\HandlersLocatorInterface: '@domainEvent.bus.messenger.handlers_locator'
 
-    TaskManager\Projections\Domain\Service\EventStreamFactory:
+    TaskManager\Projections\Domain\Service\EventStore\EventStreamFactory:
         autowire: false
         # For development purposes only: app domains pretend to be microservices
         arguments:
-            $streamFilter: '@TaskManager\Projections\Domain\Service\SimulateMicroserviceEventStreamFilter'
+            $streamFilter: '@TaskManager\Projections\Domain\Service\EventStore\SimulateMicroserviceEventStreamFilter'
