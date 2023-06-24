@@ -32,6 +32,22 @@ RUN touch $MESSENGER_WORKER_PATH && \
     echo "numprocs=2" >> $MESSENGER_WORKER_PATH && \
     echo "autostart=true" >> $MESSENGER_WORKER_PATH && \
     echo "autorestart=true" >> $MESSENGER_WORKER_PATH && \
-    echo "process_name=%(program_name)s_%(process_num)02d" >> $MESSENGER_WORKER_PATH
+    echo "startsecs=0" >> $MESSENGER_WORKER_PATH && \
+    echo "startretries=10" >> $MESSENGER_WORKER_PATH && \
+    echo "process_name=%(program_name)s_%(process_num)02d" >> $MESSENGER_WORKER_PATH 
+
+ARG PROJECTIONIST_SLEEP
+ARG PROJECTIONIST_WORKER_PATH=/etc/supervisor/conf.d/projectionist-worker.conf
+
+RUN touch $PROJECTIONIST_WORKER_PATH && \
+    echo "[program:event-consume]" >> $PROJECTIONIST_WORKER_PATH && \
+    echo "command=/bin/bash -c 'source /var/www/symfony/.env && php /var/www/symfony/bin/console event_stream:consume $PROJECTIONIST_SLEEP'" >> $PROJECTIONIST_WORKER_PATH && \
+    echo "user=root" >> $PROJECTIONIST_WORKER_PATH && \
+    echo "numprocs=1" >> $PROJECTIONIST_WORKER_PATH && \
+    echo "autostart=true" >> $PROJECTIONIST_WORKER_PATH && \
+    echo "autorestart=true" >> $PROJECTIONIST_WORKER_PATH && \
+    echo "startsecs=0" >> $PROJECTIONIST_WORKER_PATH && \
+    echo "startretries=10" >> $PROJECTIONIST_WORKER_PATH && \
+    echo "process_name=%(program_name)s_%(process_num)02d" >> $PROJECTIONIST_WORKER_PATH 
 
 CMD ["sh", "-c", "service supervisor stop && service supervisor start && symfony serve --dir=symfony/public --port=8080"]

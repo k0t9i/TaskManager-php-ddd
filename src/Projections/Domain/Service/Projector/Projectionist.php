@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TaskManager\Projections\Domain\Service\Projector;
 
+use TaskManager\Projections\Domain\DTO\ProjectionistResultDTO;
 use TaskManager\Projections\Domain\Service\EventStore\EventStoreInterface;
 
 final readonly class Projectionist implements ProjectionistInterface
@@ -19,12 +20,15 @@ final readonly class Projectionist implements ProjectionistInterface
     }
 
     /**
-     * @throws \Exception
+     * @return ProjectionistResultDTO[]
      */
-    public function projectAll(): void
+    public function projectAll(): array
     {
+        $result = [];
+
         foreach ($this->projectors as $projector) {
             if ($this->positionHandler->isBroken($projector)) {
+                $result[] = new ProjectionistResultDTO($projector::class, 0, true);
                 continue;
             }
 
@@ -32,6 +36,7 @@ final readonly class Projectionist implements ProjectionistInterface
             $streamInfo = $this->eventStore->getStreamInfo($position);
 
             if (0 === $streamInfo->stream->eventCount()) {
+                $result[] = new ProjectionistResultDTO($projector::class, 0);
                 continue;
             }
 
@@ -47,6 +52,10 @@ final readonly class Projectionist implements ProjectionistInterface
             $projector->flush();
             $this->positionHandler->storePosition($projector, $streamInfo->lastPosition);
             $this->positionHandler->flush();
+
+            $result[] = new ProjectionistResultDTO($projector::class, $streamInfo->stream->eventCount());
         }
+
+        return $result;
     }
 }

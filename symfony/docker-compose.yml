@@ -12,6 +12,7 @@ services:
             dockerfile: ./docker/images/php/Dockerfile
             args:
                 RABBITMQ_QUEUE_NAME: ${RABBITMQ_QUEUE_NAME}
+                PROJECTIONIST_SLEEP: ${PROJECTIONIST_SLEEP}
         restart: unless-stopped
         working_dir: /var/www
         depends_on:
