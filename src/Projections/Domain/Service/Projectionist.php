@@ -27,24 +27,23 @@ final readonly class Projectionist implements ProjectionistInterface
             }
 
             $position = $this->positionHandler->getPosition($projector);
-            $stream = $this->eventStore->getStream($position);
+            $streamInfo = $this->eventStore->getStreamInfo($position);
 
-            if (0 === $stream->eventCount()) {
+            if (0 === $streamInfo->stream->eventCount()) {
                 continue;
             }
 
-            while (null !== $event = $stream->next()) {
-                $position = new \DateTimeImmutable($event->getOccurredOn());
+            while (null !== $event = $streamInfo->stream->next()) {
                 try {
                     $projector->projectWhen($event);
                 } catch (\Exception $e) {
                     $this->positionHandler->markAsBroken($projector);
-                    //TODO log exception
+                    // TODO log exception
                 }
             }
 
             $projector->flush();
-            $this->positionHandler->storePosition($projector, $position);
+            $this->positionHandler->storePosition($projector, $streamInfo->lastPosition);
             $this->positionHandler->flush();
         }
     }
