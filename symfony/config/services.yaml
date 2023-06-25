@@ -22,14 +22,13 @@ services:
         resource: '../../src/'
         exclude:
             - '../../src/tests/'
-            - '../../src/**/Application/Command/*'
-            - '../../src/**/Application/Query/*'
-            - '../../src/**/Domain/Collection/*'
-            - '../../src/**/Domain/DTO/*'
-            - '../../src/**/Domain/Entity/*'
-            - '../../src/**/Domain/Event/*'
-            - '../../src/**/Domain/Exception/*'
-            - '../../src/**/Domain/ValueObject/*'
+            - '../../src/*/Application/Command/*'
+            - '../../src/*/Application/Query/*'
+            - '../../src/*/Domain/Collection/*'
+            - '../../src/*/Domain/DTO/*'
+            - '../../src/*/Domain/Entity/*'
+            - '../../src/*/Domain/Exception/*'
+            - '../../src/*/Domain/ValueObject/*'
 
     _instanceof:
         TaskManager\Shared\Application\Bus\Command\CommandHandlerInterface:
