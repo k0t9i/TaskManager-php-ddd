@@ -6,6 +6,7 @@ namespace TaskManager\Projections\Domain\Service\Projector;
 
 use TaskManager\Projections\Domain\Collection\ProjectListProjectionCollection;
 use TaskManager\Projections\Domain\Entity\ProjectListProjection;
+use TaskManager\Projections\Domain\Entity\UserProjection;
 use TaskManager\Projections\Domain\Event\ProjectInformationWasChangedEvent;
 use TaskManager\Projections\Domain\Event\ProjectOwnerWasChangedEvent;
 use TaskManager\Projections\Domain\Event\ProjectParticipantWasAddedEvent;
@@ -15,8 +16,10 @@ use TaskManager\Projections\Domain\Event\ProjectWasCreatedEvent;
 use TaskManager\Projections\Domain\Event\RequestStatusWasChangedEvent;
 use TaskManager\Projections\Domain\Event\RequestWasCreatedEvent;
 use TaskManager\Projections\Domain\Event\TaskWasCreatedEvent;
+use TaskManager\Projections\Domain\Event\UserProfileWasChangedEvent;
 use TaskManager\Projections\Domain\ProjectionDoesNotExistException;
 use TaskManager\Projections\Domain\Repository\ProjectListProjectionRepositoryInterface;
+use TaskManager\Projections\Domain\Repository\UserProjectionRepositoryInterface;
 
 final class ProjectListProjector extends Projector
 {
@@ -25,8 +28,10 @@ final class ProjectListProjector extends Projector
      */
     private array $projections = [];
 
-    public function __construct(private readonly ProjectListProjectionRepositoryInterface $repository)
-    {
+    public function __construct(
+        private readonly ProjectListProjectionRepositoryInterface $repository,
+        private readonly UserProjectionRepositoryInterface $userRepository,
+    ) {
     }
 
     public function flush(): void
@@ -52,12 +57,21 @@ final class ProjectListProjector extends Projector
     private function whenProjectCreated(ProjectWasCreatedEvent $event): void
     {
         $projections = $this->loadProjectionsAsNeeded($event->getAggregateId());
+
+        $userProjection = $this->userRepository->findById($event->ownerId);
+        if (null === $userProjection) {
+            throw new ProjectionDoesNotExistException($event->ownerId, UserProjection::class);
+        }
+
         $projections->addOrUpdateElement(new ProjectListProjection(
             $event->getAggregateId(),
             $event->ownerId,
             $event->name,
             new \DateTime($event->finishDate),
             $event->ownerId,
+            $userProjection->email,
+            $userProjection->firstname,
+            $userProjection->lastname,
             (int) $event->status
         ));
     }
@@ -83,11 +97,19 @@ final class ProjectListProjector extends Projector
         $projections = $this->loadProjectionsAsNeeded($id);
         $this->ensureProjectionExists($event->getAggregateId(), $projections->getItems());
 
+        $userProjection = $this->userRepository->findById($event->ownerId);
+        if (null === $userProjection) {
+            throw new ProjectionDoesNotExistException($event->ownerId, UserProjection::class);
+        }
+
         $oldOwnerId = null;
         /** @var ProjectListProjection $projection */
         foreach ($projections->getItems() as $projection) {
             $oldOwnerId = $projection->ownerId;
             $projection->ownerId = $event->ownerId;
+            $projection->ownerEmail = $userProjection->email;
+            $projection->ownerFirstname = $userProjection->firstname;
+            $projection->ownerLastname = $userProjection->lastname;
         }
 
         /** @var ProjectListProjection $newOwnerProjection */
@@ -178,6 +200,21 @@ final class ProjectListProjector extends Projector
         /** @var ProjectListProjection $projection */
         foreach ($projections->getItems() as $projection) {
             --$projection->participantsCount;
+        }
+    }
+
+    private function whenUserProfileChanged(UserProfileWasChangedEvent $event): void
+    {
+        $projectionsByOwnerId = $this->repository->findAllByOwnerId($event->getAggregateId());
+
+        foreach ($projectionsByOwnerId as $projectionByOwnerId) {
+            $projections = $this->loadProjectionsAsNeeded($projectionByOwnerId->id);
+
+            /** @var ProjectListProjection $projection */
+            foreach ($projections->getItems() as $projection) {
+                $projection->ownerFirstname = $event->firstname;
+                $projection->ownerLastname = $event->lastname;
+            }
         }
     }
 
