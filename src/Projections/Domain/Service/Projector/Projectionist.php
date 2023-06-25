@@ -49,7 +49,9 @@ final readonly class Projectionist implements ProjectionistInterface
                 }
             }
 
-            $projector->flush();
+            if (!$this->positionHandler->isBroken($projector)) {
+                $projector->flush();
+            }
             $this->positionHandler->storePosition($projector, $streamInfo->lastPosition);
             $this->positionHandler->flush();
 
