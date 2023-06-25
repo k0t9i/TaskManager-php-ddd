@@ -17,7 +17,7 @@ use TaskManager\Projections\Domain\Event\RequestStatusWasChangedEvent;
 use TaskManager\Projections\Domain\Event\RequestWasCreatedEvent;
 use TaskManager\Projections\Domain\Event\TaskWasCreatedEvent;
 use TaskManager\Projections\Domain\Event\UserProfileWasChangedEvent;
-use TaskManager\Projections\Domain\ProjectionDoesNotExistException;
+use TaskManager\Projections\Domain\Exception\ProjectionDoesNotExistException;
 use TaskManager\Projections\Domain\Repository\ProjectListProjectionRepositoryInterface;
 use TaskManager\Projections\Domain\Repository\UserProjectionRepositoryInterface;
 

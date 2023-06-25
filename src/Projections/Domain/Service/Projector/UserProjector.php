@@ -7,7 +7,7 @@ namespace TaskManager\Projections\Domain\Service\Projector;
 use TaskManager\Projections\Domain\Entity\UserProjection;
 use TaskManager\Projections\Domain\Event\UserProfileWasChangedEvent;
 use TaskManager\Projections\Domain\Event\UserWasCreatedEvent;
-use TaskManager\Projections\Domain\ProjectionDoesNotExistException;
+use TaskManager\Projections\Domain\Exception\ProjectionDoesNotExistException;
 use TaskManager\Projections\Infrastructure\Repository\DoctrineUserProjectionRepository;
 
 final class UserProjector extends Projector

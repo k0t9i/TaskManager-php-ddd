@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskManager\Projections\Domain;
+namespace TaskManager\Projections\Domain\Exception;
 
 use TaskManager\Shared\Domain\Exception\DomainException;
 

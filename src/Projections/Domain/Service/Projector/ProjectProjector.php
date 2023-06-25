@@ -10,7 +10,7 @@ use TaskManager\Projections\Domain\Event\ProjectInformationWasChangedEvent;
 use TaskManager\Projections\Domain\Event\ProjectOwnerWasChangedEvent;
 use TaskManager\Projections\Domain\Event\ProjectStatusWasChangedEvent;
 use TaskManager\Projections\Domain\Event\ProjectWasCreatedEvent;
-use TaskManager\Projections\Domain\ProjectionDoesNotExistException;
+use TaskManager\Projections\Domain\Exception\ProjectionDoesNotExistException;
 use TaskManager\Projections\Domain\Repository\ProjectProjectionRepositoryInterface;
 
 final class ProjectProjector extends Projector
