@@ -298,10 +298,11 @@ class TaskTest extends TestCase
 
     public function testCloseAsNeeded(): void
     {
+        $performerId = new ProjectUserId($this->faker->uuid());
         $builder = new TaskBuilder($this->faker);
         $task = $builder->build();
 
-        $task->closeAsNeeded();
+        $task->closeAsNeeded($builder->getOwner()->id);
         $events = $task->releaseEvents();
 
         $this->assertCount(1, $events);
@@ -318,6 +319,7 @@ class TaskTest extends TestCase
      */
     public function testLimitDates(): void
     {
+        $performerId = new ProjectUserId($this->faker->uuid());
         $startDate = '01-02-2023';
         $finishDate = '05-02-2023';
         $dateAfter = '10-02-2023';
@@ -332,21 +334,50 @@ class TaskTest extends TestCase
         $reflectionObject = new \ReflectionObject($task);
         $reflectionProperty = $reflectionObject->getProperty('information');
 
-        $task->limitDates(new DateTime($dateAfter));
+        $task->limitDates(new DateTime($dateAfter), $performerId);
+        $events = $task->releaseEvents();
+
+        $this->assertCount(0, $events);
         /** @var TaskInformation $information */
         $information = $reflectionProperty->getValue($task);
         $this->assertEquals(new TaskFinishDate($finishDate), $information->finishDate);
         $this->assertEquals(new TaskStartDate($startDate), $information->startDate);
 
-        $task->limitDates(new DateTime($dateBetween));
+        $task->limitDates(new DateTime($dateBetween), $performerId);
+        $events = $task->releaseEvents();
+
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(TaskInformationWasChangedEvent::class, $events[0]);
+        $this->assertEquals($builder->getId()->value, $events[0]->getAggregateId());
+        $this->assertEquals($performerId->value, $events[0]->getPerformerId());
         /** @var TaskInformation $information */
         $information = $reflectionProperty->getValue($task);
+        $this->assertEquals([
+            'name' => $builder->getName(),
+            'brief' => $builder->getBrief(),
+            'description' => $builder->getDescription(),
+            'startDate' => $information->startDate->getValue(),
+            'finishDate' => $information->finishDate->getValue(),
+        ], $events[0]->toPrimitives());
         $this->assertEquals(new TaskFinishDate($dateBetween), $information->finishDate);
         $this->assertEquals(new TaskStartDate($startDate), $information->startDate);
 
-        $task->limitDates(new DateTime($dateBefore));
+        $task->limitDates(new DateTime($dateBefore), $performerId);
+        $events = $task->releaseEvents();
+
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(TaskInformationWasChangedEvent::class, $events[0]);
+        $this->assertEquals($builder->getId()->value, $events[0]->getAggregateId());
+        $this->assertEquals($performerId->value, $events[0]->getPerformerId());
         /** @var TaskInformation $information */
         $information = $reflectionProperty->getValue($task);
+        $this->assertEquals([
+            'name' => $builder->getName(),
+            'brief' => $builder->getBrief(),
+            'description' => $builder->getDescription(),
+            'startDate' => $information->startDate->getValue(),
+            'finishDate' => $information->finishDate->getValue(),
+        ], $events[0]->toPrimitives());
         $this->assertEquals(new TaskFinishDate($dateBefore), $information->finishDate);
         $this->assertEquals(new TaskStartDate($dateBefore), $information->startDate);
     }

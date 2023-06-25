@@ -167,9 +167,9 @@ final class Task extends AggregateRoot
         $this->owner->ensureUserIsOwner($currentUserId);
     }
 
-    public function closeAsNeeded(): void
+    public function closeAsNeeded(ProjectUserId $performerId): void
     {
-        $this->changeStatus(new ClosedTaskStatus(), $this->owner->id);
+        $this->changeStatus(new ClosedTaskStatus(), $performerId);
     }
 
     public function undraft(): void
@@ -177,9 +177,22 @@ final class Task extends AggregateRoot
         $this->isDraft = false;
     }
 
-    public function limitDates(DateTime $date): void
+    public function limitDates(DateTime $date, ProjectUserId $performerId): void
     {
-        $this->information = $this->information->limitDates($date);
+        $information = $this->information->limitDates($date);
+
+        if (!$information->equals($this->information)) {
+            $this->information = $information;
+            $this->registerEvent(new TaskInformationWasChangedEvent(
+                $this->id->value,
+                $information->name->value,
+                $information->brief->value,
+                $information->description->value,
+                $information->startDate->getValue(),
+                $information->finishDate->getValue(),
+                $performerId->value
+            ));
+        }
     }
 
     public function createBackLink(TaskId $linkedTaskId, ProjectUserId $performerId): void
