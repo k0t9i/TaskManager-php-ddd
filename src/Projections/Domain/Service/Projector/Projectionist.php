@@ -66,6 +66,7 @@ final readonly class Projectionist implements ProjectionistInterface
 
     /**
      * @param iterable<int, ProjectorInterface> $projectorsGenerator
+     *
      * @return ProjectorInterface[]
      */
     private function prioritizeProjectors(iterable $projectorsGenerator): array
