@@ -65,6 +65,9 @@ final class ProjectRequestProjector extends Projector
         );
     }
 
+    /**
+     * @throws \Exception
+     */
     private function whenRequestStatusChanged(RequestStatusWasChangedEvent $event): void
     {
         $projection = $this->loadProjectionsAsNeeded($event->requestId);
@@ -74,8 +77,7 @@ final class ProjectRequestProjector extends Projector
         }
 
         $projection->status = $event->status;
-
-        $this->projections[$event->requestId] = $projection;
+        $projection->changeDate = new \DateTime($event->changeDate);
     }
 
     private function whenUserProfileChanged(UserProfileWasChangedEvent $event): void
