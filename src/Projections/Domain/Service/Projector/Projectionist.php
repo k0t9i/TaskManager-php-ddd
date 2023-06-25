@@ -12,14 +12,14 @@ final readonly class Projectionist implements ProjectionistInterface
     private array $projectors;
 
     /**
-     * @param ProjectorInterface[] $projectors
+     * @param iterable<int, ProjectorInterface> $projectors
      */
     public function __construct(
         iterable $projectors,
         private EventStoreInterface $eventStore,
         private ProjectorPositionHandler $positionHandler
     ) {
-        $this->prioritizeProjectors($projectors);
+        $this->projectors = $this->prioritizeProjectors($projectors);
     }
 
     /**
@@ -64,7 +64,11 @@ final readonly class Projectionist implements ProjectionistInterface
         return $result;
     }
 
-    private function prioritizeProjectors(iterable $projectorsGenerator): void
+    /**
+     * @param iterable<int, ProjectorInterface> $projectorsGenerator
+     * @return ProjectorInterface[]
+     */
+    private function prioritizeProjectors(iterable $projectorsGenerator): array
     {
         $projectors = [...$projectorsGenerator];
         usort($projectors, function (ProjectorInterface $left, ProjectorInterface $right) {
@@ -75,6 +79,6 @@ final readonly class Projectionist implements ProjectionistInterface
             return ($left->priority() < $right->priority()) ? 1 : -1;
         });
 
-        $this->projectors = $projectors;
+        return $projectors;
     }
 }

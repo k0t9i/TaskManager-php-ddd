@@ -59,5 +59,7 @@ final class ConsumeEventStreamCommand extends Command
 
             $this->clock->sleep($sleepAmount);
         }
+
+        return 0;
     }
 }

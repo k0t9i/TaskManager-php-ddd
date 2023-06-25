@@ -115,7 +115,10 @@ final class ProjectRequestProjector extends Projector
     private function loadProjectionsAsNeeded(string $id): ?ProjectRequestProjection
     {
         if (!isset($this->projections[$id])) {
-            $this->projections[$id] = $this->repository->findById($id);
+            $projection = $this->repository->findById($id);
+            if (null !== $projection) {
+                $this->projections[$id] = $projection;
+            }
         }
 
         return $this->projections[$id];

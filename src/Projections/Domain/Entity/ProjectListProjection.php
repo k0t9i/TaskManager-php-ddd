@@ -29,7 +29,7 @@ final class ProjectListProjection implements Hashable
         return $this->userId;
     }
 
-    public function __clone(): void
+    public function __clone()
     {
         $this->finishDate = clone $this->finishDate;
     }

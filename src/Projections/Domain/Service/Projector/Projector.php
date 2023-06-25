@@ -35,8 +35,9 @@ abstract class Projector implements ProjectorInterface
             if (1 !== $method->getNumberOfParameters()) {
                 continue;
             }
-            $typeName = $method->getParameters()[0]->getType()->getName();
-            if (is_a($event, $typeName)) {
+            /** @var \ReflectionNamedType $type */
+            $type = $method->getParameters()[0]->getType();
+            if (is_a($event, $type->getName())) {
                 $method->invoke($this, $event);
             }
         }
