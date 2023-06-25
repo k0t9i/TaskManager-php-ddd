@@ -182,20 +182,32 @@ final class Task extends AggregateRoot
         $this->information = $this->information->limitDates($date);
     }
 
-    public function createBackLink(TaskId $linkedTaskId): void
+    public function createBackLink(TaskId $linkedTaskId, ProjectUserId $performerId): void
     {
         $link = new TaskLink($this->id, $linkedTaskId);
-        $this->links->ensureTaskLinkDoesNotExist($link);
 
-        $this->links->addOrUpdateElement($link);
+        if (!$this->links->exists($link->getHash())) {
+            $this->links->addOrUpdateElement($link);
+            $this->registerEvent(new TaskLinkWasCreated(
+                $this->id->value,
+                $linkedTaskId->value,
+                $performerId->value
+            ));
+        }
     }
 
-    public function deleteBackLink(TaskId $linkedTaskId): void
+    public function deleteBackLink(TaskId $linkedTaskId, ProjectUserId $performerId): void
     {
         $link = new TaskLink($this->id, $linkedTaskId);
-        $this->links->ensureTaskLinkExists($link);
 
-        $this->links->remove($link->getHash());
+        if ($this->links->exists($link->getHash())) {
+            $this->links->remove($link->getHash());
+            $this->registerEvent(new TaskLinkWasDeleted(
+                $this->id->value,
+                $linkedTaskId->value,
+                $performerId->value
+            ));
+        }
     }
 
     public function getId(): TaskId

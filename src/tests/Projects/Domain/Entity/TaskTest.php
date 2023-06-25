@@ -512,6 +512,7 @@ class TaskTest extends TestCase
 
     public function testCreateBackLink(): void
     {
+        $performerId = new ProjectUserId($this->faker->uuid());
         $linkedTaskId = new TaskId($this->faker->uuid());
         $builder = new TaskBuilder($this->faker);
         $task = $builder->build();
@@ -520,8 +521,16 @@ class TaskTest extends TestCase
         /** @var TaskLinkCollection $links */
         $links = $reflectionProperty->getValue($task);
 
-        $task->createBackLink($linkedTaskId);
+        $task->createBackLink($linkedTaskId, $performerId);
+        $events = $task->releaseEvents();
 
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(TaskLinkWasCreated::class, $events[0]);
+        $this->assertEquals($builder->getId()->value, $events[0]->getAggregateId());
+        $this->assertEquals($performerId->value, $events[0]->getPerformerId());
+        $this->assertEquals([
+            'linkedTaskId' => $linkedTaskId->value,
+        ], $events[0]->toPrimitives());
         $this->assertCount(1, $links->getItems());
         /** @var TaskLink $link */
         $link = $links->get($linkedTaskId->value);
@@ -541,18 +550,15 @@ class TaskTest extends TestCase
             ))
             ->build();
 
-        $this->expectException(TaskLinkAlreadyExistsException::class);
-        $this->expectExceptionMessage(sprintf(
-            'Link from task "%s" to task "%s" already exists',
-            $linkedTaskId->value,
-            $taskId->value
-        ));
+        $task->createBackLink($linkedTaskId, new ProjectUserId($this->faker->uuid()));
+        $events = $task->releaseEvents();
 
-        $task->createBackLink($linkedTaskId);
+        $this->assertCount(0, $events);
     }
 
     public function testDeleteBackLink(): void
     {
+        $performerId = new ProjectUserId($this->faker->uuid());
         $taskId = new TaskId($this->faker->uuid());
         $linkedTaskId = new TaskId($this->faker->uuid());
         $builder = new TaskBuilder($this->faker);
@@ -568,8 +574,16 @@ class TaskTest extends TestCase
         /** @var TaskLinkCollection $links */
         $links = $reflectionProperty->getValue($task);
 
-        $task->deleteBackLink($linkedTaskId);
+        $task->deleteBackLink($linkedTaskId, $performerId);
+        $events = $task->releaseEvents();
 
+        $this->assertCount(1, $events);
+        $this->assertInstanceOf(TaskLinkWasDeleted::class, $events[0]);
+        $this->assertEquals($builder->getId()->value, $events[0]->getAggregateId());
+        $this->assertEquals($performerId->value, $events[0]->getPerformerId());
+        $this->assertEquals([
+            'linkedTaskId' => $linkedTaskId->value,
+        ], $events[0]->toPrimitives());
         $this->assertCount(0, $links->getItems());
     }
 
@@ -579,14 +593,10 @@ class TaskTest extends TestCase
         $builder = new TaskBuilder($this->faker);
         $task = $builder->build();
 
-        $this->expectException(TaskLinkDoesNotExistException::class);
-        $this->expectExceptionMessage(sprintf(
-            'Link from task "%s" to task "%s" doesn\'t exist',
-            $linkedTaskId->value,
-            $task->getId()->value
-        ));
+        $task->deleteBackLink($linkedTaskId, new ProjectUserId($this->faker->uuid()));
+        $events = $task->releaseEvents();
 
-        $task->deleteBackLink($linkedTaskId);
+        $this->assertCount(0, $events);
     }
 
     private function expectTaskModificationIsNotAllowedException(): void
