@@ -18,6 +18,8 @@ interface TaskProjectionRepositoryInterface
      */
     public function findAllByProjectId(string $id): array;
 
+    public function findById(string $id): ?TaskProjection;
+
     public function save(TaskProjection $projection): void;
 
     public function delete(TaskProjection $projection): void;

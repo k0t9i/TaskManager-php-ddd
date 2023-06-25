@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                          https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="TaskManager\Projections\Domain\Entity\TaskLinkProjection" table="task_link_projections">
+        <id name="taskId" length="36" />
+        <id name="linkedTaskId" length="36" />
+        <id name="userId" column="user_id" length="36" />
+        <field name="linkedTaskName" length="4000" />
+    </entity>
+</doctrine-mapping>
