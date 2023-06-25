@@ -47,8 +47,8 @@ final class ProjectRequestProjector extends Projector
             throw new ProjectionDoesNotExistException($event->userId, UserProjection::class);
         }
 
-        $projectProjections = $this->projectRepository->findAllById($event->getAggregateId());
-        if (0 === count($projectProjections)) {
+        $projectProjection = $this->projectRepository->findById($event->getAggregateId());
+        if (null === $projectProjection) {
             throw new ProjectionDoesNotExistException($event->getAggregateId(), ProjectProjection::class);
         }
 
@@ -61,7 +61,7 @@ final class ProjectRequestProjector extends Projector
             $event->status,
             new \DateTime($event->changeDate),
             $event->getAggregateId(),
-            $projectProjections[0]->ownerId
+            $projectProjection->ownerId
         );
     }
 

@@ -13,6 +13,8 @@ interface ProjectProjectionRepositoryInterface
      */
     public function findAllById(string $id): array;
 
+    public function findById(string $id): ?ProjectProjection;
+
     public function save(ProjectProjection $projection): void;
 
     public function delete(ProjectProjection $projection): void;

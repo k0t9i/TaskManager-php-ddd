@@ -38,8 +38,8 @@ final class UserRequestProjector extends Projector
      */
     private function whenRequestCreated(RequestWasCreatedEvent $event): void
     {
-        $projectProjections = $this->projectRepository->findAllById($event->getAggregateId());
-        if (0 === count($projectProjections)) {
+        $projectProjection = $this->projectRepository->findById($event->getAggregateId());
+        if (null === $projectProjection) {
             throw new ProjectionDoesNotExistException($event->getAggregateId(), ProjectProjection::class);
         }
 
@@ -49,7 +49,7 @@ final class UserRequestProjector extends Projector
             $event->status,
             new \DateTime($event->changeDate),
             $event->getAggregateId(),
-            $projectProjections[0]->name
+            $projectProjection->name
         );
     }
 
