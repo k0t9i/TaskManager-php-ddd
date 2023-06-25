@@ -73,7 +73,7 @@ nelmio_api_doc:
                     schema:
                         ref: '#/components/schemas/objectId/properties/id'
                 linkedTaskId:
-                    name: id
+                    name: linkedTaskId
                     in: path
                     description: 'Linked task ID'
                     required: true
