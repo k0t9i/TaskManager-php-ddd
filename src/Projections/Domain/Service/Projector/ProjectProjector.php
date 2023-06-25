@@ -10,6 +10,7 @@ use TaskManager\Projections\Domain\Event\ProjectInformationWasChangedEvent;
 use TaskManager\Projections\Domain\Event\ProjectOwnerWasChangedEvent;
 use TaskManager\Projections\Domain\Event\ProjectStatusWasChangedEvent;
 use TaskManager\Projections\Domain\Event\ProjectWasCreatedEvent;
+use TaskManager\Projections\Domain\ProjectionDoesNotExistException;
 use TaskManager\Projections\Domain\Repository\ProjectProjectionRepositoryInterface;
 
 final class ProjectProjector extends Projector
@@ -63,6 +64,7 @@ final class ProjectProjector extends Projector
     private function whenProjectInformationChanged(ProjectInformationWasChangedEvent $event): void
     {
         $projections = $this->loadProjectionsAsNeeded($event->getAggregateId());
+        $this->ensureProjectionExists($event->getAggregateId(), $projections->getItems());
 
         /** @var ProjectProjection $projection */
         foreach ($projections->getItems() as $projection) {
@@ -76,6 +78,7 @@ final class ProjectProjector extends Projector
     {
         $id = $event->getAggregateId();
         $projections = $this->loadProjectionsAsNeeded($id);
+        $this->ensureProjectionExists($event->getAggregateId(), $projections->getItems());
 
         $oldOwnerId = null;
         /** @var ProjectProjection $projection */
@@ -94,6 +97,7 @@ final class ProjectProjector extends Projector
     private function whenProjectStatusChanged(ProjectStatusWasChangedEvent $event): void
     {
         $projections = $this->loadProjectionsAsNeeded($event->getAggregateId());
+        $this->ensureProjectionExists($event->getAggregateId(), $projections->getItems());
 
         /** @var ProjectProjection $projection */
         foreach ($projections->getItems() as $projection) {
@@ -108,5 +112,12 @@ final class ProjectProjector extends Projector
         }
 
         return $this->projections[$id];
+    }
+
+    private function ensureProjectionExists(string $id, array $items): void
+    {
+        if (0 === count($items)) {
+            throw new ProjectionDoesNotExistException($id, ProjectProjection::class);
+        }
     }
 }
