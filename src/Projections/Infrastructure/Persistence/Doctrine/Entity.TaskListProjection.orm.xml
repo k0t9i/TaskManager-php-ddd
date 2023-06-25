@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                          https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+    <entity name="TaskManager\Projections\Domain\Entity\TaskListProjection" table="task_list_projections">
+        <id name="id" length="36" />
+        <id name="userId" column="user_id" length="36" />
+        <field name="name" length="4000" />
+        <field name="startDate" column="start_date" type="datetime" />
+        <field name="finishDate" column="finish_date" type="datetime" />
+        <field name="ownerId" column="owner_id" length="36" />
+        <field name="ownerEmail" column="owner_email" length="4000" />
+        <field name="ownerFirstname" column="owner_firstname" length="4000" />
+        <field name="ownerLastname" column="owner_lastname" length="4000" />
+        <field name="status" type="integer" />
+        <field name="projectId" column="project_id" length="36" />
+        <field name="linksCount" column="links_count" type="integer" />
+    </entity>
+</doctrine-mapping>
