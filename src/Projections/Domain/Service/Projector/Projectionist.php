@@ -9,14 +9,17 @@ use TaskManager\Projections\Domain\Service\EventStore\EventStoreInterface;
 
 final readonly class Projectionist implements ProjectionistInterface
 {
+    private array $projectors;
+
     /**
      * @param ProjectorInterface[] $projectors
      */
     public function __construct(
-        private iterable $projectors,
+        iterable $projectors,
         private EventStoreInterface $eventStore,
         private ProjectorPositionHandler $positionHandler
     ) {
+        $this->prioritizeProjectors($projectors);
     }
 
     /**
@@ -59,5 +62,19 @@ final readonly class Projectionist implements ProjectionistInterface
         }
 
         return $result;
+    }
+
+    private function prioritizeProjectors(iterable $projectorsGenerator): void
+    {
+        $projectors = [...$projectorsGenerator];
+        usort($projectors, function (ProjectorInterface $left, ProjectorInterface $right) {
+            if ($left->priority() === $right->priority()) {
+                return 0;
+            }
+
+            return ($left->priority() < $right->priority()) ? 1 : -1;
+        });
+
+        $this->projectors = $projectors;
     }
 }

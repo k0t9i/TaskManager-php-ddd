@@ -16,6 +16,11 @@ abstract class Projector implements ProjectorInterface
         $this->invokeSuitableMethods($event);
     }
 
+    public function priority(): int
+    {
+        return 100;
+    }
+
     /**
      * @throws \ReflectionException
      */

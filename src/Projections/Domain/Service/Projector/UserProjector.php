@@ -28,6 +28,11 @@ final class UserProjector extends Projector
         }
     }
 
+    public function priority(): int
+    {
+        return 200;
+    }
+
     private function whenUserCreated(UserWasCreatedEvent $event): void
     {
         $this->projections[$event->getAggregateId()] = new UserProjection(

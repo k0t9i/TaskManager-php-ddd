@@ -10,5 +10,7 @@ interface ProjectorInterface
 {
     public function projectWhen(DomainEventInterface $event): void;
 
+    public function priority(): int;
+
     public function flush(): void;
 }

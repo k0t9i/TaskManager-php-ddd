@@ -33,6 +33,11 @@ final class UserRequestProjector extends Projector
         }
     }
 
+    public function priority(): int
+    {
+        return 50;
+    }
+
     /**
      * @throws \Exception
      */
