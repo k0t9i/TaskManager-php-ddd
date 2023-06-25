@@ -8,7 +8,7 @@ use TaskManager\Projections\Domain\Entity\UserProjection;
 use TaskManager\Projections\Domain\Event\UserProfileWasChangedEvent;
 use TaskManager\Projections\Domain\Event\UserWasCreatedEvent;
 use TaskManager\Projections\Domain\Exception\ProjectionDoesNotExistException;
-use TaskManager\Projections\Infrastructure\Repository\DoctrineUserProjectionRepository;
+use TaskManager\Projections\Domain\Repository\UserProjectionRepositoryInterface;
 
 final class UserProjector extends Projector
 {
@@ -17,7 +17,7 @@ final class UserProjector extends Projector
      */
     private array $projections = [];
 
-    public function __construct(private readonly DoctrineUserProjectionRepository $repository)
+    public function __construct(private readonly UserProjectionRepositoryInterface $repository)
     {
     }
 
@@ -40,7 +40,8 @@ final class UserProjector extends Projector
 
     private function whenUserProfileChanged(UserProfileWasChangedEvent $event): void
     {
-        $projection = $this->repository->findById($event->getAggregateId());
+        $projection = $this->projections[$event->getAggregateId()] ??
+            $this->repository->findById($event->getAggregateId());
 
         if (null === $projection) {
             throw new ProjectionDoesNotExistException($event->getAggregateId(), UserProjection::class);
