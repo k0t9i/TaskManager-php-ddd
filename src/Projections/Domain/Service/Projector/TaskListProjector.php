@@ -116,7 +116,7 @@ final class TaskListProjector extends Projector
 
             $oldProjection = $projections->findFirst();
             if (null === $oldProjection) {
-                throw new ProjectionDoesNotExistException($projectionByProjectId->id, TaskListProjection::class);
+                continue;
             }
 
             /** @var TaskListProjection $newOwnerProjection */
