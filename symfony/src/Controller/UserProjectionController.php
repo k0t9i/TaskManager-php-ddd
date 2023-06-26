@@ -14,7 +14,7 @@ use TaskManager\Projections\Application\Query\UserProfileQuery;
 use TaskManager\Shared\Application\Bus\Query\QueryBusInterface;
 
 #[AsController]
-#[Route('/api/user-projections', name: 'user-projection.')]
+#[Route('/api/users', name: 'user.')]
 #[Areas(['default'])]
 final readonly class UserProjectionController
 {

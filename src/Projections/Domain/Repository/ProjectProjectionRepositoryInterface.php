@@ -15,6 +15,8 @@ interface ProjectProjectionRepositoryInterface
 
     public function findById(string $id): ?ProjectProjection;
 
+    public function findByIdAndUserId(string $id, string $userId): ?ProjectProjection;
+
     public function save(ProjectProjection $projection): void;
 
     public function delete(ProjectProjection $projection): void;

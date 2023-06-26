@@ -20,5 +20,10 @@ interface ProjectRequestProjectionRepositoryInterface
      */
     public function findAllByProjectId(string $id): array;
 
+    /**
+     * @return ProjectRequestProjection[]
+     */
+    public function findAllByProjectIdAndOwnerId(string $projectId, string $userId): array;
+
     public function save(ProjectRequestProjection $projection): void;
 }

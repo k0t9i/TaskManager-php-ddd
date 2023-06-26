@@ -36,6 +36,16 @@ final readonly class DoctrineProjectListProjectionRepository implements ProjectL
         ]);
     }
 
+    /**
+     * @return ProjectListProjection[]
+     */
+    public function findAllByUserId(string $id): array
+    {
+        return $this->getRepository()->findBy([
+            'userId' => $id,
+        ]);
+    }
+
     public function save(ProjectListProjection $projection): void
     {
         $this->entityManager->persist($projection);

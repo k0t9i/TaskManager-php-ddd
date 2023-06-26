@@ -273,7 +273,7 @@ final readonly class ProjectController
     #[OA\Post(
         description: 'Create request to the project',
         tags: [
-            'request',
+            'project',
         ],
         parameters: [
             new OA\Parameter(
@@ -305,7 +305,7 @@ final readonly class ProjectController
     #[OA\Patch(
         description: 'Confirm pending request',
         tags: [
-            'request',
+            'project',
         ],
         parameters: [
             new OA\Parameter(
@@ -340,7 +340,7 @@ final readonly class ProjectController
     #[OA\Patch(
         description: 'Reject pending request',
         tags: [
-            'request',
+            'project',
         ],
         parameters: [
             new OA\Parameter(

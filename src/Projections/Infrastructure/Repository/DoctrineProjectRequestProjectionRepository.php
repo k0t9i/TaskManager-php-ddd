@@ -43,6 +43,17 @@ final readonly class DoctrineProjectRequestProjectionRepository implements Proje
         ]);
     }
 
+    /**
+     * @return ProjectRequestProjection[]
+     */
+    public function findAllByProjectIdAndOwnerId(string $projectId, string $userId): array
+    {
+        return $this->getRepository()->findBy([
+            'projectId' => $projectId,
+            'ownerId' => $userId,
+        ]);
+    }
+
     public function save(ProjectRequestProjection $projection): void
     {
         $this->entityManager->persist($projection);

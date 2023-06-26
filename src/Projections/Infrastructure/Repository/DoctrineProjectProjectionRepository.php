@@ -33,6 +33,14 @@ final readonly class DoctrineProjectProjectionRepository implements ProjectProje
         ]);
     }
 
+    public function findByIdAndUserId(string $id, string $userId): ?ProjectProjection
+    {
+        return $this->getRepository()->findOneBy([
+            'id' => $id,
+            'userId' => $userId,
+        ]);
+    }
+
     public function save(ProjectProjection $projection): void
     {
         $this->entityManager->persist($projection);
