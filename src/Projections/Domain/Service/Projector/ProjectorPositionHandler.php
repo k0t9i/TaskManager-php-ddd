@@ -6,6 +6,7 @@ namespace TaskManager\Projections\Domain\Service\Projector;
 
 use TaskManager\Projections\Domain\Entity\ProjectorPosition;
 use TaskManager\Projections\Domain\Repository\ProjectorPositionRepositoryInterface;
+use TaskManager\Shared\Domain\ValueObject\DateTime;
 
 final class ProjectorPositionHandler implements ProjectorPositionHandlerInterface
 {
@@ -18,20 +19,18 @@ final class ProjectorPositionHandler implements ProjectorPositionHandlerInterfac
     {
     }
 
-    public function getPosition(ProjectorInterface $projector): ?\DateTimeImmutable
+    public function getPosition(ProjectorInterface $projector): ?DateTime
     {
         $position = $this->getPositionInternal($projector);
 
         return $position->getPosition();
     }
 
-    public function storePosition(ProjectorInterface $projector, ?\DateTimeImmutable $position): void
+    public function storePosition(ProjectorInterface $projector, ?DateTime $position): void
     {
         $positionObject = $this->getPositionInternal($projector);
 
-        $positionObject->adjustPosition(
-            null !== $position ? \DateTime::createFromImmutable($position) : null
-        );
+        $positionObject->adjustPosition($position);
     }
 
     public function isBroken(ProjectorInterface $projector): bool

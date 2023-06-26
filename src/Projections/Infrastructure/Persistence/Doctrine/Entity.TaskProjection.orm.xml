@@ -9,8 +9,8 @@
         <field name="name" length="4000" />
         <field name="brief" length="4000" />
         <field name="description" length="4000" />
-        <field name="startDate" column="start_date" type="datetime" />
-        <field name="finishDate" column="finish_date" type="datetime" />
+        <field name="startDate" column="start_date" type="tm_datetime" />
+        <field name="finishDate" column="finish_date" type="tm_datetime" />
         <field name="ownerId" column="owner_id" length="36" />
         <field name="status" type="integer" />
         <field name="projectId" column="project_id" length="36" />

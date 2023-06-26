@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TaskManager\Projections\Domain\Entity;
 
 use TaskManager\Shared\Domain\Hashable;
+use TaskManager\Shared\Domain\ValueObject\DateTime;
 
 final class TaskListProjection implements Hashable
 {
@@ -12,8 +13,8 @@ final class TaskListProjection implements Hashable
         public string $id,
         public string $userId,
         public string $name,
-        public \DateTime $startDate,
-        public \DateTime $finishDate,
+        public DateTime $startDate,
+        public DateTime $finishDate,
         public string $ownerId,
         public string $ownerEmail,
         public string $ownerFirstname,
@@ -31,6 +32,7 @@ final class TaskListProjection implements Hashable
 
     public function __clone()
     {
+        $this->startDate = clone $this->startDate;
         $this->finishDate = clone $this->finishDate;
     }
 }

@@ -7,6 +7,7 @@ namespace TaskManager\Projections\Domain\Service\EventStore;
 use TaskManager\Projections\Domain\DTO\EventStreamInfoDTO;
 use TaskManager\Projections\Domain\Repository\EventRepositoryInterface;
 use TaskManager\Shared\Domain\Event\DomainEventInterface;
+use TaskManager\Shared\Domain\ValueObject\DateTime;
 use TaskManager\Shared\Infrastructure\Service\DomainEventFactoryInterface;
 
 final readonly class EventStore implements EventStoreInterface
@@ -21,7 +22,7 @@ final readonly class EventStore implements EventStoreInterface
     /**
      * @throws \Exception
      */
-    public function getStreamInfo(?\DateTimeImmutable $lastDatetime): EventStreamInfoDTO
+    public function getStreamInfo(?DateTime $lastDatetime): EventStreamInfoDTO
     {
         $events = $this->repository->findOrderedFromLastTime($lastDatetime);
 
@@ -33,7 +34,7 @@ final readonly class EventStore implements EventStoreInterface
 
         $position = $lastDatetime;
         if (count($domainEvents) > 0) {
-            $position = new \DateTimeImmutable(array_reverse($domainEvents)[0]->getOccurredOn());
+            $position = new DateTime(array_reverse($domainEvents)[0]->getOccurredOn());
         }
 
         return new EventStreamInfoDTO(

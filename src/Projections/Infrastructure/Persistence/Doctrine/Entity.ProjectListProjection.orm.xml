@@ -7,7 +7,7 @@
         <id name="id" length="36" />
         <id name="userId" column="user_id" length="36" />
         <field name="name" length="4000" />
-        <field name="finishDate" column="finish_date" type="datetime" />
+        <field name="finishDate" column="finish_date" type="tm_datetime" />
         <field name="ownerId" column="owner_id" length="36" />
         <field name="ownerEmail" column="owner_email" length="4000" />
         <field name="ownerFirstname" column="owner_firstname" length="4000" />

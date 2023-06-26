@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace TaskManager\Projections\Domain\Entity;
 
+use TaskManager\Shared\Domain\ValueObject\DateTime;
+
 final class ProjectorPosition
 {
     public function __construct(
         private readonly string $projectorName,
-        private ?\DateTime $position = null,
+        private ?DateTime $position = null,
         private bool $isBroken = false
     ) {
     }
 
-    public function adjustPosition(?\DateTime $position): void
+    public function adjustPosition(?DateTime $position): void
     {
         $this->position = $position;
     }
@@ -28,12 +30,8 @@ final class ProjectorPosition
         return $this->isBroken;
     }
 
-    public function getPosition(): ?\DateTimeImmutable
+    public function getPosition(): ?DateTime
     {
-        if (null === $this->position) {
-            return null;
-        }
-
-        return \DateTimeImmutable::createFromMutable($this->position);
+        return $this->position;
     }
 }

@@ -15,6 +15,7 @@ use TaskManager\Projections\Domain\Exception\ProjectionDoesNotExistException;
 use TaskManager\Projections\Domain\Repository\ProjectProjectionRepositoryInterface;
 use TaskManager\Projections\Domain\Repository\ProjectRequestProjectionRepositoryInterface;
 use TaskManager\Projections\Domain\Repository\UserProjectionRepositoryInterface;
+use TaskManager\Shared\Domain\ValueObject\DateTime;
 
 final class ProjectRequestProjector extends Projector
 {
@@ -64,7 +65,7 @@ final class ProjectRequestProjector extends Projector
             $userProjection->firstname,
             $userProjection->lastname,
             $event->status,
-            new \DateTime($event->changeDate),
+            new DateTime($event->changeDate),
             $event->getAggregateId(),
             $projectProjection->ownerId
         );
@@ -82,7 +83,7 @@ final class ProjectRequestProjector extends Projector
         }
 
         $projection->status = $event->status;
-        $projection->changeDate = new \DateTime($event->changeDate);
+        $projection->changeDate = new DateTime($event->changeDate);
     }
 
     private function whenUserProfileChanged(UserProfileWasChangedEvent $event): void

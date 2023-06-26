@@ -19,6 +19,7 @@ use TaskManager\Projections\Domain\Exception\ProjectionDoesNotExistException;
 use TaskManager\Projections\Domain\Repository\ProjectProjectionRepositoryInterface;
 use TaskManager\Projections\Domain\Repository\TaskListProjectionRepositoryInterface;
 use TaskManager\Projections\Domain\Repository\UserProjectionRepositoryInterface;
+use TaskManager\Shared\Domain\ValueObject\DateTime;
 
 final class TaskListProjector extends Projector
 {
@@ -80,8 +81,8 @@ final class TaskListProjector extends Projector
                 $event->getAggregateId(),
                 $userId,
                 $event->name,
-                new \DateTime($event->startDate),
-                new \DateTime($event->finishDate),
+                new DateTime($event->startDate),
+                new DateTime($event->finishDate),
                 $event->ownerId,
                 $userProjection->email,
                 $userProjection->firstname,
@@ -103,8 +104,8 @@ final class TaskListProjector extends Projector
         /** @var TaskListProjection $projection */
         foreach ($projections->getItems() as $projection) {
             $projection->name = $event->name;
-            $projection->startDate = new \DateTime($event->startDate);
-            $projection->finishDate = new \DateTime($event->finishDate);
+            $projection->startDate = new DateTime($event->startDate);
+            $projection->finishDate = new DateTime($event->finishDate);
         }
     }
 

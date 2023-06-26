@@ -20,6 +20,7 @@ use TaskManager\Projections\Domain\Event\UserProfileWasChangedEvent;
 use TaskManager\Projections\Domain\Exception\ProjectionDoesNotExistException;
 use TaskManager\Projections\Domain\Repository\ProjectListProjectionRepositoryInterface;
 use TaskManager\Projections\Domain\Repository\UserProjectionRepositoryInterface;
+use TaskManager\Shared\Domain\ValueObject\DateTime;
 
 final class ProjectListProjector extends Projector
 {
@@ -67,7 +68,7 @@ final class ProjectListProjector extends Projector
             $event->getAggregateId(),
             $event->ownerId,
             $event->name,
-            new \DateTime($event->finishDate),
+            new DateTime($event->finishDate),
             $event->ownerId,
             $userProjection->email,
             $userProjection->firstname,
@@ -87,7 +88,7 @@ final class ProjectListProjector extends Projector
         /** @var ProjectListProjection $projection */
         foreach ($projections->getItems() as $projection) {
             $projection->name = $event->name;
-            $projection->finishDate = new \DateTime($event->finishDate);
+            $projection->finishDate = new DateTime($event->finishDate);
         }
     }
 

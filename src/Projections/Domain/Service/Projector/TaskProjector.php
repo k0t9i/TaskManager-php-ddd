@@ -14,6 +14,7 @@ use TaskManager\Projections\Domain\Event\TaskWasCreatedEvent;
 use TaskManager\Projections\Domain\Exception\ProjectionDoesNotExistException;
 use TaskManager\Projections\Domain\Repository\ProjectProjectionRepositoryInterface;
 use TaskManager\Projections\Domain\Repository\TaskProjectionRepositoryInterface;
+use TaskManager\Shared\Domain\ValueObject\DateTime;
 
 final class TaskProjector extends Projector
 {
@@ -71,8 +72,8 @@ final class TaskProjector extends Projector
                 $event->name,
                 $event->brief,
                 $event->description,
-                new \DateTime($event->startDate),
-                new \DateTime($event->finishDate),
+                new DateTime($event->startDate),
+                new DateTime($event->finishDate),
                 $event->ownerId,
                 (int) $event->status,
                 $projectProjection->id
@@ -93,8 +94,8 @@ final class TaskProjector extends Projector
             $projection->name = $event->name;
             $projection->brief = $event->brief;
             $projection->description = $event->description;
-            $projection->startDate = new \DateTime($event->startDate);
-            $projection->finishDate = new \DateTime($event->finishDate);
+            $projection->startDate = new DateTime($event->startDate);
+            $projection->finishDate = new DateTime($event->finishDate);
         }
     }
 

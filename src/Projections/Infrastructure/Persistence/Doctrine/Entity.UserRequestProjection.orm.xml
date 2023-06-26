@@ -7,7 +7,7 @@
         <id name="id" length="36" />
         <field name="userId" column="user_id" length="36" />
         <field name="status" type="integer" />
-        <field name="changeDate" column="change_date" type="datetime" />
+        <field name="changeDate" column="change_date" type="tm_datetime" />
         <field name="projectId" column="project_id" length="36" />
         <field name="projectName" column="project_name" length="4000" />
     </entity>

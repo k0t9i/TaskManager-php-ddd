@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TaskManager\Projections\Domain\Entity;
 
 use TaskManager\Shared\Domain\Event\DomainEventInterface;
+use TaskManager\Shared\Domain\ValueObject\DateTime;
 use TaskManager\Shared\Infrastructure\Service\DomainEventFactoryInterface;
 
 final readonly class Event
@@ -15,7 +16,7 @@ final readonly class Event
         private string $aggregateId,
         private string $body,
         private string $performerId,
-        private \DateTime $occurredOn
+        private DateTime $occurredOn
     ) {
     }
 
@@ -30,7 +31,7 @@ final readonly class Event
             $domainEvent->getAggregateId(),
             json_encode($domainEvent->toPrimitives()),
             $domainEvent->getPerformerId(),
-            new \DateTime($domainEvent->getOccurredOn())
+            new DateTime($domainEvent->getOccurredOn())
         );
     }
 
@@ -44,7 +45,7 @@ final readonly class Event
             $this->aggregateId,
             json_decode($this->body, true),
             $this->performerId,
-            $this->occurredOn->format('Y-m-d\TH:i:s.uP') // fixme use own datetime
+            $this->occurredOn->getValue()
         );
     }
 }

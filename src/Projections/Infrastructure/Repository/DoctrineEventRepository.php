@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use TaskManager\Projections\Domain\Entity\Event;
 use TaskManager\Projections\Domain\Repository\EventRepositoryInterface;
+use TaskManager\Shared\Domain\ValueObject\DateTime;
 
 final readonly class DoctrineEventRepository implements EventRepositoryInterface
 {
@@ -26,7 +27,7 @@ final readonly class DoctrineEventRepository implements EventRepositoryInterface
     /**
      * @return Event[]
      */
-    public function findOrderedFromLastTime(?\DateTimeImmutable $lastDatetime): array
+    public function findOrderedFromLastTime(?DateTime $lastDatetime): array
     {
         $criteria = new Criteria();
 

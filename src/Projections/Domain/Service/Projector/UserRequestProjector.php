@@ -12,6 +12,7 @@ use TaskManager\Projections\Domain\Event\RequestWasCreatedEvent;
 use TaskManager\Projections\Domain\Exception\ProjectionDoesNotExistException;
 use TaskManager\Projections\Domain\Repository\ProjectProjectionRepositoryInterface;
 use TaskManager\Projections\Domain\Repository\UserRequestProjectionRepositoryInterface;
+use TaskManager\Shared\Domain\ValueObject\DateTime;
 
 final class UserRequestProjector extends Projector
 {
@@ -52,7 +53,7 @@ final class UserRequestProjector extends Projector
             $event->requestId,
             $event->userId,
             $event->status,
-            new \DateTime($event->changeDate),
+            new DateTime($event->changeDate),
             $event->getAggregateId(),
             $projectProjection->name
         );
@@ -70,7 +71,7 @@ final class UserRequestProjector extends Projector
         }
 
         $projection->status = $event->status;
-        $projection->changeDate = new \DateTime($event->changeDate);
+        $projection->changeDate = new DateTime($event->changeDate);
     }
 
     private function whenProjectInformationChanged(ProjectInformationWasChangedEvent $event): void

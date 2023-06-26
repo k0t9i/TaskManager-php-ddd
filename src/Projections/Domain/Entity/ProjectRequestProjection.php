@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace TaskManager\Projections\Domain\Entity;
 
+use TaskManager\Shared\Domain\ValueObject\DateTime;
+
 final class ProjectRequestProjection
 {
     public function __construct(
@@ -13,7 +15,7 @@ final class ProjectRequestProjection
         public string $userFirstname,
         public string $userLastname,
         public string $status,
-        public \DateTime $changeDate,
+        public DateTime $changeDate,
         public string $projectId,
         public string $ownerId
     ) {

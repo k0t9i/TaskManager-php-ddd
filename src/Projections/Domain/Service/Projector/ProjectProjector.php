@@ -12,6 +12,7 @@ use TaskManager\Projections\Domain\Event\ProjectStatusWasChangedEvent;
 use TaskManager\Projections\Domain\Event\ProjectWasCreatedEvent;
 use TaskManager\Projections\Domain\Exception\ProjectionDoesNotExistException;
 use TaskManager\Projections\Domain\Repository\ProjectProjectionRepositoryInterface;
+use TaskManager\Shared\Domain\ValueObject\DateTime;
 
 final class ProjectProjector extends Projector
 {
@@ -52,7 +53,7 @@ final class ProjectProjector extends Projector
             $event->ownerId,
             $event->name,
             $event->description,
-            new \DateTime($event->finishDate),
+            new DateTime($event->finishDate),
             $event->ownerId,
             (int) $event->status
         ));
@@ -70,7 +71,7 @@ final class ProjectProjector extends Projector
         foreach ($projections->getItems() as $projection) {
             $projection->name = $event->name;
             $projection->description = $event->description;
-            $projection->finishDate = new \DateTime($event->finishDate);
+            $projection->finishDate = new DateTime($event->finishDate);
         }
     }
 

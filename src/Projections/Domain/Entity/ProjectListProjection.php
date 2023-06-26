@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TaskManager\Projections\Domain\Entity;
 
 use TaskManager\Shared\Domain\Hashable;
+use TaskManager\Shared\Domain\ValueObject\DateTime;
 
 final class ProjectListProjection implements Hashable
 {
@@ -12,7 +13,7 @@ final class ProjectListProjection implements Hashable
         public string $id,
         public string $userId,
         public string $name,
-        public \DateTime $finishDate,
+        public DateTime $finishDate,
         public string $ownerId,
         public string $ownerEmail,
         public string $ownerFirstname,
