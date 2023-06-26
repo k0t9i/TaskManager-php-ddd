@@ -25,7 +25,7 @@ final readonly class UserController
     ) {
     }
 
-    #[Route('/profile/', name: 'updateProfile', methods: ['PATCH'])]
+    #[Route('/', name: 'updateProfile', methods: ['PATCH'])]
     #[OA\Patch(
         description: 'Update profile',
         requestBody: new OA\RequestBody(
