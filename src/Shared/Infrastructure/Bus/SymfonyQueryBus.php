@@ -8,7 +8,6 @@ use Symfony\Component\Messenger\HandleTrait;
 use Symfony\Component\Messenger\MessageBusInterface;
 use TaskManager\Shared\Application\Bus\Query\QueryBusInterface;
 use TaskManager\Shared\Application\Bus\Query\QueryInterface;
-use TaskManager\Shared\Application\Bus\Query\QueryResponseInterface;
 
 final class SymfonyQueryBus implements QueryBusInterface
 {
@@ -19,7 +18,7 @@ final class SymfonyQueryBus implements QueryBusInterface
         $this->messageBus = $queryBus;
     }
 
-    public function dispatch(QueryInterface $query): QueryResponseInterface
+    public function dispatch(QueryInterface $query): mixed
     {
         return $this->handle($query);
     }

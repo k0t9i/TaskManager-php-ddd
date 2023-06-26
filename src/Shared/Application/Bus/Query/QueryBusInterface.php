@@ -6,5 +6,5 @@ namespace TaskManager\Shared\Application\Bus\Query;
 
 interface QueryBusInterface
 {
-    public function dispatch(QueryInterface $query): QueryResponseInterface;
+    public function dispatch(QueryInterface $query): mixed;
 }
