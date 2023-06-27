@@ -11,17 +11,16 @@ final readonly class UserLoginDTO
 {
     public function __construct(
         #[OA\Property(
-            description: 'User email',
-            type: 'string',
-            format: 'email',
-            example: 'john.smith@local.dev'
+            oneOf: [new OA\Schema(
+                ref: '#components/schemas/userModel/properties/email'
+            )]
         )]
         #[Assert\NotBlank]
         public string $email = '',
         #[OA\Property(
-            description: 'User password',
-            type: 'string',
-            format: 'password'
+            oneOf: [new OA\Schema(
+                ref: '#components/schemas/userModel/properties/password'
+            )]
         )]
         #[Assert\NotBlank]
         public string $password = '',

@@ -11,40 +11,38 @@ final readonly class UserRegisterDTO
 {
     public function __construct(
         #[OA\Property(
-            description: 'User email',
-            type: 'string',
-            format: 'email',
-            example: 'john.smith@local.dev'
+            oneOf: [new OA\Schema(
+                ref: '#components/schemas/userModel/properties/email'
+            )]
         )]
         #[Assert\NotBlank]
         public string $email = '',
         #[OA\Property(
-            description: 'User firstname',
-            type: 'string',
-            maxLength: 255,
-            example: 'John'
+            oneOf: [new OA\Schema(
+                ref: '#components/schemas/userModel/properties/firstname'
+            )]
         )]
         #[Assert\NotBlank]
         public string $firstname = '',
         #[OA\Property(
-            description: 'User lastname',
-            type: 'string',
-            maxLength: 255,
-            example: 'Smith'
+            oneOf: [new OA\Schema(
+                ref: '#components/schemas/userModel/properties/lastname'
+            )]
         )]
         #[Assert\NotBlank]
         public string $lastname = '',
         #[OA\Property(
-            description: 'User password',
-            type: 'string',
-            format: 'password'
+            oneOf: [new OA\Schema(
+                ref: '#components/schemas/userModel/properties/password'
+            )]
         )]
         #[Assert\NotBlank]
         public string $password = '',
         #[OA\Property(
-            description: 'User password repeating',
-            type: 'string',
-            format: 'password'
+            oneOf: [new OA\Schema(
+                ref: '#components/schemas/userModel/properties/password',
+                description: 'User password repeating',
+            )]
         )]
         #[Assert\NotBlank]
         public string $repeatPassword = '',

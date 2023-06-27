@@ -22,6 +22,88 @@ nelmio_api_doc:
                             type: string
                             format: uuid
                             example: 123e4567-e89b-12d3-a456-426614174000
+                userModel:
+                    type: object
+                    properties:
+                        email:
+                            type: string
+                            format: email
+                            example: 'john.smith@local.dev'
+                            description: 'User email'
+                        firstname:
+                            description: 'User firstname'
+                            type: 'string'
+                            maxLength: 255
+                            example: 'John'
+                        lastname:
+                            description: 'User lastname'
+                            type: 'string'
+                            maxLength: 255
+                            example: 'Smith'
+                        password:
+                            description: 'User password'
+                            type: 'string'
+                            format: 'password'
+                projectModel:
+                    type: object
+                    properties:
+                        name:
+                            description: 'Project name'
+                            type: 'string'
+                            maxLength: 255
+                            example: 'My project'
+                        description:
+                            description: 'Project description'
+                            type: 'string'
+                            maxLength: 4000
+                            example: 'Yet another awesome project.'
+                        finishDate:
+                            description: 'Project finish date'
+                            type: 'string'
+                            format: 'date'
+                            example: '2023-05-10'
+                        status:
+                            description: 'Project status: 0 - closed, 1 - active'
+                            type: int
+                            enum:
+                                - 0
+                                - 1
+                            example: 1
+                taskModel:
+                    type: object
+                    properties:
+                        name:
+                            description: 'Task name'
+                            type: 'string'
+                            maxLength: 255
+                            example: 'My task'
+                        brief:
+                            description: 'Task brief info'
+                            type: 'string'
+                            maxLength: 2000
+                            example: 'Yet another awesome task.'
+                        description:
+                            description: 'Task description'
+                            type: 'string'
+                            maxLength: 4000
+                            example: 'Yet another awesome task.'
+                        startDate:
+                            description: 'Task start date'
+                            type: 'string'
+                            format: 'date'
+                            example: '2023-05-01'
+                        finishDate:
+                            description: 'Task finish date'
+                            type: 'string'
+                            format: 'date'
+                            example: '2023-05-07'
+                        status:
+                            description: 'Task status: 0 - closed, 1 - active'
+                            type: int
+                            enum:
+                                - 0
+                                - 1
+                            example: 1
             responses:
                 createObject:
                     description: 'Returns the ID of the newly created object.'

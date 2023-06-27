@@ -12,27 +12,24 @@ final readonly class ProjectInformationDTO
 {
     public function __construct(
         #[OA\Property(
-            description: 'Project name',
-            type: 'string',
-            maxLength: 255,
-            example: 'My project'
+            oneOf: [new OA\Schema(
+                ref: '#components/schemas/projectModel/properties/name'
+            )]
         )]
         #[Groups(['create', 'update'])]
         #[Assert\NotBlank(groups: ['create'])]
         public string $name = '',
         #[OA\Property(
-            description: 'Project description',
-            type: 'string',
-            maxLength: 4000,
-            example: 'Yet another awesome project.'
+            oneOf: [new OA\Schema(
+                ref: '#components/schemas/projectModel/properties/description'
+            )]
         )]
         #[Groups(['create', 'update'])]
         public string $description = '',
         #[OA\Property(
-            description: 'Project finish date',
-            type: 'string',
-            format: 'date',
-            example: '2023-05-10'
+            oneOf: [new OA\Schema(
+                ref: '#components/schemas/projectModel/properties/finishDate'
+            )]
         )]
         #[Groups(['create', 'update'])]
         public string $finishDate = ''

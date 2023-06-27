@@ -12,43 +12,38 @@ final readonly class TaskInformationDTO
 {
     public function __construct(
         #[OA\Property(
-            description: 'Task name',
-            type: 'string',
-            maxLength: 255,
-            example: 'My task'
+            oneOf: [new OA\Schema(
+                ref: '#components/schemas/taskModel/properties/name'
+            )]
         )]
         #[Groups(['create', 'update'])]
         #[Assert\NotBlank(groups: ['create'])]
         public string $name = '',
         #[OA\Property(
-            description: 'Task brief info',
-            type: 'string',
-            maxLength: 2000,
-            example: 'Yet another awesome task.'
+            oneOf: [new OA\Schema(
+                ref: '#components/schemas/taskModel/properties/brief'
+            )]
         )]
         #[Groups(['create', 'update'])]
         public string $brief = '',
         #[OA\Property(
-            description: 'Task description',
-            type: 'string',
-            maxLength: 4000,
-            example: 'Yet another awesome task.'
+            oneOf: [new OA\Schema(
+                ref: '#components/schemas/taskModel/properties/description'
+            )]
         )]
         #[Groups(['create', 'update'])]
         public string $description = '',
         #[OA\Property(
-            description: 'Task start date',
-            type: 'string',
-            format: 'date',
-            example: '2023-05-01'
+            oneOf: [new OA\Schema(
+                ref: '#components/schemas/taskModel/properties/startDate'
+            )]
         )]
         #[Groups(['create', 'update'])]
         public string $startDate = '',
         #[OA\Property(
-            description: 'Task finish date',
-            type: 'string',
-            format: 'date',
-            example: '2023-05-07'
+            oneOf: [new OA\Schema(
+                ref: '#components/schemas/taskModel/properties/finishDate'
+            )]
         )]
         #[Groups(['create', 'update'])]
         public string $finishDate = ''
