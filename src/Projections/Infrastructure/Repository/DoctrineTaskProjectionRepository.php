@@ -43,6 +43,14 @@ final readonly class DoctrineTaskProjectionRepository implements TaskProjectionR
         ]);
     }
 
+    public function findByIdAndUserId(string $id, string $userId): ?TaskProjection
+    {
+        return $this->getRepository()->findOneBy([
+            'id' => $id,
+            'userId' => $userId,
+        ]);
+    }
+
     public function save(TaskProjection $projection): void
     {
         $this->entityManager->persist($projection);

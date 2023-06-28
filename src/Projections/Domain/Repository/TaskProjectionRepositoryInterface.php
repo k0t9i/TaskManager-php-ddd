@@ -20,6 +20,8 @@ interface TaskProjectionRepositoryInterface
 
     public function findById(string $id): ?TaskProjection;
 
+    public function findByIdAndUserId(string $id, string $userId): ?TaskProjection;
+
     public function save(TaskProjection $projection): void;
 
     public function delete(TaskProjection $projection): void;
