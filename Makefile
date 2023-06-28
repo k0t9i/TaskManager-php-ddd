@@ -1,10 +1,10 @@
 .PHONY: code-style
 code-style:
-	docker exec task_manager-php ./symfony/vendor/bin/php-cs-fixer fix --config ./symfony/.php-cs-fixer.dist.php --allow-risky=yes --dry-run -vv --show-progress=dots
+	docker exec task_manager-php ./symfony/vendor/bin/php-cs-fixer fix --config ./symfony/.php-cs-fixer.dist.php --allow-risky=yes -vv --dry-run --show-progress=dots
 
 .PHONY: static-analysis
 static-analysis:
-	docker exec task_manager-php ./symfony/vendor/bin/psalm --config=symfony/psalm.xml --memory-limit=-1
+	docker exec task_manager-php ./symfony/vendor/bin/psalm --config=symfony/psalm.dist.xml --memory-limit=-1
 
 .PHONY: test
 test:
