@@ -52,7 +52,7 @@ final class UserRequestProjector extends Projector
         $this->projections[$event->requestId] = new UserRequestProjection(
             $event->requestId,
             $event->userId,
-            $event->status,
+            (int) $event->status,
             new DateTime($event->changeDate),
             $event->getAggregateId(),
             $projectProjection->name
@@ -70,7 +70,7 @@ final class UserRequestProjector extends Projector
             throw new ProjectionDoesNotExistException($event->requestId, UserRequestProjection::class);
         }
 
-        $projection->status = $event->status;
+        $projection->status = (int) $event->status;
         $projection->changeDate = new DateTime($event->changeDate);
     }
 

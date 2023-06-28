@@ -12,6 +12,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Annotation\Route;
 use TaskManager\Projections\Application\Query\UserProfileQuery;
+use TaskManager\Projections\Application\Query\UserRequestQuery;
+use TaskManager\Projections\Infrastructure\DTO\UserRequestResponseDTO;
 use TaskManager\Projections\Infrastructure\DTO\UserResponseDTO;
 use TaskManager\Shared\Application\Bus\Query\QueryBusInterface;
 
@@ -49,5 +51,35 @@ final readonly class UserProjectionController
         $user = $this->queryBus->dispatch(new UserProfileQuery());
 
         return new JsonResponse(UserResponseDTO::createFromProjection($user));
+    }
+
+    #[Route('/requests/', name: 'getAllRequests', methods: ['GET'])]
+    #[OA\Get(
+        description: 'Get all user requests',
+        tags: [
+            'user',
+        ],
+        responses: [
+            new OA\Response(
+                response: '200',
+                description: 'List of user requests',
+                content: new OA\JsonContent(
+                    type: 'array',
+                    items: new OA\Items(
+                        ref: new Model(type: UserRequestResponseDTO::class)
+                    )
+                )
+            ),
+            new OA\Response(ref: '#components/responses/generic401', response: '401'),
+            new OA\Response(ref: '#components/responses/generic403', response: '403'),
+            new OA\Response(ref: '#components/responses/generic404', response: '404'),
+        ]
+    )]
+    #[Security(name: 'Bearer')]
+    public function getAllRequests(): JsonResponse
+    {
+        $requests = $this->queryBus->dispatch(new UserRequestQuery());
+
+        return new JsonResponse(UserRequestResponseDTO::createFromProjections($requests));
     }
 }

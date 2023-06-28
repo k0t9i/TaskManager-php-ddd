@@ -53,28 +53,31 @@ final readonly class ProjectRequestResponseDTO
                 ref: '#components/schemas/requestModel/properties/changeDate'
             )]
         )]
-        public string $changeDate,
-        #[OA\Property(
-            description: 'Project ID',
-            oneOf: [new OA\Schema(
-                ref: '#/components/schemas/objectId/properties/id'
-            )]
-        )]
-        public string $projectId
+        public string $changeDate
     ) {
     }
 
-    public static function createFromProjection(ProjectRequestProjection $projection): self
+    /**
+     * @param ProjectRequestProjection[] $projections
+     *
+     * @return self[]
+     */
+    public static function createFromProjections(array $projections): array
     {
-        return new self(
-            $projection->id,
-            $projection->userId,
-            $projection->userEmail,
-            $projection->userFirstname,
-            $projection->userLastname,
-            $projection->status,
-            $projection->changeDate->getValue(),
-            $projection->projectId,
-        );
+        $result = [];
+
+        foreach ($projections as $projection) {
+            $result[] = new self(
+                $projection->id,
+                $projection->userId,
+                $projection->userEmail,
+                $projection->userFirstname,
+                $projection->userLastname,
+                $projection->status,
+                $projection->changeDate->getValue()
+            );
+        }
+
+        return $result;
     }
 }

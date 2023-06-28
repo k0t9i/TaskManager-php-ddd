@@ -122,6 +122,6 @@ final readonly class ProjectProjectionController
     {
         $requests = $this->queryBus->dispatch(new ProjectRequestQuery($id));
 
-        return new JsonResponse(ProjectRequestResponseDTO::createFromProjection($requests));
+        return new JsonResponse(ProjectRequestResponseDTO::createFromProjections($requests));
     }
 }

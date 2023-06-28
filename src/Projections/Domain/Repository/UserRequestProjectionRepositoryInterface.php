@@ -15,5 +15,10 @@ interface UserRequestProjectionRepositoryInterface
      */
     public function findAllByProjectId(string $id): array;
 
+    /**
+     * @return UserRequestProjection[]
+     */
+    public function findAllByUserId(string $id): array;
+
     public function save(UserRequestProjection $projection): void;
 }

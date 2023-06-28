@@ -33,6 +33,16 @@ final readonly class DoctrineUserRequestProjectionRepository implements UserRequ
         ]);
     }
 
+    /**
+     * @return UserRequestProjection[]
+     */
+    public function findAllByUserId(string $id): array
+    {
+        return $this->getRepository()->findBy([
+            'userId' => $id,
+        ]);
+    }
+
     public function save(UserRequestProjection $projection): void
     {
         $this->entityManager->persist($projection);
