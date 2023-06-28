@@ -23,6 +23,11 @@ interface TaskListProjectionRepositoryInterface
      */
     public function findAllByProjectId(string $id): array;
 
+    /**
+     * @return TaskListProjection[]
+     */
+    public function findAllByProjectIdAndUserId(string $projectId, string $userId): array;
+
     public function save(TaskListProjection $projection): void;
 
     public function delete(TaskListProjection $projection): void;

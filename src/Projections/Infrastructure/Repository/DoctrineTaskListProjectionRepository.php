@@ -46,6 +46,17 @@ final readonly class DoctrineTaskListProjectionRepository implements TaskListPro
         ]);
     }
 
+    /**
+     * @return TaskListProjection[]
+     */
+    public function findAllByProjectIdAndUserId(string $projectId, string $userId): array
+    {
+        return $this->getRepository()->findBy([
+            'projectId' => $projectId,
+            'userId' => $userId,
+        ]);
+    }
+
     public function save(TaskListProjection $projection): void
     {
         $this->entityManager->persist($projection);

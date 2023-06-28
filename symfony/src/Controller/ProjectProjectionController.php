@@ -14,9 +14,11 @@ use Symfony\Component\Routing\Annotation\Route;
 use TaskManager\Projections\Application\Query\ProjectListQuery;
 use TaskManager\Projections\Application\Query\ProjectQuery;
 use TaskManager\Projections\Application\Query\ProjectRequestQuery;
+use TaskManager\Projections\Application\Query\TaskListQuery;
 use TaskManager\Projections\Infrastructure\DTO\ProjectListResponseDTO;
 use TaskManager\Projections\Infrastructure\DTO\ProjectRequestResponseDTO;
 use TaskManager\Projections\Infrastructure\DTO\ProjectResponseDTO;
+use TaskManager\Projections\Infrastructure\DTO\TaskListResponseDTO;
 use TaskManager\Shared\Application\Bus\Query\QueryBusInterface;
 
 #[AsController]
@@ -123,5 +125,39 @@ final readonly class ProjectProjectionController
         $requests = $this->queryBus->dispatch(new ProjectRequestQuery($id));
 
         return new JsonResponse(ProjectRequestResponseDTO::createFromProjections($requests));
+    }
+
+    #[Route('/{id}/tasks/', name: 'getAllTasks', methods: ['GET'])]
+    #[OA\Get(
+        description: 'Get task list',
+        tags: [
+            'project',
+        ],
+        parameters: [
+            new OA\Parameter(
+                ref: '#/components/parameters/projectId'
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: '200',
+                description: 'List of project tasks',
+                content: new OA\JsonContent(
+                    type: 'array',
+                    items: new OA\Items(
+                        ref: new Model(type: TaskListResponseDTO::class)
+                    )
+                )
+            ),
+            new OA\Response(ref: '#components/responses/generic401', response: '401'),
+            new OA\Response(ref: '#components/responses/generic404', response: '404'),
+        ]
+    )]
+    #[Security(name: 'Bearer')]
+    public function getAllTasks(string $id): JsonResponse
+    {
+        $projects = $this->queryBus->dispatch(new TaskListQuery($id));
+
+        return new JsonResponse(TaskListResponseDTO::createFromProjections($projects));
     }
 }

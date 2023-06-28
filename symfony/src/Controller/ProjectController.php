@@ -380,7 +380,7 @@ final readonly class ProjectController
             )
         ),
         tags: [
-            'task',
+            'project',
         ],
         parameters: [
             new OA\Parameter(
