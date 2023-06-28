@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SymfonyApp\Controller;
 
 use Nelmio\ApiDocBundle\Annotation\Areas;
+use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -13,6 +14,9 @@ use Symfony\Component\Routing\Annotation\Route;
 use TaskManager\Projections\Application\Query\ProjectListQuery;
 use TaskManager\Projections\Application\Query\ProjectQuery;
 use TaskManager\Projections\Application\Query\ProjectRequestQuery;
+use TaskManager\Projections\Infrastructure\DTO\ProjectListResponseDTO;
+use TaskManager\Projections\Infrastructure\DTO\ProjectRequestResponseDTO;
+use TaskManager\Projections\Infrastructure\DTO\ProjectResponseDTO;
 use TaskManager\Shared\Application\Bus\Query\QueryBusInterface;
 
 #[AsController]
@@ -32,7 +36,16 @@ final readonly class ProjectProjectionController
             'project',
         ],
         responses: [
-            new OA\Response(ref: '#components/responses/generic200', response: '200'),
+            new OA\Response(
+                response: '200',
+                description: 'List of user projects',
+                content: new OA\JsonContent(
+                    type: 'array',
+                    items: new OA\Items(
+                        ref: new Model(type: ProjectListResponseDTO::class)
+                    )
+                )
+            ),
             new OA\Response(ref: '#components/responses/generic401', response: '401'),
             new OA\Response(ref: '#components/responses/generic404', response: '404'),
         ]
@@ -42,7 +55,7 @@ final readonly class ProjectProjectionController
     {
         $projects = $this->queryBus->dispatch(new ProjectListQuery());
 
-        return new JsonResponse($projects);
+        return new JsonResponse(ProjectListResponseDTO::createFromProjections($projects));
     }
 
     #[Route('/{id}/', name: 'get', methods: ['GET'])]
@@ -57,7 +70,13 @@ final readonly class ProjectProjectionController
             ),
         ],
         responses: [
-            new OA\Response(ref: '#components/responses/generic200', response: '200'),
+            new OA\Response(
+                response: '200',
+                description: 'Project info',
+                content: new OA\JsonContent(
+                    ref: new Model(type: ProjectResponseDTO::class)
+                )
+            ),
             new OA\Response(ref: '#components/responses/generic401', response: '401'),
             new OA\Response(ref: '#components/responses/generic403', response: '403'),
             new OA\Response(ref: '#components/responses/generic404', response: '404'),
@@ -66,9 +85,9 @@ final readonly class ProjectProjectionController
     #[Security(name: 'Bearer')]
     public function get(string $id): JsonResponse
     {
-        $projects = $this->queryBus->dispatch(new ProjectQuery($id));
+        $project = $this->queryBus->dispatch(new ProjectQuery($id));
 
-        return new JsonResponse($projects);
+        return new JsonResponse(ProjectResponseDTO::createFromProjection($project));
     }
 
     #[Route('/{id}/requests/', name: 'getAllRequests', methods: ['GET'])]
@@ -83,7 +102,16 @@ final readonly class ProjectProjectionController
             ),
         ],
         responses: [
-            new OA\Response(ref: '#components/responses/generic200', response: '200'),
+            new OA\Response(
+                response: '200',
+                description: 'List of project requests',
+                content: new OA\JsonContent(
+                    type: 'array',
+                    items: new OA\Items(
+                        ref: new Model(type: ProjectRequestResponseDTO::class)
+                    )
+                )
+            ),
             new OA\Response(ref: '#components/responses/generic401', response: '401'),
             new OA\Response(ref: '#components/responses/generic403', response: '403'),
             new OA\Response(ref: '#components/responses/generic404', response: '404'),
@@ -94,6 +122,6 @@ final readonly class ProjectProjectionController
     {
         $requests = $this->queryBus->dispatch(new ProjectRequestQuery($id));
 
-        return new JsonResponse($requests);
+        return new JsonResponse(ProjectRequestResponseDTO::createFromProjection($requests));
     }
 }

@@ -69,6 +69,22 @@ nelmio_api_doc:
                                 - 0
                                 - 1
                             example: 1
+                requestModel:
+                    type: object
+                    properties:
+                        changeDate:
+                            description: 'Request change datetime'
+                            type: 'string'
+                            format: 'datetime'
+                            example: '2023-05-10 10:00:00'
+                        status:
+                            description: 'Request status: 0 - pending, 1 - confirmed, 2 - rejected'
+                            type: int
+                            enum:
+                                - 0
+                                - 1
+                                - 2
+                            example: 1
                 taskModel:
                     type: object
                     properties:

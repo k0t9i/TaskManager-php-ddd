@@ -14,7 +14,7 @@ final class ProjectRequestProjection
         public string $userEmail,
         public string $userFirstname,
         public string $userLastname,
-        public string $status,
+        public int $status,
         public DateTime $changeDate,
         public string $projectId,
         public string $ownerId
