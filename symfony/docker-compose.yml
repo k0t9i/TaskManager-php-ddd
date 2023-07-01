@@ -40,3 +40,13 @@ services:
         restart: always
         ports:
             - 9080:8080
+    frontend:
+        container_name: task_manager-frontend
+        build:
+            context: ../
+            dockerfile: ./docker/images/frontend/Dockerfile
+        restart: unless-stopped
+        volumes:
+            - ../src-frontend:/app
+        ports:
+            - 7080:7080
