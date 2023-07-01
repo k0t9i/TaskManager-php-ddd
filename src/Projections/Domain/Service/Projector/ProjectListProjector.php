@@ -17,6 +17,7 @@ use TaskManager\Projections\Domain\Event\RequestStatusWasChangedEvent;
 use TaskManager\Projections\Domain\Event\RequestWasCreatedEvent;
 use TaskManager\Projections\Domain\Event\TaskWasCreatedEvent;
 use TaskManager\Projections\Domain\Event\UserProfileWasChangedEvent;
+use TaskManager\Projections\Domain\Event\UserWasCreatedEvent;
 use TaskManager\Projections\Domain\Exception\ProjectionDoesNotExistException;
 use TaskManager\Projections\Domain\Repository\ProjectListProjectionRepositoryInterface;
 use TaskManager\Projections\Domain\Repository\UserProjectionRepositoryInterface;
@@ -59,22 +60,27 @@ final class ProjectListProjector extends Projector
     {
         $projections = $this->loadProjectionsAsNeeded($event->getAggregateId());
 
-        $userProjection = $this->userRepository->findById($event->ownerId);
-        if (null === $userProjection) {
+        $ownerProjection = $this->userRepository->findById($event->ownerId);
+        if (null === $ownerProjection) {
             throw new ProjectionDoesNotExistException($event->ownerId, UserProjection::class);
         }
 
-        $projections->addOrUpdateElement(new ProjectListProjection(
-            $event->getAggregateId(),
-            $event->ownerId,
-            $event->name,
-            new DateTime($event->finishDate),
-            $event->ownerId,
-            $userProjection->email,
-            $userProjection->firstname,
-            $userProjection->lastname,
-            (int) $event->status
-        ));
+        $userProjections = $this->userRepository->findAll();
+
+        foreach ($userProjections as $userProjection) {
+            $projections->addOrUpdateElement(new ProjectListProjection(
+                $event->getAggregateId(),
+                $userProjection->id,
+                $event->name,
+                new DateTime($event->finishDate),
+                $event->ownerId,
+                $userProjection->email,
+                $userProjection->firstname,
+                $userProjection->lastname,
+                (int) $event->status,
+                $userProjection->id === $event->ownerId
+            ));
+        }
     }
 
     /**
@@ -103,21 +109,17 @@ final class ProjectListProjector extends Projector
             throw new ProjectionDoesNotExistException($event->ownerId, UserProjection::class);
         }
 
-        $oldOwnerId = null;
         /** @var ProjectListProjection $projection */
         foreach ($projections->getItems() as $projection) {
-            $oldOwnerId = $projection->ownerId;
             $projection->ownerId = $event->ownerId;
             $projection->ownerEmail = $userProjection->email;
             $projection->ownerFirstname = $userProjection->firstname;
             $projection->ownerLastname = $userProjection->lastname;
+            $projection->isOwner = $projection->userId === $event->ownerId;
+            if ($projection->isOwner) {
+                $projection->lastRequestStatus = null;
+            }
         }
-
-        /** @var ProjectListProjection $newOwnerProjection */
-        $newOwnerProjection = clone $projections->get($oldOwnerId);
-        $newOwnerProjection->userId = $event->ownerId;
-        $projections->remove($oldOwnerId);
-        $projections->addOrUpdateElement($newOwnerProjection);
     }
 
     private function whenProjectStatusChanged(ProjectStatusWasChangedEvent $event): void
@@ -150,22 +152,23 @@ final class ProjectListProjector extends Projector
         /** @var ProjectListProjection $projection */
         foreach ($projections->getItems() as $projection) {
             ++$projection->pendingRequestsCount;
+            if ($projection->userId === $event->userId) {
+                $projection->lastRequestStatus = (int) $event->status;
+            }
         }
     }
 
-    private function whenRequestStatusChange(RequestStatusWasChangedEvent $event): void
+    private function whenRequestStatusChanged(RequestStatusWasChangedEvent $event): void
     {
-        // TODO use class constant
-        if ('0' === $event->status) {
-            return;
-        }
-
         $projections = $this->loadProjectionsAsNeeded($event->getAggregateId());
         $this->ensureProjectionExists($event->getAggregateId(), $projections->getItems());
 
         /** @var ProjectListProjection $projection */
         foreach ($projections->getItems() as $projection) {
             --$projection->pendingRequestsCount;
+            if ($projection->userId === $event->userId) {
+                $projection->lastRequestStatus = (int) $event->status;
+            }
         }
     }
 
@@ -180,11 +183,6 @@ final class ProjectListProjector extends Projector
             throw new \RuntimeException(sprintf('Project "%s" does not exist.', $event->getAggregateId()));
         }
 
-        $newProjection = clone $existingProjection;
-        $newProjection->userId = $event->participantId;
-
-        $projections->addOrUpdateElement($newProjection);
-
         /** @var ProjectListProjection $projection */
         foreach ($projections->getItems() as $projection) {
             ++$projection->participantsCount;
@@ -196,11 +194,28 @@ final class ProjectListProjector extends Projector
         $projections = $this->loadProjectionsAsNeeded($event->getAggregateId());
         $this->ensureProjectionExists($event->getAggregateId(), $projections->getItems());
 
-        $projections->remove($event->participantId);
-
         /** @var ProjectListProjection $projection */
         foreach ($projections->getItems() as $projection) {
             --$projection->participantsCount;
+        }
+    }
+
+    private function whenUserCreated(UserWasCreatedEvent $event): void
+    {
+        $ownersProjects = $this->repository->findAllOwnersProjects();
+
+        foreach ($ownersProjects as $ownersProject) {
+            $id = $ownersProject->id;
+            if (!isset($this->projections[$id])) {
+                $this->projections[$id] = new ProjectListProjectionCollection([$ownersProject]);
+            }
+
+            $newProjection = clone $ownersProject;
+            $newProjection->userId = $event->getAggregateId();
+            $newProjection->isOwner = false;
+            $newProjection->lastRequestStatus = null;
+
+            $this->projections[$id]->addOrUpdateElement($newProjection);
         }
     }
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TaskManager\Projections\Infrastructure\Repository;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ObjectRepository;
+use Doctrine\ORM\EntityRepository;
 use TaskManager\Projections\Domain\Entity\ProjectListProjection;
 use TaskManager\Projections\Domain\Repository\ProjectListProjectionRepositoryInterface;
 
@@ -46,6 +46,18 @@ final readonly class DoctrineProjectListProjectionRepository implements ProjectL
         ]);
     }
 
+    /**
+     * @return ProjectListProjection[]
+     */
+    public function findAllOwnersProjects(): array
+    {
+        $queryBuilder = $this->getRepository()->createQueryBuilder('t');
+
+        $queryBuilder->where('t.userId = t.ownerId');
+
+        return $queryBuilder->getQuery()->getResult();
+    }
+
     public function save(ProjectListProjection $projection): void
     {
         $this->entityManager->persist($projection);
@@ -58,7 +70,7 @@ final readonly class DoctrineProjectListProjectionRepository implements ProjectL
         $this->entityManager->flush();
     }
 
-    private function getRepository(): ObjectRepository
+    private function getRepository(): EntityRepository
     {
         return $this->entityManager->getRepository(ProjectListProjection::class);
     }

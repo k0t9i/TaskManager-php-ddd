@@ -47,12 +47,16 @@ final class ProjectorPositionHandler implements ProjectorPositionHandlerInterfac
         $positionObject->markAsBroken();
     }
 
-    public function flush(): void
+    public function flushPosition(ProjectorInterface $projector): void
     {
-        foreach ($this->positions as $position) {
-            $this->repository->save($position);
+        $position = $this->getPositionInternal($projector);
+
+        if (!$this->isBroken($projector)) {
+            $projector->flush();
         }
-        $this->positions = [];
+        $this->repository->save($position);
+
+        unset($this->positions[$this->getProjectorName($projector)]);
     }
 
     private function getProjectorName(ProjectorInterface $projector): string

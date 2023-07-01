@@ -13,8 +13,10 @@
         <field name="ownerFirstname" column="owner_firstname" length="4000" />
         <field name="ownerLastname" column="owner_lastname" length="4000" />
         <field name="status" type="integer" />
+        <field name="isOwner" column="is_owner" type="boolean" />
         <field name="tasksCount" column="tasks_count" type="integer" />
         <field name="participantsCount" column="participants_count" type="integer" />
         <field name="pendingRequestsCount" column="pending_requests_count" type="integer" />
+        <field name="lastRequestStatus" column="last_request_status" type="integer" nullable="true" />
     </entity>
 </doctrine-mapping>
