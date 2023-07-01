@@ -16,5 +16,5 @@ interface ProjectorPositionHandlerInterface
 
     public function markAsBroken(ProjectorInterface $projector): void;
 
-    public function flush(): void;
+    public function flushPosition(ProjectorInterface $projector): void;
 }
