@@ -310,6 +310,41 @@ class ProjectTest extends TestCase
         ], $events[0]->toPrimitives());
     }
 
+    public function testChangeOwnerToUserWithPendingRequest(): void
+    {
+        $builder = new ProjectBuilder($this->faker);
+        $otherUserId = new ProjectUserId($this->faker->uuid());
+        $project = $builder
+            ->withRequest(new Request(
+                new RequestId($this->faker->uuid()),
+                new ProjectId($this->faker->uuid()),
+                $otherUserId,
+                new PendingRequestStatus(),
+                new RequestChangeDate()
+            ))
+            ->build();
+
+        $project->changeOwner(new ProjectOwner($otherUserId), $builder->getOwner()->id);
+        $events = $project->releaseEvents();
+
+        $this->assertCount(2, $events);
+        $this->assertInstanceOf(RequestStatusWasChangedEvent::class, $events[0]);
+        $this->assertEquals($builder->getId()->value, $events[0]->getAggregateId());
+        $this->assertEquals($builder->getOwner()->id->value, $events[0]->getPerformerId());
+        $this->assertEquals([
+            'requestId' => $builder->getRequests()[0]->getId()->value,
+            'userId' => $builder->getRequests()[0]->getUserId()->value,
+            'status' => RequestStatus::STATUS_REJECTED,
+            'changeDate' => $builder->getRequests()[0]->getChangeDate()->getValue(),
+        ], $events[0]->toPrimitives());
+        $this->assertInstanceOf(ProjectOwnerWasChangedEvent::class, $events[1]);
+        $this->assertEquals($builder->getId()->value, $events[1]->getAggregateId());
+        $this->assertEquals($builder->getOwner()->id->value, $events[1]->getPerformerId());
+        $this->assertEquals([
+            'ownerId' => $otherUserId->value,
+        ], $events[1]->toPrimitives());
+    }
+
     public function testChangeOwnerToAlreadyOwner(): void
     {
         $builder = new ProjectBuilder($this->faker);

@@ -156,6 +156,14 @@ final class Project extends AggregateRoot
         $this->participants->ensureUserIsNotParticipant($owner->id);
         $this->tasks->ensureUserDoesNotHaveTask($this->owner->id, $this->id);
 
+        /** @var Request $pendingRequest */
+        $pendingRequest = $this->requests->findFirst(function (string $key, Request $request) use ($owner) {
+            return $request->isPendingForUser($owner->id);
+        });
+        if (null !== $pendingRequest) {
+            $this->rejectRequest($pendingRequest->getId(), $currentUserId);
+        }
+
         $this->owner = $owner;
 
         $this->registerEvent(new ProjectOwnerWasChangedEvent(
