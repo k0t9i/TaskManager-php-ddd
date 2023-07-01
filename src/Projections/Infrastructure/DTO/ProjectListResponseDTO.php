@@ -86,7 +86,14 @@ final readonly class ProjectListResponseDTO
             type: 'bool',
             example: true
         )]
-        public bool $isOwner
+        public bool $isOwner,
+        #[OA\Property(
+            description: 'Last project request status of current user',
+            oneOf: [new OA\Schema(
+                ref: '#components/schemas/requestModel/properties/status'
+            )]
+        )]
+        public ?int $lastRequestStatus,
     ) {
     }
 
@@ -112,7 +119,8 @@ final readonly class ProjectListResponseDTO
                 $projection->tasksCount,
                 $projection->participantsCount,
                 $projection->pendingRequestsCount,
-                $projection->isOwner
+                $projection->isOwner,
+                $projection->lastRequestStatus,
             );
         }
 

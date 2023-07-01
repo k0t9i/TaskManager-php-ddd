@@ -23,6 +23,14 @@ final readonly class DoctrineUserProjectionRepository implements UserProjectionR
         ]);
     }
 
+    /**
+     * @return UserProjection[]
+     */
+    public function findAll(): array
+    {
+        return $this->getRepository()->findAll();
+    }
+
     public function save(UserProjection $projection): void
     {
         $this->entityManager->persist($projection);

@@ -24,7 +24,7 @@ framework:
 
         routing:
             'TaskManager\Shared\Domain\Event\DomainEventInterface': sync
-            'TaskManager\Shared\Application\Bus\Event\IntegrationEventInterface': async
+            'TaskManager\Shared\Application\Bus\Event\IntegrationEventInterface': sync
             'TaskManager\Shared\Application\Bus\Command\CommandInterface': sync
             'TaskManager\Shared\Application\Bus\Query\QueryInterface': sync
 
