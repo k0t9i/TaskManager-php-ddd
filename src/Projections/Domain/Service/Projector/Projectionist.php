@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TaskManager\Projections\Domain\Service\Projector;
 
 use TaskManager\Projections\Domain\DTO\ProjectionistResultDTO;
+use TaskManager\Projections\Domain\Repository\TransactionManagerInterface;
 use TaskManager\Projections\Domain\Service\EventStore\EventStoreInterface;
 
 final readonly class Projectionist implements ProjectionistInterface
@@ -17,13 +18,16 @@ final readonly class Projectionist implements ProjectionistInterface
     public function __construct(
         iterable $projectors,
         private EventStoreInterface $eventStore,
-        private ProjectorPositionHandler $positionHandler
+        private ProjectorPositionHandlerInterface $positionHandler,
+        private TransactionManagerInterface $transactionManager
     ) {
         $this->projectors = $this->prioritizeProjectors($projectors);
     }
 
     /**
      * @return ProjectionistResultDTO[]
+     *
+     * @throws \Exception
      */
     public function projectAll(): array
     {
@@ -43,20 +47,20 @@ final readonly class Projectionist implements ProjectionistInterface
                 continue;
             }
 
-            while (null !== $event = $streamInfo->stream->next()) {
+            $this->transactionManager->withTransaction(function () use ($streamInfo, $projector) {
                 try {
-                    $projector->projectWhen($event);
+                    while (null !== $event = $streamInfo->stream->next()) {
+                        $projector->projectWhen($event);
+                    }
+
+                    $this->positionHandler->storePosition($projector, $streamInfo->lastPosition);
+                    $this->positionHandler->flushPosition($projector);
                 } catch (\Exception $e) {
                     $this->positionHandler->markAsBroken($projector);
-                    // TODO log exception
+                    $this->positionHandler->flushPosition($projector);
+                    throw $e;
                 }
-            }
-
-            if (!$this->positionHandler->isBroken($projector)) {
-                $projector->flush();
-            }
-            $this->positionHandler->storePosition($projector, $streamInfo->lastPosition);
-            $this->positionHandler->flush();
+            });
 
             $result[] = new ProjectionistResultDTO($projector::class, $streamInfo->stream->eventCount());
         }
