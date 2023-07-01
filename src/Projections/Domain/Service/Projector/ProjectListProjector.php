@@ -111,6 +111,7 @@ final class ProjectListProjector extends Projector
             $projection->ownerEmail = $userProjection->email;
             $projection->ownerFirstname = $userProjection->firstname;
             $projection->ownerLastname = $userProjection->lastname;
+            $projection->isOwner = $projection->userId === $event->ownerId;
         }
 
         /** @var ProjectListProjection $newOwnerProjection */

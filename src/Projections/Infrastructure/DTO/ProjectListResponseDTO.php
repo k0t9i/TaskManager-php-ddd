@@ -82,11 +82,11 @@ final readonly class ProjectListResponseDTO
         )]
         public int $pendingRequestsCount,
         #[OA\Property(
-            description: 'Is project readonly for current user?',
+            description: 'Is current user project owner?',
             type: 'bool',
             example: true
         )]
-        public bool $readonly
+        public bool $isOwner
     ) {
     }
 
@@ -112,7 +112,7 @@ final readonly class ProjectListResponseDTO
                 $projection->tasksCount,
                 $projection->participantsCount,
                 $projection->pendingRequestsCount,
-                $projection->userId !== $projection->ownerId
+                $projection->isOwner
             );
         }
 
