@@ -1,4 +1,15 @@
 services:
+    nginx:
+        image: nginx:latest
+        ports:
+            - '8081:80'
+        volumes:
+            - ../docker/configs/nginx:/etc/nginx/conf.d
+            - ../symfony:/var/www/symfony
+            - ../src:/var/www/src
+            - ../logs/nginx:/var/log/nginx
+        working_dir: /var/www
+        command:
     rabbitmq:
         container_name: ${RABBITMQ_HOST:-task_manager-rabbitmq}
         image: rabbitmq:3.11.17-management-alpine
@@ -18,12 +29,15 @@ services:
         depends_on:
             - db
             - rabbitmq
+            - nginx
         volumes:
             - ../symfony:/var/www/symfony
-            - ../src:/var/www/src
+            - /var/www/symfony/vendor
+            - /var/www/symfony/var/cache
+            - ../src:/var/www/src:cached
             - ../logs/supervisor:/var/log/supervisor
-        ports:
-            - 8081:8080
+        expose:
+            - 9000
     db:
         container_name: ${DATABASE_HOST:-task_manager-db}
         image: postgres:${DATABASE_VERSION:-14}-alpine3.15

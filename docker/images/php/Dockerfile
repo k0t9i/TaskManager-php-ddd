@@ -18,6 +18,7 @@ RUN echo 'deb [trusted=yes] https://repo.symfony.com/apt/ /' | tee /etc/apt/sour
     && cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini
 
 COPY ./docker/configs/php /usr/local/etc/php/conf.d
+COPY ./symfony/vendor /var/www/symfony/vendor
 
 RUN mkdir -p /opt/home && chmod 777 /opt/home
 ENV HOME /opt/home
@@ -50,4 +51,4 @@ RUN touch $PROJECTIONIST_WORKER_PATH && \
     echo "startretries=10" >> $PROJECTIONIST_WORKER_PATH && \
     echo "process_name=%(program_name)s_%(process_num)02d" >> $PROJECTIONIST_WORKER_PATH 
 
-CMD ["sh", "-c", "service supervisor stop && service supervisor start && symfony serve --dir=symfony/public --port=8080"]
+CMD ["sh", "-c", "service supervisor stop && service supervisor start && php-fpm"]
