@@ -1,6 +1,7 @@
 <script setup>
 import {useAuthStore} from "../stores/auth";
 import routes from "../router/routes";
+import AsyncNavBarUserInfo from "./AsyncNavBarUserInfo.vue";
 
 const authStore = useAuthStore();
 </script>
@@ -16,7 +17,14 @@ const authStore = useAuthStore();
         <ul class="navbar-nav ms-auto mb-2 mb-md-0">
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="userLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              k0t9i@yandex.ru
+              <Suspense>
+                <AsyncNavBarUserInfo />
+                <template #fallback>
+                  <span>
+                    <div class="spinner-grow spinner-grow-sm text-light mr1" role="status" /> loading...
+                  </span>
+                </template>
+              </Suspense>
             </a>
             <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdown">
               <li><RouterLink class="dropdown-item" :to="routes.profile.uri">Profile</RouterLink></li>

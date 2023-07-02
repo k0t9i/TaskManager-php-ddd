@@ -5,33 +5,38 @@ import {useAuthStore} from "../stores/auth";
 const ajaxWrapper = {
     get:  async (url, config) => {
         return wrap(
-            axios.get(url, injectAuthHeader(config))
+            axios.get(url, injectAuthHeader(config)),
+            false
         );
     },
     post: async (url, data, config) => {
         return wrap(
-            axios.post(url, data, injectAuthHeader(config))
+            axios.post(url, data, injectAuthHeader(config)),
+            true
         );
     },
     put: async (url, data, config) => {
         return wrap(
-            axios.put(url, data, injectAuthHeader(config))
+            axios.put(url, data, injectAuthHeader(config)),
+            true
         );
     },
     patch: async (url, data, config) => {
         return wrap(
-            axios.patch(url, data, injectAuthHeader(config))
+            axios.patch(url, data, injectAuthHeader(config)),
+            true
         );
     },
     delete: async (url, config) => {
         return wrap(
-            axios.delete(url, injectAuthHeader(config))
+            axios.delete(url, injectAuthHeader(config)),
+            true
         );
     }
 };
 
-async function wrap(promise) {
-    return handleLoader(promise)
+async function wrap(promise, withSpinner) {
+    return (withSpinner ? handleLoader(promise) : promise)
         .catch(handleException);
 }
 
