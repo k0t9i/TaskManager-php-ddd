@@ -3,6 +3,8 @@ import routes from '../router/routes';
 import router from "../router";
 import {reactive, ref} from "vue";
 import ajaxWrapper from "../helpers/ajaxWrapper";
+import FormError from "../components/FormError.vue";
+import FormSuccess from "../components/FormSuccess.vue";
 
 const error = ref('');
 const registeredEmail = ref('');
@@ -26,19 +28,21 @@ function onSubmit() {
         password: user.password,
         repeatPassword: user.repeatPassword
       })
-      .then((response) => {
-        registeredEmail.value = user.email;
-        user.email = '';
-        user.firstname = '';
-        user.lastname = '';
-        user.password = '';
-        user.repeatPassword = '';
-
-        return response;
-      })
+      .then(onSuccess)
       .catch((e) => {
         error.value = e.response.data.message;
       });
+}
+
+function onSuccess(response) {
+  registeredEmail.value = user.email;
+  user.email = '';
+  user.firstname = '';
+  user.lastname = '';
+  user.password = '';
+  user.repeatPassword = '';
+
+  return response;
 }
 </script>
 
@@ -48,12 +52,10 @@ function onSubmit() {
       <form class="row" @submit.prevent="onSubmit">
         <div class="col"></div>
         <div class="col-lg-4">
-          <div v-if="error" class="alert alert-danger mb-3" role="alert">
-            {{ error }}
-          </div>
-          <div v-if="registeredEmail !== ''" class="alert alert-success mb-3" role="alert">
+          <FormError :error="error" />
+          <FormSuccess v-if="registeredEmail">
             User "{{ registeredEmail }}" registered successfully. You can now <a @click.prevent="router.push(routes.login.uri)" href="#">sign in</a>.
-          </div>
+          </FormSuccess>
           <div class="mb-3">
             <label class="form-label">Email address</label>
             <input type="email" name="email" required="required" class="form-control" v-model="user.email">

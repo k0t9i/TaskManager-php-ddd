@@ -3,6 +3,7 @@ import {reactive, ref} from "vue";
 import routes from '../router/routes';
 import router from '../router';
 import { useAuthStore } from '../stores/auth';
+import FormError from "../components/FormError.vue";
 
 const error = ref('');
 const user = reactive({
@@ -29,9 +30,7 @@ function onSubmit() {
       <form @submit.prevent="onSubmit" class="row">
         <div class="col"></div>
         <div class="col-lg-4">
-          <div v-if="error" class="alert alert-danger mb-3" role="alert">
-            {{ error }}
-          </div>
+          <FormError :error="error" />
           <div class="mb-3">
             <label class="form-label">Email address</label>
             <input type="email" name="email" required="required" class="form-control" v-model="user.email">
