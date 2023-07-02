@@ -30,8 +30,9 @@ const ajaxWrapper = {
     }
 };
 
-function wrap(promise) {
-    return handleLoader(promise);
+async function wrap(promise) {
+    return handleLoader(promise)
+        .catch(handleException);
 }
 
 function injectAuthHeader(config) {
@@ -48,11 +49,20 @@ function injectAuthHeader(config) {
     return config;
 }
 
-function handleLoader(promise) {
+async function handleLoader(promise) {
     loader.show();
     return promise.finally(() => {
         loader.hide();
     });
+}
+
+function handleException(e) {
+    if (e.response.status === 401) {
+        const authStore = useAuthStore();
+        authStore.logout();
+    } else {
+        throw e;
+    }
 }
 
 export default ajaxWrapper;

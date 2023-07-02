@@ -12,15 +12,20 @@ export const useAuthStore = defineStore({
     }),
     actions: {
         async login(email, password) {
-            const response = await ajaxWrapper.post(`${baseUrl}/login/`, {
+            return ajaxWrapper.post(`${baseUrl}/login/`, {
                 email: email,
                 password: password
+            }).then((response) => {
+                localStorage.setItem('token', response.data.token);
+                this.token = localStorage.getItem('token');
+
+                router.push(routes.main.uri);
             });
-
-            this.token = response.data.token;
-            localStorage.setItem('token', this.token);
-
-            await router.push(routes.main.uri)
+        },
+        logout() {
+            localStorage.removeItem('token');
+            this.token = localStorage.getItem('token');
+            router.push(routes.login.uri);
         }
     }
 });

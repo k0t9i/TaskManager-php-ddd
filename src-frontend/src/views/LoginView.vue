@@ -17,9 +17,8 @@ function onSubmit() {
 
   return authStore
       .login(user.value.email, user.value.password)
-      .catch(e => {
+      .catch((e) => {
         error.value = e.response.data.message;
-        console.log(error);
       });
 }
 </script>
