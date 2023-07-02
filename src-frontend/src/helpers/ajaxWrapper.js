@@ -1,26 +1,51 @@
 import axios from "axios";
 import loader from '../components/loader'
+import {useAuthStore} from "../stores/auth";
 
 const ajaxWrapper = {
-    get: (url, config) => {
-        return wrap(axios.get(url, config));
+    get:  async (url, config) => {
+        return wrap(
+            axios.get(url, injectAuthHeader(config))
+        );
     },
-    post: (url, data, config) => {
-        return wrap(axios.post(url, data, config));
+    post: async (url, data, config) => {
+        return wrap(
+            axios.post(url, data, injectAuthHeader(config))
+        );
     },
-    put: (url, data, config) => {
-        return wrap(axios.put(url, data, config));
+    put: async (url, data, config) => {
+        return wrap(
+            axios.put(url, data, injectAuthHeader(config))
+        );
     },
-    patch: (url, data, config) => {
-        return wrap(axios.patch(url, data, config));
+    patch: async (url, data, config) => {
+        return wrap(
+            axios.patch(url, data, injectAuthHeader(config))
+        );
     },
-    delete: (url, config) => {
-        return wrap(axios.delete(url, config));
+    delete: async (url, config) => {
+        return wrap(
+            axios.delete(url, injectAuthHeader(config))
+        );
     }
 };
 
 function wrap(promise) {
     return handleLoader(promise);
+}
+
+function injectAuthHeader(config) {
+    const authStore = useAuthStore();
+
+    config = config || {};
+
+    if (authStore.token) {
+        const headers = config.headers || {};
+        headers.Authorization = 'Bearer ' + authStore.token;
+        config.headers = headers;
+    }
+
+    return config;
 }
 
 function handleLoader(promise) {

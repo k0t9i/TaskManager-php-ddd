@@ -1,6 +1,5 @@
 <script setup>
 import loader from './loader';
-console.log(loader.isShowing());
 </script>
 
 <template>
