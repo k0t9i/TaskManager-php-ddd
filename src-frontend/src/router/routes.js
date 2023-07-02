@@ -1,7 +1,9 @@
 export default {
     main: {
         uri: '/',
-        isPublic: false
+    },
+    profile: {
+        uri: '/profile',
     },
     login: {
         uri: '/login',
