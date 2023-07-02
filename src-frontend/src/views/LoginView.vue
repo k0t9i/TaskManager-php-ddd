@@ -1,11 +1,11 @@
 <script setup>
-import {ref} from "vue";
+import {reactive, ref} from "vue";
 import routes from '../router/routes';
 import router from '../router';
 import { useAuthStore } from '../stores/auth';
 
-const error = ref();
-const user = ref({
+const error = ref('');
+const user = reactive({
   email: '',
   password: ''
 })
@@ -16,7 +16,7 @@ function onSubmit() {
   const authStore = useAuthStore();
 
   return authStore
-      .login(user.value.email, user.value.password)
+      .login(user.email, user.password)
       .catch((e) => {
         error.value = e.response.data.message;
       });
@@ -34,17 +34,17 @@ function onSubmit() {
           </div>
           <div class="mb-3">
             <label class="form-label">Email address</label>
-            <input type="email" class="form-control" v-model="user.email">
+            <input type="email" name="email" required="required" class="form-control" v-model="user.email">
           </div>
           <div class="mb-3">
             <label class="form-label">Password</label>
-            <input type="password" class="form-control"  v-model="user.password">
+            <input type="password" name="password" required="required" class="form-control"  v-model="user.password">
           </div>
           <div class="d-grid mb-3">
             <button type="submit" class="btn btn-primary">Sign In</button>
           </div>
           <div class="text-center mb-3">
-            <p><a @click.prevent="router.push(routes.register.uri)" href="#">Register</a></p>
+            <p><a @click.prevent="router.push(routes.register.uri)" href="#">Sign Out</a></p>
           </div>
         </div>
         <div class="col"></div>
