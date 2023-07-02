@@ -1,5 +1,5 @@
 import axios from "axios";
-import {useLoaderStore} from "../stores/loader";
+import loader from '../components/loader'
 
 const ajaxWrapper = {
     get: (url, config) => {
@@ -17,16 +17,17 @@ const ajaxWrapper = {
     delete: (url, config) => {
         return wrap(axios.delete(url, config));
     }
-}
+};
 
 function wrap(promise) {
-    const loaderStore = useLoaderStore();
+    return handleLoader(promise);
+}
 
-    loaderStore.isLoading = true;
-    promise.finally(() => {
-        loaderStore.isLoading = false;
-    })
-    return promise;
+function handleLoader(promise) {
+    loader.show();
+    return promise.finally(() => {
+        loader.hide();
+    });
 }
 
 export default ajaxWrapper;

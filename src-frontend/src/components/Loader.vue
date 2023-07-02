@@ -1,11 +1,10 @@
 <script setup>
-import {useLoaderStore} from "../stores/loader";
-
-const loaderStore = useLoaderStore();
+import loader from './loader';
+console.log(loader.isShowing());
 </script>
 
 <template>
-  <div v-if="loaderStore.isLoading" class="loader d-flex align-items-center justify-content-center">
+  <div v-if="loader.isShowing()" class="loader d-flex align-items-center justify-content-center">
     <div class="spinner-border text-dark" role="status">
     </div>
   </div>
