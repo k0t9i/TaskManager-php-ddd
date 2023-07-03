@@ -12,7 +12,7 @@ const router = createRouter({
         },
         {
             path: routes.profile.uri,
-            component: () => import('../views/MainView.vue')
+            component: () => import('../views/ProfileView.vue')
         },
         {
             path: routes.login.uri,

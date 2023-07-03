@@ -21,7 +21,7 @@ const authStore = useAuthStore();
                 <AsyncNavBarUserInfo />
                 <template #fallback>
                   <span>
-                    <div class="spinner-grow spinner-grow-sm text-light mr1" role="status" /> loading...
+                    <div class="spinner-border spinner-border-sm text-light mx-1" role="status" />Loading...
                   </span>
                 </template>
               </Suspense>

@@ -10,7 +10,7 @@ defineProps({
 <template>
   <button v-bind="$attrs" :disabled="locked">
     <slot v-if="locked" name="lockedContent">
-      <span><span class="spinner-border spinner-border-sm" role="status"></span>Loading...</span>
+      <span><span class="spinner-border spinner-border-sm mx-1" role="status"></span>Loading...</span>
     </slot>
     <slot v-else></slot>
   </button>
