@@ -1,9 +1,9 @@
 <script setup>
-import ajaxWrapper from "../helpers/ajaxWrapper";
 import {ref} from "vue";
+import axiosInstance from "../helpers/axios";
 
 const email = ref();
-await ajaxWrapper.get(`${import.meta.env.VITE_API_URL}/users/`).then((response) => {
+await axiosInstance.get('/users/').then((response) => {
   email.value = response.data.email;
   return response;
 });

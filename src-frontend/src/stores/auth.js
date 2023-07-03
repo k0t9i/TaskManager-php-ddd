@@ -1,7 +1,7 @@
 import {defineStore} from 'pinia';
-import ajaxWrapper from "../helpers/ajaxWrapper";
 import router from "../router";
 import routes from "../router/routes";
+import axiosInstance from "../helpers/axios";
 
 export const useAuthStore = defineStore({
     id: 'auth',
@@ -10,7 +10,7 @@ export const useAuthStore = defineStore({
     }),
     actions: {
         async login(email, password) {
-            return ajaxWrapper.post(`${import.meta.env.VITE_API_URL}/security/login/`, {
+            return axiosInstance.post('/security/login/', {
                 email: email,
                 password: password
             }).then((response) => {
