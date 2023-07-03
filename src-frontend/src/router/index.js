@@ -39,6 +39,10 @@ router.beforeEach(async (to) => {
     if (!isPublic && !authStore.token) {
         return routes.login.uri;
     }
+
+    if (isPublic && authStore.token) {
+        return routes.main.uri;
+    }
 });
 
 export default router;
