@@ -29,7 +29,7 @@ function onSubmit() {
     <div class="container">
       <form @submit.prevent="onSubmit" class="row">
         <div class="col"></div>
-        <div class="col-lg-4">
+        <div class="col-md-4">
           <FormError :error="error" />
           <div class="mb-3">
             <label class="form-label">Email address</label>

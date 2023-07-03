@@ -51,7 +51,7 @@ function onSuccess(response) {
     <div class="container">
       <form class="row" @submit.prevent="onSubmit">
         <div class="col"></div>
-        <div class="col-lg-4">
+        <div class="col-md-4">
           <FormError :error="error" />
           <FormSuccess v-if="registeredEmail">
             User "{{ registeredEmail }}" registered successfully. You can now <a @click.prevent="router.push(routes.login.uri)" href="#">sign in</a>.
