@@ -15,6 +15,10 @@ const router = createRouter({
             component: () => import('../views/ProfileView.vue')
         },
         {
+            path: routes.create_project.uri,
+            component: () => import('../views/CreateProjectView.vue')
+        },
+        {
             path: routes.login.uri,
             component: () => import('../views/LoginView.vue')
         },

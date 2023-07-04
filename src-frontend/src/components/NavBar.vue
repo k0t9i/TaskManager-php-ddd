@@ -14,6 +14,11 @@ const authStore = useAuthStore();
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navBar">
+        <ul class="navbar-nav mr-auto mb-2 mb-md-0">
+          <li class="nav-item dropdown">
+            <RouterLink :to="routes.create_project.uri" class="nav-link">Create project</RouterLink>
+          </li>
+        </ul>
         <ul class="navbar-nav ms-auto mb-2 mb-md-0">
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" id="userLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">

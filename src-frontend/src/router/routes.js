@@ -5,6 +5,9 @@ export default {
     profile: {
         uri: '/profile',
     },
+    create_project: {
+        uri: '/create-project',
+    },
     login: {
         uri: '/login',
         isPublic: true
