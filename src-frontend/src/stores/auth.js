@@ -22,11 +22,9 @@ export const useAuthStore = defineStore({
             });
         },
         logout() {
-            router.push({name: 'login'}).then((result) => {
-                localStorage.removeItem('token');
-                this.token = localStorage.getItem('token');
-                return result;
-            });
+            localStorage.removeItem('token');
+            this.token = localStorage.getItem('token');
+            router.push({name: 'login'});
         }
     }
 });
