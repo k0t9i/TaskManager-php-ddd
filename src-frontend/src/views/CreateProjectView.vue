@@ -6,7 +6,6 @@ import {reactive, ref} from "vue";
 import axiosInstance from "../helpers/axios";
 import Datepicker from 'vue3-datepicker';
 import router from "../router";
-import routes from "../router/routes";
 
 const error = ref();
 const projectId = ref();
@@ -52,7 +51,7 @@ function onSuccess(response) {
         <div class="col-md-6">
           <FormError :error="error" />
           <FormSuccess v-if="projectId">
-            Successfully saved. Do you want to <a href="#" @click.prevent="router.push(routes.main.uri)">edit this project</a>?
+            Successfully saved. Do you want to <a href="#" @click.prevent="router.push({name: 'main'})">edit this project</a>?
           </FormSuccess>
           <div class="mb-3">
             <label class="form-label">Name</label>

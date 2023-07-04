@@ -1,6 +1,5 @@
 <script setup>
 import {useAuthStore} from "../stores/auth";
-import routes from "../router/routes";
 import AsyncNavBarUserInfo from "./AsyncNavBarUserInfo.vue";
 
 const authStore = useAuthStore();
@@ -9,14 +8,14 @@ const authStore = useAuthStore();
 <template>
   <nav class="navbar navbar-dark bg-dark px-4 navbar-expand-md">
     <div class="container">
-      <RouterLink class="navbar-brand" :to="routes.main.uri">Task Manager</RouterLink>
+      <RouterLink class="navbar-brand" :to="{name: 'main'}">Task Manager</RouterLink>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navBar" aria-controls="navBar" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="navBar">
         <ul class="navbar-nav mr-auto mb-2 mb-md-0">
           <li class="nav-item dropdown">
-            <RouterLink :to="routes.create_project.uri" class="nav-link">Create project</RouterLink>
+            <RouterLink :to="{name: 'create_project'}" class="nav-link">Create project</RouterLink>
           </li>
         </ul>
         <ul class="navbar-nav ms-auto mb-2 mb-md-0">
@@ -32,7 +31,7 @@ const authStore = useAuthStore();
               </Suspense>
             </a>
             <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="navbarDropdown">
-              <li><RouterLink class="dropdown-item" :to="routes.profile.uri">Profile</RouterLink></li>
+              <li><RouterLink class="dropdown-item" :to="{name: 'profile'}">Profile</RouterLink></li>
               <li><hr class="dropdown-divider"></li>
               <li><a @click.prevent="authStore.logout()" href="#" class="dropdown-item">Logout</a></li>
             </ul>

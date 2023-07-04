@@ -1,6 +1,5 @@
 import {defineStore} from 'pinia';
 import router from "../router";
-import routes from "../router/routes";
 import axiosInstance from "../helpers/axios";
 
 export const useAuthStore = defineStore({
@@ -17,13 +16,13 @@ export const useAuthStore = defineStore({
                 localStorage.setItem('token', response.data.token);
                 this.token = localStorage.getItem('token');
 
-                router.push(routes.main.uri);
+                router.push({name: 'main'});
 
                 return response;
             });
         },
         logout() {
-            router.push(routes.login.uri).then((result) => {
+            router.push({name: 'login'}).then((result) => {
                 localStorage.removeItem('token');
                 this.token = localStorage.getItem('token');
                 return result;

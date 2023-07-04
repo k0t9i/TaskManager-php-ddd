@@ -1,5 +1,4 @@
 import {createRouter, createWebHistory} from 'vue-router';
-import routes from './routes';
 import {useAuthStore} from "../stores/auth";
 
 const router = createRouter({
@@ -7,45 +6,44 @@ const router = createRouter({
     linkActiveClass: 'active',
     routes: [
         {
-            path: routes.main.uri,
+            path: '/',
+            name: 'main',
             component: () => import('../views/MainView.vue')
         },
         {
-            path: routes.profile.uri,
+            path: '/profile',
+            name: 'profile',
             component: () => import('../views/ProfileView.vue')
         },
         {
-            path: routes.create_project.uri,
+            path: '/create-project',
+            name: 'create_project',
             component: () => import('../views/CreateProjectView.vue')
         },
         {
-            path: routes.login.uri,
-            component: () => import('../views/LoginView.vue')
+            path: '/login',
+            name: 'login',
+            component: () => import('../views/LoginView.vue'),
         },
         {
-            path: routes.register.uri,
+            path: '/register',
+            name: 'register',
             component: () => import('../views/RegisterView.vue')
         }
     ]
 });
 
 router.beforeEach(async (to) => {
-    let isPublic = true;
-    Object.values(routes).forEach(value => {
-        const isPublicUri = value.isPublic !== undefined ? value.isPublic : false;
-        if (value.uri === to.path && !isPublicUri) {
-            isPublic = false;
-        }
-    });
-
+    const publicPages = ['login', 'register'];
+    const isPublic = publicPages.includes(to.name);
     const authStore = useAuthStore();
 
     if (!isPublic && !authStore.token) {
-        return routes.login.uri;
+        return {name: 'login'};
     }
 
     if (isPublic && authStore.token) {
-        return routes.main.uri;
+        return {name: 'main'};
     }
 });
 
