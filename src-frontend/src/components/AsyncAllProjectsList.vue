@@ -1,10 +1,11 @@
 <script setup>
 import axiosInstance from "../helpers/axios";
-import {reactive} from "vue";
+import {reactive, ref} from "vue";
 import ProjectStatus from "./ProjectStatus.vue";
+import RequestStatus from "./RequestStatus.vue";
 
 /**
- * @type {{
+ * @type {Object<{
  * id: string,
  * name: string,
  * finisDate: datetime,
@@ -16,16 +17,28 @@ import ProjectStatus from "./ProjectStatus.vue";
  * participantsCount: number,
  * isOwner: boolean,
  * lastRequestStatus: number
- * }[]}
+ * }>}
  */
-const projects = reactive([]);
+const projects = reactive({});
+const joinLocked = ref({});
 
-await axiosInstance.get('/projects/').then((response) => {
-  for (const [key, value] of Object.entries(response.data)) {
-    projects.push(value);
-  }
-  return response;
-});
+await axiosInstance.get('/projects/')
+    .then((response) => {
+      for (const [key, value] of Object.entries(response.data)) {
+        projects[value.id] = value;
+      }
+      return response;
+    });
+
+async function onJoin(projectId) {
+  joinLocked.value[projectId] = true;
+  await axiosInstance.post(`/projects/${projectId}/requests/`)
+      .then((response) => {
+        projects[projectId].lastRequestStatus = 0;
+        joinLocked.value[projectId] = false;
+        return response;
+      });
+}
 </script>
 
 <template>
@@ -39,12 +52,13 @@ await axiosInstance.get('/projects/').then((response) => {
         <th scope="col">Status</th>
         <th scope="col">Tasks count</th>
         <th scope="col">Participants count</th>
+        <th scope="col">Last request status</th>
         <th scope="col"></th>
       </tr>
     </thead>
     <tbody>
-      <tr v-for="(project, num) in projects">
-        <th scope="row">{{ num + 1 }}</th>
+      <tr v-for="(project, key, index) in projects">
+        <th scope="row">{{ index + 1 }}</th>
         <td>
           <RouterLink :to="{name: 'edit_project', params: { id: project.id }}" v-if="project.isOwner">{{ project.name }}</RouterLink>
           <span v-else>{{ project.name }}</span>
@@ -54,7 +68,11 @@ await axiosInstance.get('/projects/').then((response) => {
         <td><ProjectStatus :status="project.status" /></td>
         <td>{{ project.tasksCount }}</td>
         <td>{{ project.participantsCount }}</td>
-        <td></td>
+        <td><RequestStatus :status="project.lastRequestStatus" /></td>
+        <td>
+          <span v-if="joinLocked[project.id]"><div class="spinner-border spinner-border-sm text-dark mx-1" role="status" />Loading...</span>
+          <span v-else><a href="#" @click.prevent="onJoin(project.id)" v-if="!project.isOwner && ![0, 1].includes(project.lastRequestStatus)">Join</a></span>
+        </td>
       </tr>
     </tbody>
   </table>
