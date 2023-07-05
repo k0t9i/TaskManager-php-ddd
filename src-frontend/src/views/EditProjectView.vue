@@ -1,7 +1,6 @@
 <script setup>
 import {useRoute} from 'vue-router';
 import AsyncProjectForm from "../components/AsyncProjectForm.vue";
-import ProjectStatus from "../components/ProjectStatus.vue";
 
 const route = useRoute();
 </script>
