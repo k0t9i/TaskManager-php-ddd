@@ -18,6 +18,7 @@ const project = reactive({
   status: 1
 });
 const isLocked = ref(false);
+const isStatusLocked = ref(false);
 
 const props = defineProps({
   id: {
@@ -70,6 +71,21 @@ function onSuccess(response) {
 
   return response;
 }
+
+async function toggleStatus() {
+  if (isStatusLocked.value) {
+    return;
+  }
+  isStatusLocked.value = true;
+  const endpoint = project.status === 1 ? 'close' : 'activate';
+  await axiosInstance.patch(`/projects/${props.id}/${endpoint}/`)
+      .then((response) => {
+        project.status = Math.abs(project.status - 1);
+        isStatusLocked.value = false;
+
+        return response;
+      });
+}
 </script>
 
 <template>
@@ -87,7 +103,10 @@ function onSuccess(response) {
         <div class="mb-3" v-if="props.id">
           <label class="form-label">Status</label>
           <div class="h5">
-            <ProjectStatus :status="project.status" />
+            <span v-if="isStatusLocked" class="badge bg-light text-dark">
+              <div class="spinner-border spinner-border-sm mx-1" role="status" />Loading...
+            </span>
+            <a href="#" v-else @click.prevent="toggleStatus"><ProjectStatus :status="project.status" /></a>
           </div>
         </div>
         <div class="mb-3">

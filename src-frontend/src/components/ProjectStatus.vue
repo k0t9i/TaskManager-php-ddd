@@ -1,7 +1,7 @@
 <script setup>
 defineProps({
   status: Number
-})
+});
 </script>
 
 <template>
