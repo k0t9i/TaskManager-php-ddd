@@ -17,6 +17,9 @@ const authStore = useAuthStore();
           <li class="nav-item dropdown">
             <RouterLink :to="{name: 'create_project'}" class="nav-link">Create project</RouterLink>
           </li>
+          <li class="nav-item dropdown">
+            <li><RouterLink :to="{name: 'user_requests'}" class="nav-link">My requests</RouterLink></li>
+          </li>
         </ul>
         <ul class="navbar-nav ms-auto mb-2 mb-md-0">
           <li class="nav-item dropdown">
