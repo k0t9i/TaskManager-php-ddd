@@ -1,5 +1,4 @@
 <script setup>
-import router from "../router";
 import {reactive, ref} from "vue";
 import FormError from "../components/FormError.vue";
 import FormSuccess from "../components/FormSuccess.vue";
@@ -60,7 +59,7 @@ function onSuccess(response) {
           <div class="col-md-4">
             <FormError :error="error" />
             <FormSuccess v-if="registeredEmail">
-              User "{{ registeredEmail }}" registered successfully. You can now <a @click.prevent="router.push({name: 'login'})" href="#">sign in</a>.
+              User "{{ registeredEmail }}" registered successfully. You can now <RouterLink :to="{name: 'login'}" href="#">Sign In</RouterLink>.
             </FormSuccess>
             <div class="mb-3">
               <label class="form-label">Email address</label>
@@ -86,7 +85,7 @@ function onSuccess(response) {
               <LockableButton class="btn btn-primary" type="sumbit" :locked="isLocked">Sign Out</LockableButton>
             </div>
             <div class="text-center mb-3">
-              <p><a @click.prevent="router.push({name: 'login'})" href="#">Sign In</a></p>
+              <p><RouterLink :to="{name: 'login'}" href="#">Sign In</RouterLink></p>
             </div>
           </div>
           <div class="col"></div>

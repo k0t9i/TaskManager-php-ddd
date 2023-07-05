@@ -1,6 +1,5 @@
 <script setup>
 import {reactive, ref} from "vue";
-import router from '../router';
 import {useAuthStore} from '../stores/auth';
 import FormError from "../components/FormError.vue";
 import LockableButton from "../components/LockableButton.vue";
@@ -49,7 +48,7 @@ function onSubmit() {
               <LockableButton class="btn btn-primary" type="sumbit" :locked="isLocked">Sign In</LockableButton>
             </div>
             <div class="text-center mb-3">
-              <p><a @click.prevent="router.push({name: 'register'})" href="#">Sign Out</a></p>
+              <p><RouterLink :to="{name: 'register'}" href="#">Sign Out</RouterLink></p>
             </div>
           </div>
           <div class="col"></div>
