@@ -74,9 +74,9 @@ final class ProjectListProjector extends Projector
                 $event->name,
                 new DateTime($event->finishDate),
                 $event->ownerId,
-                $userProjection->email,
-                $userProjection->firstname,
-                $userProjection->lastname,
+                $ownerProjection->email,
+                $ownerProjection->firstname,
+                $ownerProjection->lastname,
                 (int) $event->status,
                 $userProjection->id === $event->ownerId
             ));
