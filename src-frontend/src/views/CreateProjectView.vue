@@ -49,7 +49,7 @@ function onSuccess(response) {
       <fieldset class="row mt-4" :disabled="isLocked">
         <div class="col">
         </div>
-        <div class="col-md-6">
+        <div class="col-md-9">
           <FormError :error="error" />
           <FormSuccess v-if="projectId">
             Successfully saved. Do you want to <RouterLink :to="{name: 'edit_project', params: { id: projectId }}">edit this project</RouterLink>?
@@ -70,7 +70,6 @@ function onSuccess(response) {
             <LockableButton type="submit" class="btn btn-primary" :locked="isLocked">Save</LockableButton>
           </div>
         </div>
-        <div class="col"></div>
       </fieldset>
     </form>
   </div>

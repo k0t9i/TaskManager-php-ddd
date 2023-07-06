@@ -6,7 +6,9 @@ import {reactive, ref} from "vue";
 import axiosInstance from "../helpers/axios";
 import Datepicker from 'vue3-datepicker';
 import ProjectStatus from "./ProjectStatus.vue";
+import {useRoute} from "vue-router";
 
+const route = useRoute();
 const error = ref();
 const success = ref(false);
 const project = reactive({
@@ -18,14 +20,9 @@ const project = reactive({
 const isLocked = ref(false);
 const isStatusLocked = ref(false);
 
-const props = defineProps({
-  id: {
-    type: String,
-    required: true
-  }
-});
+const projectId = route.params.id;
 
-await axiosInstance.get('/projects/' + props.id).then((response) => {
+await axiosInstance.get('/projects/' + projectId).then((response) => {
   project.name = response.data.name;
   project.description = response.data.description;
   project.finishDate = new Date(response.data.finishDate);
@@ -39,7 +36,7 @@ function onSubmit() {
   isLocked.value = true;
 
   return axiosInstance
-      .patch(`/projects/${props.id}/`)
+      .patch(`/projects/${projectId}/`, project)
       .then(onSuccess)
       .catch((e) => {
         error.value = e.response.data.message;
@@ -61,7 +58,7 @@ async function toggleStatus() {
   }
   isStatusLocked.value = true;
   const endpoint = project.status === 1 ? 'close' : 'activate';
-  await axiosInstance.patch(`/projects/${props.id}/${endpoint}/`)
+  await axiosInstance.patch(`/projects/${projectId}/${endpoint}/`)
       .then((response) => {
         project.status = Math.abs(project.status - 1);
         isStatusLocked.value = false;
@@ -73,38 +70,33 @@ async function toggleStatus() {
 
 <template>
   <form @submit.prevent="onSubmit">
-    <fieldset class="row mt-4" :disabled="isLocked || project.status === 0">
-      <div class="col">
-      </div>
-      <div class="col-md-6">
-        <FormError :error="error" />
-        <FormSuccess v-if="success">Successfully saved.</FormSuccess>
-        <div class="mb-3">
-          <label class="form-label">Status</label>
-          <div class="h5">
-            <span v-if="isStatusLocked" class="badge bg-light text-dark">
-              <div class="spinner-border spinner-border-sm mx-1" role="status" />Loading...
-            </span>
-            <a href="#" v-else @click.prevent="toggleStatus"><ProjectStatus :status="project.status" /></a>
-          </div>
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Name</label>
-          <input type="text" name="name" required="required" class="form-control" v-model="project.name">
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Description</label>
-          <textarea name="description" class="form-control" rows="10" v-model="project.description"></textarea>
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Finish Date</label>
-          <Datepicker class="form-control" v-model="project.finishDate" />
-        </div>
-        <div class="mb-3 text-end">
-          <LockableButton type="submit" class="btn btn-primary" :locked="isLocked">Save</LockableButton>
+    <fieldset :disabled="isLocked || project.status === 0">
+      <FormError :error="error" />
+      <FormSuccess v-if="success">Successfully saved.</FormSuccess>
+      <div class="mb-3">
+        <label class="form-label">Status</label>
+        <div class="h5">
+          <span v-if="isStatusLocked" class="badge bg-light text-dark">
+            <div class="spinner-border spinner-border-sm mx-1" role="status" />Loading...
+          </span>
+          <a href="#" v-else @click.prevent="toggleStatus"><ProjectStatus :status="project.status" /></a>
         </div>
       </div>
-      <div class="col"></div>
+      <div class="mb-3">
+        <label class="form-label">Name</label>
+        <input type="text" name="name" required="required" class="form-control" v-model="project.name">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Description</label>
+        <textarea name="description" class="form-control" rows="10" v-model="project.description"></textarea>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Finish Date</label>
+        <Datepicker class="form-control" v-model="project.finishDate" />
+      </div>
+      <div class="mb-3 text-end">
+        <LockableButton type="submit" class="btn btn-primary" :locked="isLocked">Save</LockableButton>
+      </div>
     </fieldset>
   </form>
 </template>

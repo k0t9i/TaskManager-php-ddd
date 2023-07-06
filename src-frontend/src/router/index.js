@@ -21,9 +21,22 @@ const router = createRouter({
             component: () => import('../views/CreateProjectView.vue')
         },
         {
-            path: '/edit-project/:id',
-            name: 'edit_project',
-            component: () => import('../views/EditProjectView.vue'),
+            path: '/project-info/:id',
+            name: 'project_info',
+            component: () => import('../views/ProjectInfoView.vue'),
+            redirect: {name: 'edit_project'},
+            children: [
+                {
+                    path: 'edit',
+                    name: 'edit_project',
+                    component: () => import('../views//EditProjectView.vue')
+                },
+                {
+                    path: 'requests',
+                    name: 'project_requests',
+                    component: () => import('../views//ProjectRequests.vue')
+                }
+            ]
         },
         {
             path: '/user-requests/',
