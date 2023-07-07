@@ -18,7 +18,6 @@ RUN echo 'deb [trusted=yes] https://repo.symfony.com/apt/ /' | tee /etc/apt/sour
     && cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini
 
 COPY ./docker/configs/php /usr/local/etc/php/conf.d
-COPY ./symfony/vendor /var/www/symfony/vendor
 
 RUN mkdir -p /opt/home && chmod 777 /opt/home
 ENV HOME /opt/home

@@ -30,8 +30,7 @@ services:
             - rabbitmq
             - nginx
         volumes:
-            - ../symfony:/var/www/symfony
-            - /var/www/symfony/vendor
+            - ../symfony:/var/www/symfony:cached
             - /var/www/symfony/var/cache
             - ../src:/var/www/src:cached
             - ../logs/supervisor:/var/log/supervisor

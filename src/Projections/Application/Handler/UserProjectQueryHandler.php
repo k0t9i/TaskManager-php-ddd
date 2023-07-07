@@ -6,9 +6,8 @@ namespace TaskManager\Projections\Application\Handler;
 
 use TaskManager\Projections\Application\Query\UserRequestQuery;
 use TaskManager\Projections\Application\Service\CurrentUserExtractorInterface;
-use TaskManager\Projections\Domain\Entity\UserRequestProjection;
+use TaskManager\Projections\Domain\Entity\ProjectListProjection;
 use TaskManager\Projections\Domain\Repository\ProjectListProjectionRepositoryInterface;
-use TaskManager\Projections\Domain\Repository\UserRequestProjectionRepositoryInterface;
 use TaskManager\Shared\Application\Bus\Query\QueryHandlerInterface;
 
 final readonly class UserProjectQueryHandler implements QueryHandlerInterface
@@ -20,7 +19,7 @@ final readonly class UserProjectQueryHandler implements QueryHandlerInterface
     }
 
     /**
-     * @return UserRequestProjection[]
+     * @return ProjectListProjection[]
      */
     public function __invoke(UserRequestQuery $query): array
     {
