@@ -9,7 +9,6 @@ services:
             - ../src:/var/www/src
             - ../logs/nginx:/var/log/nginx
         working_dir: /var/www
-        command:
     rabbitmq:
         container_name: ${RABBITMQ_HOST:-task_manager-rabbitmq}
         image: rabbitmq:3.11.17-management-alpine
