@@ -78,7 +78,7 @@ final class ProjectListProjector extends Projector
                 $ownerProjection->firstname,
                 $ownerProjection->lastname,
                 (int) $event->status,
-                $userProjection->id === $event->ownerId
+                $userProjection->id === $event->ownerId,
             ));
         }
     }
@@ -186,6 +186,9 @@ final class ProjectListProjector extends Projector
         /** @var ProjectListProjection $projection */
         foreach ($projections->getItems() as $projection) {
             ++$projection->participantsCount;
+            if ($projection->userId === $event->participantId) {
+                $projection->isParticipating = true;
+            }
         }
     }
 
@@ -197,6 +200,9 @@ final class ProjectListProjector extends Projector
         /** @var ProjectListProjection $projection */
         foreach ($projections->getItems() as $projection) {
             --$projection->participantsCount;
+            if ($projection->userId === $event->participantId) {
+                $projection->isParticipating = false;
+            }
         }
     }
 

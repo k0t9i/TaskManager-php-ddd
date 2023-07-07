@@ -12,7 +12,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Annotation\Route;
 use TaskManager\Projections\Application\Query\UserProfileQuery;
+use TaskManager\Projections\Application\Query\UserProjectQuery;
 use TaskManager\Projections\Application\Query\UserRequestQuery;
+use TaskManager\Projections\Infrastructure\DTO\ProjectListResponseDTO;
 use TaskManager\Projections\Infrastructure\DTO\UserRequestResponseDTO;
 use TaskManager\Projections\Infrastructure\DTO\UserResponseDTO;
 use TaskManager\Shared\Application\Bus\Query\QueryBusInterface;
@@ -81,5 +83,35 @@ final readonly class UserProjectionController
         $requests = $this->queryBus->dispatch(new UserRequestQuery());
 
         return new JsonResponse(UserRequestResponseDTO::createFromProjections($requests));
+    }
+
+    #[Route('/projects/', name: 'getAllProjects', methods: ['GET'])]
+    #[OA\Get(
+        description: 'Get all user projects',
+        tags: [
+            'user',
+        ],
+        responses: [
+            new OA\Response(
+                response: '200',
+                description: 'List of user projects',
+                content: new OA\JsonContent(
+                    type: 'array',
+                    items: new OA\Items(
+                        ref: new Model(type: ProjectListResponseDTO::class)
+                    )
+                )
+            ),
+            new OA\Response(ref: '#components/responses/generic401', response: '401'),
+            new OA\Response(ref: '#components/responses/generic403', response: '403'),
+            new OA\Response(ref: '#components/responses/generic404', response: '404'),
+        ]
+    )]
+    #[Security(name: 'Bearer')]
+    public function getAllProjects(): JsonResponse
+    {
+        $projects = $this->queryBus->dispatch(new UserProjectQuery());
+
+        return new JsonResponse(ProjectListResponseDTO::createFromProjections($projects));
     }
 }

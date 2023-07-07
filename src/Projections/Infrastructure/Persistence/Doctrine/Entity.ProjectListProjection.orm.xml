@@ -14,6 +14,7 @@
         <field name="ownerLastname" column="owner_lastname" length="4000" />
         <field name="status" type="integer" />
         <field name="isOwner" column="is_owner" type="boolean" />
+        <field name="isParticipating" column="is_participating" type="boolean" />
         <field name="tasksCount" column="tasks_count" type="integer" />
         <field name="participantsCount" column="participants_count" type="integer" />
         <field name="pendingRequestsCount" column="pending_requests_count" type="integer" />
