@@ -40,7 +40,13 @@ final readonly class ProjectResponseDTO
                 ref: '#components/schemas/projectModel/properties/status'
             )]
         )]
-        public int $status
+        public int $status,
+        #[OA\Property(
+            description: 'Is current user project owner?',
+            type: 'bool',
+            example: true
+        )]
+        public bool $isOwner
     ) {
     }
 
@@ -52,6 +58,7 @@ final readonly class ProjectResponseDTO
             $projection->description,
             $projection->finishDate->getValue(),
             $projection->status,
+            $projection->isOwner
         );
     }
 }

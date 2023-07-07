@@ -8,6 +8,8 @@ use TaskManager\Projections\Domain\Collection\ProjectProjectionCollection;
 use TaskManager\Projections\Domain\Entity\ProjectProjection;
 use TaskManager\Projections\Domain\Event\ProjectInformationWasChangedEvent;
 use TaskManager\Projections\Domain\Event\ProjectOwnerWasChangedEvent;
+use TaskManager\Projections\Domain\Event\ProjectParticipantWasAddedEvent;
+use TaskManager\Projections\Domain\Event\ProjectParticipantWasRemovedEvent;
 use TaskManager\Projections\Domain\Event\ProjectStatusWasChangedEvent;
 use TaskManager\Projections\Domain\Event\ProjectWasCreatedEvent;
 use TaskManager\Projections\Domain\Exception\ProjectionDoesNotExistException;
@@ -104,6 +106,37 @@ final class ProjectProjector extends Projector
         foreach ($projections->getItems() as $projection) {
             $projection->status = (int) $event->status;
         }
+    }
+
+    private function whenParticipantAdded(ProjectParticipantWasAddedEvent $event): void
+    {
+        $projections = $this->loadProjectionsAsNeeded($event->getAggregateId());
+        $this->ensureProjectionExists($event->getAggregateId(), $projections->getItems());
+
+        /** @var ProjectProjection $existingProjection */
+        $existingProjection = $projections->findFirst();
+        if (null === $existingProjection) {
+            throw new \RuntimeException(sprintf('Project "%s" does not exist.', $event->getAggregateId()));
+        }
+
+        $newProjection = clone $existingProjection;
+        $newProjection->userId = $event->participantId;
+        $newProjection->isOwner = false;
+        $projections->addOrUpdateElement($newProjection);
+    }
+
+    private function whenParticipantRemoved(ProjectParticipantWasRemovedEvent $event): void
+    {
+        $projections = $this->loadProjectionsAsNeeded($event->getAggregateId());
+        $this->ensureProjectionExists($event->getAggregateId(), $projections->getItems());
+
+        /** @var ProjectProjection $existingProjection */
+        $existingProjection = $projections->findFirst();
+        if (null === $existingProjection) {
+            throw new \RuntimeException(sprintf('Project "%s" does not exist.', $event->getAggregateId()));
+        }
+
+        $projections->remove($event->participantId);
     }
 
     private function loadProjectionsAsNeeded(string $id): ProjectProjectionCollection
