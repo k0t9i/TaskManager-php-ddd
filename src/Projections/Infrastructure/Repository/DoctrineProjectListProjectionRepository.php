@@ -58,6 +58,21 @@ final readonly class DoctrineProjectListProjectionRepository implements ProjectL
         return $queryBuilder->getQuery()->getResult();
     }
 
+    /**
+     * @return ProjectListProjection[]
+     */
+    public function findAllWhereUserInvolved(string $userId): array
+    {
+        $queryBuilder = $this->getRepository()->createQueryBuilder('t');
+
+        $queryBuilder->where('t.userId = :userId')
+            ->andWhere('t.isOwner = true or t.isParticipating = true');
+
+        $queryBuilder->setParameter('userId', $userId);
+
+        return $queryBuilder->getQuery()->getResult();
+    }
+
     public function save(ProjectListProjection $projection): void
     {
         $this->entityManager->persist($projection);

@@ -78,7 +78,7 @@ final class ProjectListProjector extends Projector
                 $ownerProjection->firstname,
                 $ownerProjection->lastname,
                 (int) $event->status,
-                $userProjection->id === $event->ownerId
+                $userProjection->id === $event->ownerId,
             ));
         }
     }
@@ -186,6 +186,9 @@ final class ProjectListProjector extends Projector
         /** @var ProjectListProjection $projection */
         foreach ($projections->getItems() as $projection) {
             ++$projection->participantsCount;
+            if ($projection->userId === $event->participantId) {
+                $projection->isParticipating = true;
+            }
         }
     }
 
@@ -194,9 +197,19 @@ final class ProjectListProjector extends Projector
         $projections = $this->loadProjectionsAsNeeded($event->getAggregateId());
         $this->ensureProjectionExists($event->getAggregateId(), $projections->getItems());
 
+        /** @var ProjectListProjection $existingProjection */
+        $existingProjection = $projections->findFirst();
+        if (null === $existingProjection) {
+            throw new \RuntimeException(sprintf('Project "%s" does not exist.', $event->getAggregateId()));
+        }
+
         /** @var ProjectListProjection $projection */
         foreach ($projections->getItems() as $projection) {
             --$projection->participantsCount;
+            if ($projection->userId === $event->participantId) {
+                $projection->isParticipating = false;
+                $projection->lastRequestStatus = null;
+            }
         }
     }
 

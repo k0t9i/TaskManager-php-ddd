@@ -16,7 +16,8 @@ final class ProjectProjection implements Hashable
         public string $description,
         public DateTime $finishDate,
         public string $ownerId,
-        public int $status
+        public int $status,
+        public bool $isOwner = true
     ) {
     }
 

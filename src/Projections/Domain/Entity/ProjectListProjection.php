@@ -20,6 +20,7 @@ final class ProjectListProjection implements Hashable
         public string $ownerLastname,
         public int $status,
         public bool $isOwner,
+        public bool $isParticipating = false,
         public int $tasksCount = 0,
         public int $participantsCount = 0,
         public int $pendingRequestsCount = 0,
