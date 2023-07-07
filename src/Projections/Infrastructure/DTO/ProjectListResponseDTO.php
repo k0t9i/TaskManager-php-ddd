@@ -88,6 +88,12 @@ final readonly class ProjectListResponseDTO
         )]
         public bool $isOwner,
         #[OA\Property(
+            description: 'Is current user participates in the project?',
+            type: 'bool',
+            example: true
+        )]
+        public bool $isParticipating,
+        #[OA\Property(
             description: 'Last project request status of current user',
             oneOf: [new OA\Schema(
                 ref: '#components/schemas/requestModel/properties/status'
@@ -120,6 +126,7 @@ final readonly class ProjectListResponseDTO
                 $projection->participantsCount,
                 $projection->pendingRequestsCount,
                 $projection->isOwner,
+                $projection->isParticipating,
                 $projection->lastRequestStatus,
             );
         }

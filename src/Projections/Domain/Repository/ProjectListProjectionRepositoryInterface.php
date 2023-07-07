@@ -28,6 +28,11 @@ interface ProjectListProjectionRepositoryInterface
      */
     public function findAllOwnersProjects(): array;
 
+    /**
+     * @return ProjectListProjection[]
+     */
+    public function findAllWhereUserInvolved(string $userId): array;
+
     public function save(ProjectListProjection $projection): void;
 
     public function delete(ProjectListProjection $projection): void;
