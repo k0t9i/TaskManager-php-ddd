@@ -208,6 +208,7 @@ final class ProjectListProjector extends Projector
             --$projection->participantsCount;
             if ($projection->userId === $event->participantId) {
                 $projection->isParticipating = false;
+                $projection->lastRequestStatus = null;
             }
         }
     }
