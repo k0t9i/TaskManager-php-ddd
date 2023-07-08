@@ -21,7 +21,7 @@ import RequestStatus from "./RequestStatus.vue";
  * }>}
  */
 const projects = reactive({});
-const joinLocked = ref({});
+const isJoinLocked = ref({});
 
 await axiosInstance.get('/projects/')
     .then((response) => {
@@ -32,11 +32,11 @@ await axiosInstance.get('/projects/')
     });
 
 async function onJoin(projectId) {
-  joinLocked.value[projectId] = true;
+  isJoinLocked.value[projectId] = true;
   await axiosInstance.post(`/projects/${projectId}/requests/`)
       .then((response) => {
         projects[projectId].lastRequestStatus = 0;
-        joinLocked.value[projectId] = false;
+        isJoinLocked.value[projectId] = false;
         return response;
       });
 }
@@ -71,7 +71,7 @@ async function onJoin(projectId) {
         <td>{{ project.participantsCount }}</td>
         <td><RequestStatus :status="project.lastRequestStatus" /></td>
         <td>
-          <span v-if="joinLocked[project.id]"><div class="spinner-border spinner-border-sm text-dark mx-1" role="status" />Loading...</span>
+          <span v-if="isJoinLocked[project.id]"><div class="spinner-border spinner-border-sm text-dark mx-1" role="status" />Loading...</span>
           <span v-else><a href="#" @click.prevent="onJoin(project.id)" v-if="!project.isOwner && ![0, 1].includes(project.lastRequestStatus)">Join</a></span>
         </td>
       </tr>
