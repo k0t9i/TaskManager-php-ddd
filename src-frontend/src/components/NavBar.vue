@@ -15,7 +15,7 @@ const authStore = useAuthStore();
       <div class="collapse navbar-collapse" id="navBar">
         <ul class="navbar-nav mr-auto mb-2 mb-md-0">
           <li class="nav-item dropdown">
-            <RouterLink :to="{name: 'create_project'}" class="nav-link">Create project</RouterLink>
+            <li><RouterLink :to="{name: 'user_projects'}" class="nav-link">My projects</RouterLink></li>
           </li>
           <li class="nav-item dropdown">
             <li><RouterLink :to="{name: 'user_requests'}" class="nav-link">My requests</RouterLink></li>
