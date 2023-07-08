@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TaskManager\Projections\Application\Handler;
 
-use TaskManager\Projections\Application\Query\UserRequestQuery;
+use TaskManager\Projections\Application\Query\UserProjectQuery;
 use TaskManager\Projections\Application\Service\CurrentUserExtractorInterface;
 use TaskManager\Projections\Domain\Entity\ProjectListProjection;
 use TaskManager\Projections\Domain\Repository\ProjectListProjectionRepositoryInterface;
@@ -21,7 +21,7 @@ final readonly class UserProjectQueryHandler implements QueryHandlerInterface
     /**
      * @return ProjectListProjection[]
      */
-    public function __invoke(UserRequestQuery $query): array
+    public function __invoke(UserProjectQuery $query): array
     {
         $user = $this->userExtractor->extract();
 
