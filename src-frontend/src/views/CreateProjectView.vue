@@ -52,7 +52,7 @@ function onSuccess(response) {
         <div class="col-md-9">
           <FormError :error="error" />
           <FormSuccess v-if="projectId">
-            Successfully saved. Do you want to <RouterLink :to="{name: 'edit_project', params: { id: projectId }}">edit this project</RouterLink>?
+            Successfully saved. <RouterLink :to="{name: 'project_info', params: { id: projectId }}">View</RouterLink> this project info.
           </FormSuccess>
           <div class="mb-3">
             <label class="form-label">Name</label>
