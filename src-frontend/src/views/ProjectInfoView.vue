@@ -4,7 +4,7 @@
 
 <template>
   <div class="container-md">
-    <h3 class="mt-4">Project info</h3>
+    <h3 class="my-4">Project info</h3>
     <div class="row mt-4">
       <div class="col">
         <ul class="nav flex-column">

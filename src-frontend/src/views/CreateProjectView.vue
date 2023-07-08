@@ -44,7 +44,7 @@ function onSuccess(response) {
 
 <template>
   <div class="container-md">
-    <h3 class="mt-4">Create project</h3>
+    <h3 class="my-4">Create project</h3>
     <form @submit.prevent="onSubmit">
       <fieldset class="row mt-4" :disabled="isLocked">
         <div class="col">

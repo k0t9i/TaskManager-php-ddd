@@ -3,7 +3,7 @@ import AsyncProjectRequestList from "../components/AsyncProjectRequestList.vue";
 </script>
 
 <template>
-  <h4 class="mt-4">Project requests</h4>
+  <h4 class="my-4">Project requests</h4>
   <Suspense>
     <AsyncProjectRequestList />
     <template #fallback>

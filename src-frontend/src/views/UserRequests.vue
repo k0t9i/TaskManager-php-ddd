@@ -4,7 +4,7 @@ import AsyncUserRequestList from "../components/AsyncUserRequestList.vue";
 
 <template>
   <div class="container-md">
-    <h3 class="mt-4">Requests</h3>
+    <h3 class="my-4">My requests</h3>
     <Suspense>
       <AsyncUserRequestList />
       <template #fallback>

@@ -3,7 +3,7 @@ import AsyncProjectForm from "../components/AsyncProjectForm.vue";
 </script>
 
 <template>
-  <h4 class="mt-4">Edit project</h4>
+  <h4 class="my-4">Edit project</h4>
   <Suspense>
     <AsyncProjectForm />
     <template #fallback>

@@ -4,7 +4,7 @@ import AsyncProfileForm from "../components/AsyncProfileForm.vue";
 
 <template>
   <div class="container-md">
-    <h3 class="mt-4">Profile</h3>
+    <h3 class="my-4">Profile</h3>
     <Suspense>
       <AsyncProfileForm />
       <template #fallback>
