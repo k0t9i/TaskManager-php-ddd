@@ -49,4 +49,9 @@ abstract class TaskStatus extends Status
             throw new TaskModificationIsNotAllowedException(get_class($this));
         }
     }
+
+    public function isClosed(): bool
+    {
+        return $this instanceof ClosedTaskStatus;
+    }
 }

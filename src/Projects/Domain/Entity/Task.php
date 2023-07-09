@@ -169,7 +169,16 @@ final class Task extends AggregateRoot
 
     public function closeAsNeeded(ProjectUserId $performerId): void
     {
-        $this->changeStatus(new ClosedTaskStatus(), $performerId);
+        if (!$this->status->isClosed()) {
+            $status = new ClosedTaskStatus();
+            $this->status = $status;
+
+            $this->registerEvent(new TaskStatusWasChangedEvent(
+                $this->id->value,
+                (string) $status->getScalar(),
+                $performerId->value
+            ));
+        }
     }
 
     public function undraft(): void
