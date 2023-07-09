@@ -10,7 +10,7 @@ const id = route.params.id;
 
 await projectStore.load(id);
 await requestsStore.load(id);
-const project = projectStore.project(id);
+const project = projectStore.createEmpty(id);
 </script>
 
 <template>
