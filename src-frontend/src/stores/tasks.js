@@ -1,0 +1,62 @@
+import {defineStore} from "pinia";
+import axiosInstance from "../helpers/axios";
+
+export const useTasksStore = defineStore({
+    id: 'tasks',
+    state: () => ({
+        tasks: {},
+        errors: {},
+        locked: {}
+    }),
+    getters: {
+        getTasks: (state) => {
+            return (projectId) => state.tasks[projectId];
+        },
+        error: (state) => {
+            return (projectId) => state.errors[projectId];
+        },
+        isLocked: (state) => {
+            return (id) => state.locked[id];
+        },
+        countAll: (state) => {
+            return (projectId) => Object.entries(state.tasks[projectId] ?? {}).length;
+        }
+    },
+    actions: {
+        async create(projectId, task) {
+            return axiosInstance.post(`/projects/${projectId}/tasks/`, task)
+                .then((response) => {
+                    const id = response.data.id;
+                    task.id = id;
+                    if (this.tasks[projectId] === undefined) {
+                        this.tasks[projectId] = {};
+                    }
+                    this.tasks[projectId][id] = {};
+                    for (const [key, value] of Object.entries(task)) {
+                        this.tasks[projectId][id][key] = value;
+                    }
+                    this.tasks[projectId][id].startDate = new Date(this.tasks[projectId][id].startDate);
+                    this.tasks[projectId][id].finishDate = new Date(this.tasks[projectId][id].finishDate);
+                })
+                .catch((error) => {
+                    this.errors[projectId] = error.response.data.message;
+                });
+        },
+        async load(projectId) {
+            return axiosInstance.get(`/projects/${projectId}/tasks/`)
+                .then((response) => {
+                    if (!this.tasks[projectId]) {
+                        this.tasks[projectId] = {};
+                    }
+                    for (const [key, value] of Object.entries(response.data)) {
+                        this.tasks[projectId][value.id] = value;
+                        this.tasks[projectId][value.id].startDate = new Date(value.startDate);
+                        this.tasks[projectId][value.id].finishDate = new Date(value.finishDate);
+                    }
+                })
+                .catch((error) => {
+                    this.errors[projectId] = error.response.data.message;
+                });
+        }
+    }
+});

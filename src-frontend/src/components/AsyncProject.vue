@@ -2,14 +2,17 @@
 import {useRoute} from "vue-router";
 import {useProjectStore} from "../stores/project";
 import {useProjectRequestsStore} from "../stores/projectRequests";
+import {useTasksStore} from "../stores/tasks";
 
 const route = useRoute();
 const projectStore = useProjectStore();
 const requestsStore = useProjectRequestsStore();
+const tasksStore = useTasksStore();
 const id = route.params.id;
 
 await projectStore.load(id);
 await requestsStore.load(id);
+await tasksStore.load(id);
 const project = projectStore.createEmpty(id);
 </script>
 
@@ -24,6 +27,9 @@ const project = projectStore.createEmpty(id);
           </li>
           <li class="nav-item">
             <RouterLink :to="{name: 'project_requests'}" class="nav-link" v-if="project.isOwner">Requests ({{ requestsStore.countPending(id) }}/{{ requestsStore.countAll(id) }})</RouterLink>
+          </li>
+          <li class="nav-item">
+            <RouterLink :to="{name: 'project_tasks'}" class="nav-link">Tasks ({{ tasksStore.countAll(id) }})</RouterLink>
           </li>
         </ul>
       </div>
