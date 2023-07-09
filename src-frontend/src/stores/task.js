@@ -21,6 +21,7 @@ export const useTaskStore = defineStore({
     },
     actions: {
         async load(id) {
+            this.errors[id] = '';
             return axiosInstance.get(`/tasks/${id}/`)
                 .then((response) => {
                     if (this.tasks[id]) {

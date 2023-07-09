@@ -24,6 +24,7 @@ export const useTasksStore = defineStore({
     },
     actions: {
         async create(projectId, task) {
+            this.errors[projectId] = '';
             return axiosInstance.post(`/projects/${projectId}/tasks/`, task)
                 .then((response) => {
                     const id = response.data.id;
@@ -43,6 +44,7 @@ export const useTasksStore = defineStore({
                 });
         },
         async load(projectId) {
+            this.errors[projectId] = '';
             return axiosInstance.get(`/projects/${projectId}/tasks/`)
                 .then((response) => {
                     if (!this.tasks[projectId]) {

@@ -29,6 +29,7 @@ const project = projectStore.project(id);
 
 async function onSubmit() {
   isLocked.value = true;
+  taskId.value = null;
 
   await tasksStore.create(id, task)
       .then((response) => {

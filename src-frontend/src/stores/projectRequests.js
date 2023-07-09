@@ -27,6 +27,7 @@ export const useProjectRequestsStore = defineStore({
     },
     actions: {
         async load(projectId) {
+            this.errors[projectId] = '';
             return axiosInstance.get(`/projects/${projectId}/requests/`)
                 .then((response) => {
                     if (!this.requests[projectId]) {
