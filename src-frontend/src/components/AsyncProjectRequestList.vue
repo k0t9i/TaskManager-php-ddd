@@ -5,6 +5,7 @@ import axiosInstance from "../helpers/axios";
 import {useRoute} from "vue-router";
 import {useProjectStore} from "../stores/project";
 import FormError from "./FormError.vue";
+import Datetime from "./Datetime.vue";
 
 const route = useRoute();
 const id = route.params.id;
@@ -82,7 +83,7 @@ async function changeStatus(requestId, endpoint, targetStatus) {
           </ul>
         </div>
       </td>
-      <td>{{ request.changeDate }}</td>
+      <td><Datetime :value="request.changeDate" with-time /></td>
       <td>{{ request.userFirstname }} {{ request.userLastname }} ({{ request.userEmail }})</td>
     </tr>
     </tbody>

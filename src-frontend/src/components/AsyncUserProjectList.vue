@@ -2,12 +2,13 @@
 import {reactive} from "vue";
 import axiosInstance from "../helpers/axios";
 import ProjectStatus from "./ProjectStatus.vue";
+import Datetime from "./Datetime.vue";
 
 /**
  * @type {Object<{
  * id: string,
  * name: string,
- * finisDate: datetime,
+ * finishDate: Date,
  * ownerEmail: string,
  * ownerFirstname: string,
  * ownerLastname: string,
@@ -22,6 +23,7 @@ await axiosInstance.get('/users/projects/')
     .then((response) => {
       for (const [key, value] of Object.entries(response.data)) {
         projects[value.id] = value;
+        projects[value.id].finishDate = new Date(value.finishDate);
       }
       return response;
     });
@@ -46,7 +48,7 @@ await axiosInstance.get('/users/projects/')
       <td>
         <RouterLink :to="{name: 'project', params: { id: project.id }}">{{ project.name }}</RouterLink>
       </td>
-      <td>{{ project.finishDate }}</td>
+      <td><Datetime :value="project.finishDate" /></td>
       <td>{{ project.ownerFirstname }} {{ project.ownerLastname }} ({{ project.ownerEmail }})</td>
       <td><ProjectStatus :status="project.status" /></td>
       <td>{{ project.tasksCount }}</td>

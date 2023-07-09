@@ -2,6 +2,7 @@
 import RequestStatus from "../components/RequestStatus.vue";
 import {reactive} from "vue";
 import axiosInstance from "../helpers/axios";
+import Datetime from "./Datetime.vue";
 
 /**
  * @type {{
@@ -15,7 +16,9 @@ const requests = reactive([]);
 await axiosInstance.get('/users/requests/')
     .then((response) => {
       for (const [key, value] of Object.entries(response.data)) {
-        requests.push(value);
+        let val = value;
+        val.changeDate = new Date(value.changeDate);
+        requests.push(val);
       }
       return response;
     });
@@ -35,7 +38,7 @@ await axiosInstance.get('/users/requests/')
     <tr v-for="(request, key) in requests">
       <th scope="row">{{ key + 1 }}</th>
       <td><RequestStatus :status="request.status" /></td>
-      <td>{{ request.changeDate }}</td>
+      <td><Datetime :value="request.changeDate" with-time /></td>
       <td>{{ request.projectName }}</td>
     </tr>
     </tbody>
