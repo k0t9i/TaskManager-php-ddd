@@ -25,7 +25,7 @@ export const useTaskStore = defineStore({
                 .then((response) => {
                     if (this.tasks[id]) {
                         for (const [key, value] of Object.entries(response.data)) {
-                            this.tasks[value.id][key] = value;
+                            this.tasks[id][key] = value;
                         }
                     } else {
                         this.tasks[id] = response.data
