@@ -55,7 +55,7 @@ async function onSubmit() {
       <fieldset class="row mt-4" :disabled="isLocked">
         <FormError :error="tasksStore.error(id)" />
         <FormSuccess v-if="taskId">
-          Successfully saved.
+          Successfully saved. <RouterLink :to="{name: 'edit_task', params: { id: id, taskId: taskId }}">Edit</RouterLink> this task.
         </FormSuccess>
         <div class="mb-3">
           <label class="form-label">Name</label>
@@ -63,7 +63,7 @@ async function onSubmit() {
         </div>
         <div class="mb-3">
           <label class="form-label">Brief info</label>
-          <textarea name="description" class="form-control" rows="5" v-model="task.brief"></textarea>
+          <textarea name="brief" class="form-control" rows="5" v-model="task.brief"></textarea>
         </div>
         <div class="mb-3">
           <label class="form-label">Description</label>

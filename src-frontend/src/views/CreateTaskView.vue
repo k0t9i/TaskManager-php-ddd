@@ -3,7 +3,7 @@ import AsyncCreateTask from "../components/AsyncCreateTask.vue";
 </script>
 
 <template>
-  <h4 class="my-4">Project tasks</h4>
+  <h4 class="my-4">Create task</h4>
   <Suspense>
     <AsyncCreateTask />
     <template #fallback>

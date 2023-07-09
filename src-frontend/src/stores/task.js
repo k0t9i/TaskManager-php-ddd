@@ -1,16 +1,16 @@
-import {defineStore} from 'pinia';
+import {defineStore} from "pinia";
 import axiosInstance from "../helpers/axios";
 
-export const useProjectStore = defineStore({
-    id: 'project',
+export const useTaskStore = defineStore({
+    id: 'task',
     state: () => ({
-        projects: {},
+        tasks: {},
         errors: {},
         locked: {}
     }),
     getters: {
-        project: (state) => {
-            return (id) => state.projects[id];
+        task: (state) => {
+            return (id) => state.tasks[id];
         },
         error: (state) => {
             return (id) => state.errors[id];
@@ -21,42 +21,29 @@ export const useProjectStore = defineStore({
     },
     actions: {
         async load(id) {
-            this.errors[id] = '';
-            return axiosInstance
-                .get(`/projects/${id}/`).then((response) => {
-                    if (this.projects[id]) {
+            return axiosInstance.get(`/tasks/${id}/`)
+                .then((response) => {
+                    if (this.tasks[id]) {
                         for (const [key, value] of Object.entries(response.data)) {
-                            this.projects[id][key] = response.data[key];
+                            this.tasks[value.id][key] = value;
                         }
                     } else {
-                        this.projects[id] = response.data
+                        this.tasks[id] = response.data
                     }
-                    this.projects[id].finishDate = new Date(this.projects[id].finishDate);
-                    return response;
+                    this.tasks[id].startDate = new Date(this.tasks[id].startDate);
+                    this.tasks[id].finishDate = new Date(this.tasks[id].finishDate);
                 })
                 .catch((error) => {
                     this.errors[id] = error.response.data.message;
-                });
-        },
-        async save(id){
-            this.errors[id] = '';
-            this.locked[id] = true;
-            return axiosInstance
-                .patch(`/projects/${id}/`, this.projects[id])
-                .catch((error) => {
-                    this.errors[id] = error.response.data.message;
-                })
-                .finally(() => {
-                    this.locked[id] = false;
                 });
         },
         async toggleStatus(id) {
             this.errors[id] = '';
             this.locked[id] = true;
-            const endpoint = this.projects[id].status === 1 ? 'close' : 'activate';
-            return axiosInstance.patch(`/projects/${id}/${endpoint}/`)
+            const endpoint = this.tasks[id].status === 1 ? 'close' : 'activate';
+            return axiosInstance.patch(`/tasks/${id}/${endpoint}/`)
                 .then((response) => {
-                    this.projects[id].status = Math.abs(this.projects[id].status - 1);
+                    this.tasks[id].status = Math.abs(this.tasks[id].status - 1);
                     return response;
                 })
                 .catch((error) => {
@@ -66,9 +53,17 @@ export const useProjectStore = defineStore({
                     this.locked[id] = false;
                 });
         },
-        createEmpty(id) {
-            this.projects[id] = {};
-            return this.projects[id];
-        }
+        async update(id){
+            this.errors[id] = '';
+            this.locked[id] = true;
+            return axiosInstance
+                .patch(`/tasks/${id}/`, this.tasks[id])
+                .catch((error) => {
+                    this.errors[id] = error.response.data.message;
+                })
+                .finally(() => {
+                    this.locked[id] = false;
+                });
+        },
     }
 });

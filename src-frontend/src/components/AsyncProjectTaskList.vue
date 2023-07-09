@@ -37,7 +37,9 @@ const tasks = tasksStore.getTasks(id);
     <tbody>
     <tr v-for="(task, key, index) in tasks">
       <th scope="row">{{ index + 1 }}</th>
-      <td>{{ task.name }}</td>
+      <td>
+        <RouterLink :to="{name: 'edit_task', params: { id: project.id, taskId: task.id }}">{{ task.name }}</RouterLink>
+      </td>
       <td><TaskStatus :status="task.status" /></td>
       <td><Datetime :value="task.startDate" /></td>
       <td><Datetime :value="task.finishDate" /></td>
