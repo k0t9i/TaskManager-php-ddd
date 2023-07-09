@@ -25,6 +25,8 @@ const task = reactive({
 await projectStore.load(id);
 await tasksStore.load(id);
 
+const project = projectStore.project(id);
+
 async function onSubmit() {
   isLocked.value = true;
 
@@ -69,11 +71,11 @@ async function onSubmit() {
         </div>
         <div class="mb-3">
           <label class="form-label">Start Date</label>
-          <Datepicker class="form-control" v-model="task.startDate" />
+          <Datepicker class="form-control" v-model="task.startDate" :upper-limit="task.finishDate && task.finishDate < project.finishDate ? task.finishDate : project.finishDate"  />
         </div>
         <div class="mb-3">
           <label class="form-label">Finish Date</label>
-          <Datepicker class="form-control" v-model="task.finishDate" />
+          <Datepicker class="form-control" v-model="task.finishDate" :upper-limit="project.finishDate" />
         </div>
         <div class="mb-3 text-end">
           <LockableButton type="submit" class="btn btn-primary" :locked="isLocked">Save</LockableButton>
