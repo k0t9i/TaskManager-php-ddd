@@ -44,7 +44,7 @@ await axiosInstance.get('/users/projects/')
     <tr v-for="(project, key, index) in projects">
       <th scope="row">{{ index + 1 }}</th>
       <td>
-        <RouterLink :to="{name: 'project_info', params: { id: project.id }}">{{ project.name }}</RouterLink>
+        <RouterLink :to="{name: 'project', params: { id: project.id }}">{{ project.name }}</RouterLink>
       </td>
       <td>{{ project.finishDate }}</td>
       <td>{{ project.ownerFirstname }} {{ project.ownerLastname }} ({{ project.ownerEmail }})</td>

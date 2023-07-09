@@ -61,7 +61,7 @@ async function onJoin(projectId) {
       <tr v-for="(project, key, index) in projects">
         <th scope="row">{{ index + 1 }}</th>
         <td>
-          <RouterLink :to="{name: 'project_info', params: { id: project.id }}" v-if="project.isOwner || project.isParticipating">{{ project.name }}</RouterLink>
+          <RouterLink :to="{name: 'project', params: { id: project.id }}" v-if="project.isOwner || project.isParticipating">{{ project.name }}</RouterLink>
           <span v-else>{{ project.name }}</span>
         </td>
         <td>{{ project.finishDate }}</td>
