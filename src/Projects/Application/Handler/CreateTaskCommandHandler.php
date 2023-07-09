@@ -36,9 +36,8 @@ final readonly class CreateTaskCommandHandler implements CommandHandlerInterface
         $currentUser = $this->userExtractor->extract();
         $project = $this->finder->find(new ProjectId($command->projectId));
 
-        $task = Task::create(
+        $task = $project->createTask(
             new TaskId($command->id),
-            $project->getId(),
             new TaskInformation(
                 new TaskName($command->name),
                 new TaskBrief($command->brief),
