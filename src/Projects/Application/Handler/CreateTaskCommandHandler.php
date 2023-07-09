@@ -7,7 +7,6 @@ namespace TaskManager\Projects\Application\Handler;
 use TaskManager\Projects\Application\Command\CreateTaskCommand;
 use TaskManager\Projects\Application\Service\CurrentUserExtractorInterface;
 use TaskManager\Projects\Application\Service\ProjectFinderInterface;
-use TaskManager\Projects\Domain\Entity\Task;
 use TaskManager\Projects\Domain\Repository\TaskRepositoryInterface;
 use TaskManager\Projects\Domain\ValueObject\ProjectId;
 use TaskManager\Projects\Domain\ValueObject\TaskBrief;
@@ -36,9 +35,8 @@ final readonly class CreateTaskCommandHandler implements CommandHandlerInterface
         $currentUser = $this->userExtractor->extract();
         $project = $this->finder->find(new ProjectId($command->projectId));
 
-        $task = Task::create(
+        $task = $project->createTask(
             new TaskId($command->id),
-            $project->getId(),
             new TaskInformation(
                 new TaskName($command->name),
                 new TaskBrief($command->brief),
