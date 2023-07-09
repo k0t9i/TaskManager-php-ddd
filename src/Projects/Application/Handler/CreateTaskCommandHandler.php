@@ -7,7 +7,6 @@ namespace TaskManager\Projects\Application\Handler;
 use TaskManager\Projects\Application\Command\CreateTaskCommand;
 use TaskManager\Projects\Application\Service\CurrentUserExtractorInterface;
 use TaskManager\Projects\Application\Service\ProjectFinderInterface;
-use TaskManager\Projects\Domain\Entity\Task;
 use TaskManager\Projects\Domain\Repository\TaskRepositoryInterface;
 use TaskManager\Projects\Domain\ValueObject\ProjectId;
 use TaskManager\Projects\Domain\ValueObject\TaskBrief;
