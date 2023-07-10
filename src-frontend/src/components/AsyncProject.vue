@@ -19,7 +19,7 @@ const error = ref('');
 await projectStore.load(id);
 await requestsStore.load(id);
 await tasksStore.load(id);
-const project = projectStore.createEmpty(id);
+const project = projectStore.project(id);
 
 async function onLeave(id) {
   error.value = '';

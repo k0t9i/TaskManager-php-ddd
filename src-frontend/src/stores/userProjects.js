@@ -1,8 +1,11 @@
 import {defineStore} from "pinia";
 import axiosInstance from "../helpers/axios";
+import {useCacheStore} from "./cache";
+
+const STORE_ID = 'userProjects';
 
 export const useUserProjectsStore = defineStore({
-    id: 'userProjects',
+    id: STORE_ID,
     state: () => ({
         projects: {},
         error: ''
@@ -29,17 +32,24 @@ export const useUserProjectsStore = defineStore({
         },
         async load() {
             this.error = '';
-            return axiosInstance.get('/users/projects/')
-                .then((response) => {
-                    for (const [key, value] of Object.entries(response.data)) {
-                        this.projects[value.id] = value;
-                        this.projects[value.id].finishDate = new Date(value.finishDate);
-                    }
-                    return response;
-                })
-                .catch((error) => {
-                    this.error = error.response.data.message;
-                });
+            const cache = useCacheStore();
+
+            return cache.request(
+                STORE_ID,
+                axiosInstance
+                    .get('/users/projects/')
+                    .then((response) => {
+                        for (const [key, value] of Object.entries(response.data)) {
+                            this.projects[value.id] = value;
+                            this.projects[value.id].finishDate = new Date(value.finishDate);
+                        }
+                        return response;
+                    })
+                    .catch((error) => {
+                        this.error = error.response.data.message;
+                        throw error;
+                    })
+            );
         }
     }
 });

@@ -1,8 +1,11 @@
 import {defineStore} from "pinia";
 import axiosInstance from "../helpers/axios";
+import {useCacheStore} from "./cache";
+
+const STORE_ID = 'task';
 
 export const useTaskStore = defineStore({
-    id: 'task',
+    id: STORE_ID,
     state: () => ({
         tasks: {},
         errors: {},
@@ -22,21 +25,28 @@ export const useTaskStore = defineStore({
     actions: {
         async load(id) {
             this.errors[id] = '';
-            return axiosInstance.get(`/tasks/${id}/`)
-                .then((response) => {
-                    if (this.tasks[id]) {
-                        for (const [key, value] of Object.entries(response.data)) {
-                            this.tasks[id][key] = value;
+            const cache = useCacheStore();
+
+            return cache.request(
+                STORE_ID + ':' + id,
+                axiosInstance
+                    .get(`/tasks/${id}/`)
+                    .then((response) => {
+                        if (this.tasks[id]) {
+                            for (const [key, value] of Object.entries(response.data)) {
+                                this.tasks[id][key] = value;
+                            }
+                        } else {
+                            this.tasks[id] = response.data
                         }
-                    } else {
-                        this.tasks[id] = response.data
-                    }
-                    this.tasks[id].startDate = new Date(this.tasks[id].startDate);
-                    this.tasks[id].finishDate = new Date(this.tasks[id].finishDate);
-                })
-                .catch((error) => {
-                    this.errors[id] = error.response.data.message;
-                });
+                        this.tasks[id].startDate = new Date(this.tasks[id].startDate);
+                        this.tasks[id].finishDate = new Date(this.tasks[id].finishDate);
+                    })
+                    .catch((error) => {
+                        this.errors[id] = error.response.data.message;
+                        throw error;
+                    })
+            );
         },
         async toggleStatus(id) {
             this.errors[id] = '';

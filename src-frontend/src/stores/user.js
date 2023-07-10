@@ -1,8 +1,11 @@
 import {defineStore} from 'pinia';
 import axiosInstance from "../helpers/axios";
+import {useCacheStore} from "./cache";
+
+const STORE_ID = 'user';
 
 export const useUserStore = defineStore({
-    id: 'user',
+    id: STORE_ID,
     state: () => ({
         user: {},
         error: '',
@@ -11,16 +14,22 @@ export const useUserStore = defineStore({
     actions: {
         async load() {
             this.error = '';
-            return axiosInstance
-                .get(`/users/`).then((response) => {
-                    this.user.email = response.data.email;
-                    this.user.firstname = response.data.firstname;
-                    this.user.lastname = response.data.lastname;
-                    return response;
-                })
-                .catch((error) => {
-                    this.error = error.response.data.message;
-                });
+            const cache = useCacheStore();
+
+            return cache.request(
+                STORE_ID,
+                axiosInstance
+                    .get(`/users/`).then((response) => {
+                        this.user.email = response.data.email;
+                        this.user.firstname = response.data.firstname;
+                        this.user.lastname = response.data.lastname;
+                        return response;
+                    })
+                    .catch((error) => {
+                        this.error = error.response.data.message;
+                        throw error;
+                    })
+            );
         },
         async save(){
             this.error = '';

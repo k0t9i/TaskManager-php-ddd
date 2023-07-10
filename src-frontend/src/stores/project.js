@@ -1,8 +1,11 @@
 import {defineStore} from 'pinia';
 import axiosInstance from "../helpers/axios";
+import {useCacheStore} from "./cache";
+
+const STORE_ID = 'project';
 
 export const useProjectStore = defineStore({
-    id: 'project',
+    id: STORE_ID,
     state: () => ({
         projects: {},
         errors: {},
@@ -22,21 +25,28 @@ export const useProjectStore = defineStore({
     actions: {
         async load(id) {
             this.errors[id] = '';
-            return axiosInstance
-                .get(`/projects/${id}/`).then((response) => {
-                    if (this.projects[id]) {
-                        for (const [key, value] of Object.entries(response.data)) {
-                            this.projects[id][key] = response.data[key];
+            const cache = useCacheStore();
+
+            return cache.request(
+                STORE_ID + ':' + id,
+                axiosInstance
+                    .get(`/projects/${id}/`)
+                    .then((response) => {
+                        if (this.projects[id]) {
+                            for (const [key, value] of Object.entries(response.data)) {
+                                this.projects[id][key] = response.data[key];
+                            }
+                        } else {
+                            this.projects[id] = response.data
                         }
-                    } else {
-                        this.projects[id] = response.data
-                    }
-                    this.projects[id].finishDate = new Date(this.projects[id].finishDate);
-                    return response;
-                })
-                .catch((error) => {
-                    this.errors[id] = error.response.data.message;
-                });
+                        this.projects[id].finishDate = new Date(this.projects[id].finishDate);
+                        return response;
+                    })
+                    .catch((error) => {
+                        this.errors[id] = error.response.data.message;
+                        throw error;
+                    })
+            );
         },
         async save(id){
             this.errors[id] = '';

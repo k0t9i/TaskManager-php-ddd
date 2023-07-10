@@ -1,8 +1,11 @@
 import {defineStore} from "pinia";
 import axiosInstance from "../helpers/axios";
+import {useCacheStore} from "./cache";
+
+const STORE_ID = 'tasks';
 
 export const useTasksStore = defineStore({
-    id: 'tasks',
+    id: STORE_ID,
     state: () => ({
         tasks: {},
         errors: {},
@@ -45,20 +48,27 @@ export const useTasksStore = defineStore({
         },
         async load(projectId) {
             this.errors[projectId] = '';
-            return axiosInstance.get(`/projects/${projectId}/tasks/`)
-                .then((response) => {
-                    if (!this.tasks[projectId]) {
-                        this.tasks[projectId] = {};
-                    }
-                    for (const [key, value] of Object.entries(response.data)) {
-                        this.tasks[projectId][value.id] = value;
-                        this.tasks[projectId][value.id].startDate = new Date(value.startDate);
-                        this.tasks[projectId][value.id].finishDate = new Date(value.finishDate);
-                    }
-                })
-                .catch((error) => {
-                    this.errors[projectId] = error.response.data.message;
-                });
+            const cache = useCacheStore();
+
+            return cache.request(
+                STORE_ID + ':' + projectId,
+                axiosInstance
+                    .get(`/projects/${projectId}/tasks/`)
+                    .then((response) => {
+                        if (!this.tasks[projectId]) {
+                            this.tasks[projectId] = {};
+                        }
+                        for (const [key, value] of Object.entries(response.data)) {
+                            this.tasks[projectId][value.id] = value;
+                            this.tasks[projectId][value.id].startDate = new Date(value.startDate);
+                            this.tasks[projectId][value.id].finishDate = new Date(value.finishDate);
+                        }
+                    })
+                    .catch((error) => {
+                        this.errors[projectId] = error.response.data.message;
+                        throw error;
+                    })
+            );
         }
     }
 });

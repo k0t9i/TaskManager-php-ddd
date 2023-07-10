@@ -1,8 +1,11 @@
 import {defineStore} from "pinia";
 import axiosInstance from "../helpers/axios";
+import {useCacheStore} from "./cache";
+
+const STORE_ID = 'projectRequests';
 
 export const useProjectRequestsStore = defineStore({
-    id: 'projectRequests',
+    id: STORE_ID,
     state: () => ({
         requests: {},
         errors: {},
@@ -28,19 +31,26 @@ export const useProjectRequestsStore = defineStore({
     actions: {
         async load(projectId) {
             this.errors[projectId] = '';
-            return axiosInstance.get(`/projects/${projectId}/requests/`)
-                .then((response) => {
-                    if (!this.requests[projectId]) {
-                        this.requests[projectId] = {};
-                    }
-                    for (const [key, value] of Object.entries(response.data)) {
-                        this.requests[projectId][value.id] = value;
-                        this.requests[projectId][value.id].changeDate = new Date(value.changeDate);
-                    }
-                })
-                .catch((error) => {
-                    this.errors[projectId] = error.response.data.message;
-                });
+            const cache = useCacheStore();
+
+            return cache.request(
+                STORE_ID + ':' + projectId,
+                axiosInstance
+                    .get(`/projects/${projectId}/requests/`)
+                    .then((response) => {
+                        if (!this.requests[projectId]) {
+                            this.requests[projectId] = {};
+                        }
+                        for (const [key, value] of Object.entries(response.data)) {
+                            this.requests[projectId][value.id] = value;
+                            this.requests[projectId][value.id].changeDate = new Date(value.changeDate);
+                        }
+                    })
+                    .catch((error) => {
+                        this.errors[projectId] = error.response.data.message;
+                        throw error;
+                    })
+            );
         },
         async confirm(projectId, id) {
             return this.changeStatus(projectId, id, 'confirm', 1);
