@@ -1,62 +1,39 @@
 <script setup>
 import FormSuccess from "./FormSuccess.vue";
 import FormError from "./FormError.vue";
-import {reactive, ref} from "vue";
+import {ref, toRef} from "vue";
 import LockableButton from "./LockableButton.vue";
-import axiosInstance from "../helpers/axios";
+import {useUserStore} from "../stores/user";
 
-const error = ref();
 const success = ref(false);
-const user = reactive({
-  firstname: '',
-  lastname: '',
-  password: '',
-  repeatPassword: ''
-});
-const isLocked = ref(false);
+const userStore = useUserStore();
+await userStore.load();
+const user = userStore.user;
 
 function onSubmit() {
-  error.value = '';
   success.value = false;
-  isLocked.value = true;
 
-  return axiosInstance
-      .patch('/users/', {
-        firstname: user.firstname,
-        lastname: user.lastname,
-        password: user.password,
-        repeatPassword: user.repeatPassword
-      })
-      .then(onSuccess)
-      .catch((e) => {
-        error.value = e.response.data.message;
-      })
-      .finally(() => {
-        isLocked.value = false;
-      });
+  return userStore.save()
+      .then(onSuccess);
 }
 
 function onSuccess(response) {
-  success.value = true;
-  user.password = '';
-  user.repeatPassword = '';
+  if (!userStore.error) {
+    success.value = true;
+    user.password = '';
+    user.repeatPassword = '';
+  }
 
   return response;
 }
-
-await axiosInstance.get('/users/').then((response) => {
-  user.firstname = response.data.firstname;
-  user.lastname = response.data.lastname;
-  return response;
-});
 </script>
 
 <template>
   <form @submit.prevent="onSubmit">
-    <fieldset class="row mt-4" :disabled="isLocked">
+    <fieldset class="row mt-4" :disabled="userStore.locked">
       <div class="col"></div>
       <div class="col-md-9">
-        <FormError :error="error" />
+        <FormError :error="userStore.error" />
         <FormSuccess v-if="success">
           Successfully saved.
         </FormSuccess>
@@ -77,7 +54,7 @@ await axiosInstance.get('/users/').then((response) => {
           <input type="password" name="repeatPassword" class="form-control" v-model="user.repeatPassword">
         </div>
         <div class="mb-3 text-end">
-          <LockableButton type="submit" class="btn btn-primary" :locked="isLocked">Save</LockableButton>
+          <LockableButton type="submit" class="btn btn-primary" :locked="userStore.locked">Save</LockableButton>
         </div>
       </div>
     </fieldset>

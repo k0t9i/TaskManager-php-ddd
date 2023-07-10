@@ -1,14 +1,12 @@
 <script setup>
-import {ref} from "vue";
-import axiosInstance from "../helpers/axios";
+import {useUserStore} from "../stores/user";
+import {toRef} from "vue";
 
-const email = ref();
-await axiosInstance.get('/users/').then((response) => {
-  email.value = response.data.email;
-  return response;
-});
+const userStore = useUserStore();
+await userStore.load();
+const user = userStore.user;
 </script>
 
 <template>
-  {{ email }}
+  {{ user.firstname }} {{ user.lastname }} ({{ user.email }})
 </template>
