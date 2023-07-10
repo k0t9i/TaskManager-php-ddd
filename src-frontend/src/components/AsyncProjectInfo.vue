@@ -21,7 +21,9 @@ async function onSubmit() {
   success.value = false;
   await projectStore.save(id)
       .then((result) => {
-        success.value = true;
+        if (!projectStore.error(id)) {
+          success.value = true;
+        }
         return result;
       })
 }
