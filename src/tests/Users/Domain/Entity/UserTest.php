@@ -112,8 +112,8 @@ class UserTest extends TestCase
         ], $events[0]->toPrimitives());
 
         $user->changeProfile(
-            null,
-            null,
+            $newProfile->firstname,
+            $newProfile->lastname,
             null,
         );
         $events = $user->releaseEvents();
@@ -126,19 +126,6 @@ class UserTest extends TestCase
         );
         $events = $user->releaseEvents();
         $this->assertCount(0, $events);
-
-        $user->changeProfile(
-            $profile->firstname,
-            null,
-            $newProfile->password,
-        );
-        $events = $user->releaseEvents();
-        $this->assertCount(1, $events);
-        $this->assertEquals([
-            'firstname' => $profile->firstname->value,
-            'lastname' => $newProfile->lastname->value,
-            'password' => $newProfile->password->value,
-        ], $events[0]->toPrimitives());
     }
 
     public function testEquals(): void

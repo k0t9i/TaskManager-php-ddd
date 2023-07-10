@@ -25,11 +25,8 @@ use TaskManager\Projects\Domain\ValueObject\ActiveProjectStatus;
 use TaskManager\Projects\Domain\ValueObject\ClosedProjectStatus;
 use TaskManager\Projects\Domain\ValueObject\ConfirmedRequestStatus;
 use TaskManager\Projects\Domain\ValueObject\Participant;
-use TaskManager\Projects\Domain\ValueObject\ProjectDescription;
-use TaskManager\Projects\Domain\ValueObject\ProjectFinishDate;
 use TaskManager\Projects\Domain\ValueObject\ProjectId;
 use TaskManager\Projects\Domain\ValueObject\ProjectInformation;
-use TaskManager\Projects\Domain\ValueObject\ProjectName;
 use TaskManager\Projects\Domain\ValueObject\ProjectOwner;
 use TaskManager\Projects\Domain\ValueObject\ProjectStatus;
 use TaskManager\Projects\Domain\ValueObject\ProjectTask;
@@ -37,14 +34,9 @@ use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
 use TaskManager\Projects\Domain\ValueObject\RejectedRequestStatus;
 use TaskManager\Projects\Domain\ValueObject\RequestId;
 use TaskManager\Projects\Domain\ValueObject\RequestStatus;
-use TaskManager\Projects\Domain\ValueObject\TaskBrief;
-use TaskManager\Projects\Domain\ValueObject\TaskDescription;
-use TaskManager\Projects\Domain\ValueObject\TaskFinishDate;
 use TaskManager\Projects\Domain\ValueObject\TaskId;
 use TaskManager\Projects\Domain\ValueObject\TaskInformation;
-use TaskManager\Projects\Domain\ValueObject\TaskName;
 use TaskManager\Projects\Domain\ValueObject\TaskOwner;
-use TaskManager\Projects\Domain\ValueObject\TaskStartDate;
 use TaskManager\Shared\Domain\Aggregate\AggregateRoot;
 use TaskManager\Shared\Domain\Equatable;
 
@@ -91,19 +83,11 @@ final class Project extends AggregateRoot
     }
 
     public function changeInformation(
-        ?ProjectName $name,
-        ?ProjectDescription $description,
-        ?ProjectFinishDate $finishDate,
+        ProjectInformation $information,
         ProjectUserId $currentUserId
     ): void {
         $this->status->ensureAllowsModification();
         $this->owner->ensureUserIsOwner($currentUserId);
-
-        $information = new ProjectInformation(
-            $name ?? $this->information->name,
-            $description ?? $this->information->description,
-            $finishDate ?? $this->information->finishDate,
-        );
 
         if (!$this->information->equals($information)) {
             if (!$information->finishDate->equals($this->information->finishDate)) {
@@ -254,29 +238,18 @@ final class Project extends AggregateRoot
 
     public function changeTaskInformation(
         Task $task,
-        ?TaskName $name,
-        ?TaskBrief $brief,
-        ?TaskDescription $description,
-        ?TaskStartDate $startDate,
-        ?TaskFinishDate $finishDate,
+        TaskInformation $information,
         ProjectUserId $currentUserId
     ): void {
         $this->status->ensureAllowsModification();
         $this->tasks->ensureProjectTaskExists($task->getId());
         $this->information->ensureIsFinishDateGreaterThanTaskDates(
-            $startDate,
-            $finishDate
+            $information->startDate,
+            $information->finishDate
         );
 
         try {
-            $task->changeInformation(
-                $name,
-                $brief,
-                $description,
-                $startDate,
-                $finishDate,
-                $currentUserId
-            );
+            $task->changeInformation($information, $currentUserId);
         } catch (UserIsNotTaskOwnerException $e) {
             if (!$this->owner->userIsOwner($currentUserId)) {
                 throw $e;

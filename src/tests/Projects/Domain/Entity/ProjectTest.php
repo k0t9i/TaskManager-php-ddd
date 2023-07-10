@@ -115,12 +115,7 @@ class ProjectTest extends TestCase
             ))
             ->build();
 
-        $project->changeInformation(
-            $newInformation->name,
-            $newInformation->description,
-            $newInformation->finishDate,
-            $builder->getOwner()->id
-        );
+        $project->changeInformation($newInformation, $builder->getOwner()->id);
 
         $events = $project->releaseEvents();
         $this->assertCount(2, $events);
@@ -140,37 +135,9 @@ class ProjectTest extends TestCase
             'finishDate' => $newInformation->finishDate->getValue(),
         ], $events[1]->toPrimitives());
 
-        $project->changeInformation(
-            null,
-            null,
-            null,
-            $builder->getOwner()->id
-        );
+        $project->changeInformation($newInformation, $builder->getOwner()->id);
         $events = $project->releaseEvents();
         $this->assertCount(0, $events);
-
-        $project->changeInformation(
-            $newInformation->name,
-            $newInformation->description,
-            $newInformation->finishDate,
-            $builder->getOwner()->id
-        );
-        $events = $project->releaseEvents();
-        $this->assertCount(0, $events);
-
-        $project->changeInformation(
-            $builder->getName(),
-            null,
-            $newInformation->finishDate,
-            $builder->getOwner()->id
-        );
-        $events = $project->releaseEvents();
-        $this->assertCount(1, $events);
-        $this->assertEquals([
-            'name' => $builder->getName()->value,
-            'description' => $newInformation->description->value,
-            'finishDate' => $newInformation->finishDate->getValue(),
-        ], $events[0]->toPrimitives());
     }
 
     public function testChangeInformationByNonOwner(): void
@@ -186,12 +153,7 @@ class ProjectTest extends TestCase
 
         $this->expectUserIsNotProjectOwnerException($otherUserId);
 
-        $project->changeInformation(
-            $newInformation->name,
-            $newInformation->description,
-            $newInformation->finishDate,
-            $otherUserId
-        );
+        $project->changeInformation($newInformation, $otherUserId);
     }
 
     public function testChangeInformationInClosedProject(): void
@@ -208,12 +170,7 @@ class ProjectTest extends TestCase
 
         $this->expectProjectModificationIsNotAllowedException();
 
-        $project->changeInformation(
-            $newInformation->name,
-            $newInformation->description,
-            $newInformation->finishDate,
-            $builder->getOwner()->id
-        );
+        $project->changeInformation($newInformation, $builder->getOwner()->id);
     }
 
     public function testCloseProject(): void
@@ -1057,11 +1014,7 @@ class ProjectTest extends TestCase
 
         $project->changeTaskInformation(
             $task,
-            $newTaskInfoBuilder->getName(),
-            $newTaskInfoBuilder->getBrief(),
-            $newTaskInfoBuilder->getDescription(),
-            $newTaskInfoBuilder->getStartDate(),
-            $newTaskInfoBuilder->getFinishDate(),
+            $newTaskInfoBuilder->getInformation(),
             $builder->getOwner()->id
         );
         $events = $task->releaseEvents();
@@ -1103,11 +1056,7 @@ class ProjectTest extends TestCase
 
         $project->changeTaskInformation(
             $task,
-            $newTaskInfoBuilder->getName(),
-            $newTaskInfoBuilder->getBrief(),
-            $newTaskInfoBuilder->getDescription(),
-            $newTaskInfoBuilder->getStartDate(),
-            $newTaskInfoBuilder->getFinishDate(),
+            $newTaskInfoBuilder->getInformation(),
             $builder->getOwner()->id
         );
     }
@@ -1135,11 +1084,7 @@ class ProjectTest extends TestCase
 
         $project->changeTaskInformation(
             $task,
-            $newTaskInfoBuilder->getName(),
-            $newTaskInfoBuilder->getBrief(),
-            $newTaskInfoBuilder->getDescription(),
-            $newTaskInfoBuilder->getStartDate(),
-            $newTaskInfoBuilder->getFinishDate(),
+            $newTaskInfoBuilder->getInformation(),
             $builder->getOwner()->id
         );
     }
@@ -1170,11 +1115,7 @@ class ProjectTest extends TestCase
 
         $project->changeTaskInformation(
             $task,
-            $newTaskInfoBuilder->getName(),
-            $newTaskInfoBuilder->getBrief(),
-            $newTaskInfoBuilder->getDescription(),
-            $newTaskInfoBuilder->getStartDate(),
-            $newTaskInfoBuilder->getFinishDate(),
+            $newTaskInfoBuilder->getInformation(),
             $builder->getOwner()->id
         );
     }
@@ -1205,11 +1146,7 @@ class ProjectTest extends TestCase
 
         $project->changeTaskInformation(
             $task,
-            $newTaskInfoBuilder->getName(),
-            $newTaskInfoBuilder->getBrief(),
-            $newTaskInfoBuilder->getDescription(),
-            $newTaskInfoBuilder->getStartDate(),
-            $newTaskInfoBuilder->getFinishDate(),
+            $newTaskInfoBuilder->getInformation(),
             $builder->getOwner()->id
         );
     }
@@ -1238,11 +1175,7 @@ class ProjectTest extends TestCase
 
         $project->changeTaskInformation(
             $task,
-            $newTaskInfoBuilder->getName(),
-            $newTaskInfoBuilder->getBrief(),
-            $newTaskInfoBuilder->getDescription(),
-            $newTaskInfoBuilder->getStartDate(),
-            $newTaskInfoBuilder->getFinishDate(),
+            $newTaskInfoBuilder->getInformation(),
             $otherUserId
         );
     }

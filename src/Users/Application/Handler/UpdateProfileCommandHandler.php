@@ -43,8 +43,8 @@ final readonly class UpdateProfileCommandHandler implements CommandHandlerInterf
             new UserPassword($this->passwordHasher->hashPassword($command->password)) :
             null;
         $user->changeProfile(
-            $command->firstname ? new UserFirstname($command->firstname) : null,
-            $command->lastname ? new UserLastname($command->lastname) : null,
+            new UserFirstname($command->firstname),
+            new UserLastname($command->lastname),
             $hashedPassword
         );
 

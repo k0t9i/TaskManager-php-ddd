@@ -13,6 +13,7 @@ use TaskManager\Projects\Domain\ValueObject\TaskBrief;
 use TaskManager\Projects\Domain\ValueObject\TaskDescription;
 use TaskManager\Projects\Domain\ValueObject\TaskFinishDate;
 use TaskManager\Projects\Domain\ValueObject\TaskId;
+use TaskManager\Projects\Domain\ValueObject\TaskInformation;
 use TaskManager\Projects\Domain\ValueObject\TaskName;
 use TaskManager\Projects\Domain\ValueObject\TaskStartDate;
 use TaskManager\Shared\Application\Bus\Command\CommandHandlerInterface;
@@ -37,11 +38,13 @@ final readonly class ChangeTaskInformationCommandHandler implements CommandHandl
 
         $project->changeTaskInformation(
             $task,
-            $command->name ? new TaskName($command->name) : null,
-            $command->name ? new TaskBrief($command->brief) : null,
-            $command->description ? new TaskDescription($command->description) : null,
-            $command->finishDate ? new TaskStartDate($command->startDate) : null,
-            $command->finishDate ? new TaskFinishDate($command->finishDate) : null,
+            new TaskInformation(
+                new TaskName($command->name),
+                new TaskBrief($command->brief),
+                new TaskDescription($command->description),
+                new TaskStartDate($command->startDate),
+                new TaskFinishDate($command->finishDate),
+            ),
             $currentUser->id
         );
 

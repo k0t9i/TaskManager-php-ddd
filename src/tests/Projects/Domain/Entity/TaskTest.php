@@ -94,11 +94,7 @@ class TaskTest extends TestCase
             ->build();
 
         $task->changeInformation(
-            $newInfoBuilder->getName(),
-            $newInfoBuilder->getBrief(),
-            $newInfoBuilder->getDescription(),
-            $newInfoBuilder->getStartDate(),
-            $newInfoBuilder->getFinishDate(),
+            $newInfoBuilder->getInformation(),
             $builder->getOwner()->id
         );
         $events = $task->releaseEvents();
@@ -116,50 +112,12 @@ class TaskTest extends TestCase
         ], $events[0]->toPrimitives());
 
         $task->changeInformation(
-            null,
-            null,
-            null,
-            null,
-            null,
+            $newInfoBuilder->getInformation(),
             $builder->getOwner()->id
         );
         $events = $task->releaseEvents();
 
         $this->assertCount(0, $events);
-
-        $task->changeInformation(
-            $newInfoBuilder->getName(),
-            $newInfoBuilder->getBrief(),
-            $newInfoBuilder->getDescription(),
-            $newInfoBuilder->getStartDate(),
-            $newInfoBuilder->getFinishDate(),
-            $builder->getOwner()->id
-        );
-        $events = $task->releaseEvents();
-
-        $this->assertCount(0, $events);
-
-        $task->changeInformation(
-            $builder->getName(),
-            null,
-            $builder->getDescription(),
-            $newInfoBuilder->getStartDate(),
-            null,
-            $builder->getOwner()->id
-        );
-        $events = $task->releaseEvents();
-
-        $this->assertCount(1, $events);
-        $this->assertInstanceOf(TaskInformationWasChangedEvent::class, $events[0]);
-        $this->assertEquals($builder->getId()->value, $events[0]->getAggregateId());
-        $this->assertEquals($builder->getOwner()->id->value, $events[0]->getPerformerId());
-        $this->assertEquals([
-            'name' => $builder->getName(),
-            'brief' => $newInfoBuilder->getBrief(),
-            'description' => $builder->getDescription(),
-            'startDate' => $newInfoBuilder->getStartDate(),
-            'finishDate' => $newInfoBuilder->getFinishDate(),
-        ], $events[0]->toPrimitives());
     }
 
     public function testChangeInformationInClosedTask(): void
@@ -177,11 +135,7 @@ class TaskTest extends TestCase
         $this->expectTaskModificationIsNotAllowedException();
 
         $task->changeInformation(
-            $newInfoBuilder->getName(),
-            $newInfoBuilder->getBrief(),
-            $newInfoBuilder->getDescription(),
-            $newInfoBuilder->getStartDate(),
-            $newInfoBuilder->getFinishDate(),
+            $newInfoBuilder->getInformation(),
             $builder->getOwner()->id
         );
     }
@@ -202,11 +156,7 @@ class TaskTest extends TestCase
         );
 
         $task->changeInformation(
-            $newInfoBuilder->getName(),
-            $newInfoBuilder->getBrief(),
-            $newInfoBuilder->getDescription(),
-            $newInfoBuilder->getStartDate(),
-            $newInfoBuilder->getFinishDate(),
+            $newInfoBuilder->getInformation(),
             $builder->getOwner()->id
         );
     }
@@ -225,11 +175,7 @@ class TaskTest extends TestCase
         $this->expectUserIsNotTaskOwnerException($otherUserId->value);
 
         $task->changeInformation(
-            $newInfoBuilder->getName(),
-            $newInfoBuilder->getBrief(),
-            $newInfoBuilder->getDescription(),
-            $newInfoBuilder->getStartDate(),
-            $newInfoBuilder->getFinishDate(),
+            $newInfoBuilder->getInformation(),
             $otherUserId
         );
     }

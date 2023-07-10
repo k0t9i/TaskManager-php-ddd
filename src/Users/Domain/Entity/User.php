@@ -40,11 +40,11 @@ final class User extends AggregateRoot
         return $result;
     }
 
-    public function changeProfile(?UserFirstname $firstname, ?UserLastname $lastname, ?UserPassword $password): void
+    public function changeProfile(UserFirstname $firstname, UserLastname $lastname, ?UserPassword $password): void
     {
         $profile = new UserProfile(
-            $firstname ?? $this->profile->firstname,
-            $lastname ?? $this->profile->lastname,
+            $firstname,
+            $lastname,
             $password ?? $this->profile->password,
         );
 

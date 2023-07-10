@@ -10,9 +10,9 @@ final readonly class ChangeProjectInformationCommand implements CommandInterface
 {
     public function __construct(
         public string $id,
-        public ?string $name,
-        public ?string $description,
-        public ?string $finishDate
+        public string $name,
+        public string $description,
+        public string $finishDate
     ) {
     }
 }
