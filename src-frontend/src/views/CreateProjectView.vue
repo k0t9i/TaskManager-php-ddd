@@ -1,45 +1,38 @@
 <script setup>
 import FormError from "../components/FormError.vue";
 import FormSuccess from "../components/FormSuccess.vue";
-import Datepicker from "vue3-datepicker";
 import LockableButton from "../components/LockableButton.vue";
 import {reactive, ref} from "vue";
-import axiosInstance from "../helpers/axios";
 import CommonProjectFormFields from "../components/CommonProjectFormFields.vue";
+import {useUserProjectsStore} from "../stores/userProjects";
 
-const error = ref();
 const projectId = ref();
 const project = reactive({
   name: '',
   description: '',
   finishDate: null
 });
+const userProjectsStore = useUserProjectsStore();
 const isLocked = ref(false);
 
 function onSubmit() {
-  error.value = '';
   projectId.value = null;
   isLocked.value = true;
 
-  return axiosInstance
-      .post('/projects/', project)
-      .then(onSuccess)
-      .catch((e) => {
-        error.value = e.response.data.message;
+  return userProjectsStore.create(project)
+      .then((response) => {
+        if (!userProjectsStore.error) {
+          projectId.value = project.id;
+          project.name = '';
+          project.description = '';
+          project.finishDate = null;
+        }
+
+        return response;
       })
       .finally(() => {
         isLocked.value = false;
       });
-}
-
-function onSuccess(response) {
-  projectId.value = response.data.id;
-  project.name = '';
-  project.description = '';
-  project.finishDate = null;
-  project.status = 1;
-
-  return response;
 }
 </script>
 
@@ -51,7 +44,7 @@ function onSuccess(response) {
         <div class="col">
         </div>
         <div class="col-md-9">
-          <FormError :error="error" />
+          <FormError :error="userProjectsStore.error" />
           <FormSuccess v-if="projectId">
             Successfully saved. <RouterLink :to="{name: 'project', params: { id: projectId }}">View</RouterLink> this project info.
           </FormSuccess>

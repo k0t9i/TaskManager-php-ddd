@@ -1,10 +1,11 @@
 <script setup>
-import {reactive} from "vue";
-import axiosInstance from "../helpers/axios";
 import ProjectStatus from "./ProjectStatus.vue";
 import Datetime from "./Datetime.vue";
 import FormError from "./FormError.vue";
+import {useUserProjectsStore} from "../stores/userProjects";
 
+const userProjectsStore = useUserProjectsStore();
+await userProjectsStore.load();
 /**
  * @type {Object<{
  * id: string,
@@ -18,20 +19,11 @@ import FormError from "./FormError.vue";
  * participantsCount: number
  * }>}
  */
-const projects = reactive({});
-
-await axiosInstance.get('/users/projects/')
-    .then((response) => {
-      for (const [key, value] of Object.entries(response.data)) {
-        projects[value.id] = value;
-        projects[value.id].finishDate = new Date(value.finishDate);
-      }
-      return response;
-    });
+const projects = userProjectsStore.projects;
 </script>
 
 <template>
-  <FormError :error="error" />
+  <FormError :error="userProjectsStore.error" />
   <table class="table">
     <thead>
     <tr>
