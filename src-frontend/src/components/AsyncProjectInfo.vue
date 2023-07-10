@@ -8,13 +8,17 @@ import ProjectStatus from "../components/ProjectStatus.vue";
 import {useProjectStore} from "../stores/project";
 import {useRoute} from "vue-router";
 import CommonProjectFormFields from "./CommonProjectFormFields.vue";
+import axiosInstance from "../helpers/axios";
+import {useTasksStore} from "../stores/tasks";
 
 const route = useRoute();
 const id = route.params.id;
 const success = ref(false);
 const projectStore = useProjectStore();
+const tasksStore = useTasksStore();
 
 await projectStore.load(id);
+await tasksStore.load(id);
 const project = projectStore.project(id);
 
 async function onSubmit() {

@@ -3,17 +3,38 @@ import {useRoute} from "vue-router";
 import {useProjectStore} from "../stores/project";
 import {useProjectRequestsStore} from "../stores/projectRequests";
 import {useTasksStore} from "../stores/tasks";
+import {ref} from "vue";
+import axiosInstance from "../helpers/axios";
+import LockableButton from "./LockableButton.vue";
+import router from "../router";
 
 const route = useRoute();
 const projectStore = useProjectStore();
 const requestsStore = useProjectRequestsStore();
 const tasksStore = useTasksStore();
 const id = route.params.id;
+const isLeaveLocked = ref(false);
+const error = ref('');
 
 await projectStore.load(id);
 await requestsStore.load(id);
 await tasksStore.load(id);
 const project = projectStore.createEmpty(id);
+
+async function onLeave(id) {
+  error.value = '';
+  isLeaveLocked.value = true;
+  await axiosInstance.patch(`/projects/${id}/leave/`)
+      .then((response) => {
+        return router.push({name: 'user_projects'});
+      })
+      .catch((e) => {
+        error.value = e.response.data.message;
+      })
+      .finally(() => {
+        isLeaveLocked.value = false;
+      });
+}
 </script>
 
 <template>
@@ -32,6 +53,14 @@ const project = projectStore.createEmpty(id);
             <RouterLink :to="{name: 'project_tasks'}" class="nav-link">Tasks ({{ tasksStore.countAll(id) }})</RouterLink>
           </li>
         </ul>
+        <LockableButton
+            @click.prevent="onLeave(project.id)"
+            v-if="project.id && !project.isOwner && project.status !== 0 && tasksStore.countAll(project.id) === 0"
+            class="btn btn-outline-danger btn-sm m-3"
+            :locked="isLeaveLocked"
+        >
+          Leave the project
+        </LockableButton>
       </div>
       <div class="col-md-9">
         <RouterView />

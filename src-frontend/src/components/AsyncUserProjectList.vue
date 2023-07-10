@@ -1,5 +1,5 @@
 <script setup>
-import {reactive, ref} from "vue";
+import {reactive} from "vue";
 import axiosInstance from "../helpers/axios";
 import ProjectStatus from "./ProjectStatus.vue";
 import Datetime from "./Datetime.vue";
@@ -19,8 +19,6 @@ import FormError from "./FormError.vue";
  * }>}
  */
 const projects = reactive({});
-const isLeaveLocked = ref({});
-const error = ref('');
 
 await axiosInstance.get('/users/projects/')
     .then((response) => {
@@ -30,22 +28,6 @@ await axiosInstance.get('/users/projects/')
       }
       return response;
     });
-
-async function onLeave(projectId) {
-  error.value = '';
-  isLeaveLocked.value[projectId] = true;
-  await axiosInstance.patch(`/projects/${projectId}/leave/`)
-      .then((response) => {
-        delete projects[projectId];
-        return response;
-      })
-      .catch((e) => {
-        error.value = e.response.data.message;
-      })
-      .finally(() => {
-        isLeaveLocked.value[projectId] = false;
-      });
-}
 </script>
 
 <template>
@@ -60,7 +42,6 @@ async function onLeave(projectId) {
       <th scope="col">Status</th>
       <th scope="col">Tasks count</th>
       <th scope="col">Participants count</th>
-      <th scope="col"></th>
     </tr>
     </thead>
     <tbody>
@@ -74,12 +55,6 @@ async function onLeave(projectId) {
       <td><ProjectStatus :status="project.status" /></td>
       <td>{{ project.tasksCount }}</td>
       <td>{{ project.participantsCount }}</td>
-      <td>
-        <span v-if="isLeaveLocked[project.id]"><div class="spinner-border spinner-border-sm text-dark mx-1" role="status" />Loading...</span>
-        <span v-else>
-            <a href="#" @click.prevent="onLeave(project.id)" v-if="!project.isOwner && project.status !== 0">Leave</a>
-          </span>
-      </td>
     </tr>
     </tbody>
   </table>
