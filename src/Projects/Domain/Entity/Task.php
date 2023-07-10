@@ -14,15 +14,10 @@ use TaskManager\Projects\Domain\ValueObject\ActiveTaskStatus;
 use TaskManager\Projects\Domain\ValueObject\ClosedTaskStatus;
 use TaskManager\Projects\Domain\ValueObject\ProjectId;
 use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
-use TaskManager\Projects\Domain\ValueObject\TaskBrief;
-use TaskManager\Projects\Domain\ValueObject\TaskDescription;
-use TaskManager\Projects\Domain\ValueObject\TaskFinishDate;
 use TaskManager\Projects\Domain\ValueObject\TaskId;
 use TaskManager\Projects\Domain\ValueObject\TaskInformation;
 use TaskManager\Projects\Domain\ValueObject\TaskLink;
-use TaskManager\Projects\Domain\ValueObject\TaskName;
 use TaskManager\Projects\Domain\ValueObject\TaskOwner;
-use TaskManager\Projects\Domain\ValueObject\TaskStartDate;
 use TaskManager\Projects\Domain\ValueObject\TaskStatus;
 use TaskManager\Shared\Domain\Aggregate\AggregateRoot;
 use TaskManager\Shared\Domain\Equatable;
@@ -78,22 +73,10 @@ final class Task extends AggregateRoot
     }
 
     public function changeInformation(
-        ?TaskName $name,
-        ?TaskBrief $brief,
-        ?TaskDescription $description,
-        ?TaskStartDate $startDate,
-        ?TaskFinishDate $finishDate,
+        TaskInformation $information,
         ProjectUserId $currentUserId
     ): void {
         $this->status->ensureAllowsModification();
-
-        $information = new TaskInformation(
-            $name ?? $this->information->name,
-            $brief ?? $this->information->brief,
-            $description ?? $this->information->description,
-            $startDate ?? $this->information->startDate,
-            $finishDate ?? $this->information->finishDate,
-        );
 
         $information->ensureFinishDateGreaterOrEqualStartDate();
 

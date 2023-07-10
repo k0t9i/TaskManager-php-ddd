@@ -11,6 +11,7 @@ use TaskManager\Projects\Domain\Repository\ProjectRepositoryInterface;
 use TaskManager\Projects\Domain\ValueObject\ProjectDescription;
 use TaskManager\Projects\Domain\ValueObject\ProjectFinishDate;
 use TaskManager\Projects\Domain\ValueObject\ProjectId;
+use TaskManager\Projects\Domain\ValueObject\ProjectInformation;
 use TaskManager\Projects\Domain\ValueObject\ProjectName;
 use TaskManager\Shared\Application\Bus\Command\CommandHandlerInterface;
 use TaskManager\Shared\Application\Bus\Event\IntegrationEventBusInterface;
@@ -31,9 +32,11 @@ final readonly class ChangeProjectInformationCommandHandler implements CommandHa
         $project = $this->finder->find(new ProjectId($command->id));
 
         $project->changeInformation(
-            $command->name ? new ProjectName($command->name) : null,
-            $command->description ? new ProjectDescription($command->description) : null,
-            $command->finishDate ? new ProjectFinishDate($command->finishDate) : null,
+            new ProjectInformation(
+                new ProjectName($command->name),
+                new ProjectDescription($command->description),
+                new ProjectFinishDate($command->finishDate),
+            ),
             $currentUser->id
         );
 
