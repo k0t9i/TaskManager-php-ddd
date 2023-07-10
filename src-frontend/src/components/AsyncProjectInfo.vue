@@ -7,6 +7,7 @@ import Datepicker from 'vue3-datepicker';
 import ProjectStatus from "../components/ProjectStatus.vue";
 import {useProjectStore} from "../stores/project";
 import {useRoute} from "vue-router";
+import CommonProjectFormFields from "./CommonProjectFormFields.vue";
 
 const route = useRoute();
 const id = route.params.id;
@@ -47,18 +48,7 @@ async function toggleStatus() {
           </span>
         </div>
       </div>
-      <div class="mb-3">
-        <label class="form-label">Name</label>
-        <input type="text" name="name" required="required" class="form-control" v-model="project.name">
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Description</label>
-        <textarea name="description" class="form-control" rows="10" v-model="project.description"></textarea>
-      </div>
-      <div class="mb-3">
-        <label class="form-label">Finish Date</label>
-        <Datepicker class="form-control" v-model="project.finishDate" />
-      </div>
+      <CommonProjectFormFields :project="project" />
       <div class="mb-3 text-end" v-if="project.isOwner">
         <LockableButton type="submit" class="btn btn-primary" :locked="projectStore.isLocked(id)">Save</LockableButton>
       </div>

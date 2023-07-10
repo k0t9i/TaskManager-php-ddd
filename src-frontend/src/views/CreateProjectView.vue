@@ -5,6 +5,7 @@ import Datepicker from "vue3-datepicker";
 import LockableButton from "../components/LockableButton.vue";
 import {reactive, ref} from "vue";
 import axiosInstance from "../helpers/axios";
+import CommonProjectFormFields from "../components/CommonProjectFormFields.vue";
 
 const error = ref();
 const projectId = ref();
@@ -54,18 +55,7 @@ function onSuccess(response) {
           <FormSuccess v-if="projectId">
             Successfully saved. <RouterLink :to="{name: 'project', params: { id: projectId }}">View</RouterLink> this project info.
           </FormSuccess>
-          <div class="mb-3">
-            <label class="form-label">Name</label>
-            <input type="text" name="name" required="required" class="form-control" v-model="project.name">
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Description</label>
-            <textarea name="description" class="form-control" rows="10" v-model="project.description"></textarea>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Finish Date</label>
-            <Datepicker class="form-control" v-model="project.finishDate" />
-          </div>
+          <CommonProjectFormFields :project="project" />
           <div class="mb-3 text-end">
             <LockableButton type="submit" class="btn btn-primary" :locked="isLocked">Save</LockableButton>
           </div>

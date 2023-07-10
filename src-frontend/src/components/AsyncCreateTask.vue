@@ -7,6 +7,7 @@ import {reactive, ref} from "vue";
 import {useTasksStore} from "../stores/tasks";
 import {useRoute} from "vue-router";
 import {useProjectStore} from "../stores/project";
+import CommonTaskFormFields from "./CommonTaskFormFields.vue";
 
 const route = useRoute();
 const id = route.params.id;
@@ -58,26 +59,7 @@ async function onSubmit() {
         <FormSuccess v-if="taskId">
           Successfully saved. <RouterLink :to="{name: 'edit_task', params: { id: id, taskId: taskId }}">Edit</RouterLink> this task.
         </FormSuccess>
-        <div class="mb-3">
-          <label class="form-label">Name</label>
-          <input type="text" name="name" required="required" class="form-control" v-model="task.name">
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Brief info</label>
-          <textarea name="brief" class="form-control" rows="5" v-model="task.brief"></textarea>
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Description</label>
-          <textarea name="description" class="form-control" rows="10" v-model="task.description"></textarea>
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Start Date</label>
-          <Datepicker class="form-control" v-model="task.startDate" :upper-limit="task.finishDate && task.finishDate < project.finishDate ? task.finishDate : project.finishDate"  />
-        </div>
-        <div class="mb-3">
-          <label class="form-label">Finish Date</label>
-          <Datepicker class="form-control" v-model="task.finishDate" :upper-limit="project.finishDate" />
-        </div>
+        <CommonTaskFormFields :project="project" :task="task" />
         <div class="mb-3 text-end">
           <LockableButton type="submit" class="btn btn-primary" :locked="isLocked">Save</LockableButton>
         </div>
