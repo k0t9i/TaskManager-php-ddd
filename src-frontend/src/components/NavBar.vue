@@ -6,7 +6,7 @@ const authStore = useAuthStore();
 </script>
 
 <template>
-  <nav class="navbar navbar-dark bg-dark px-4 navbar-expand-md">
+  <nav class="navbar navbar-dark bg-dark px-4 navbar-expand-md sticky-top">
     <div class="container">
       <RouterLink class="navbar-brand" :to="{name: 'main'}">Task Manager</RouterLink>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navBar" aria-controls="navBar" aria-expanded="false" aria-label="Toggle navigation">
