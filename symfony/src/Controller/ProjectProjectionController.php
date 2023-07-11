@@ -12,10 +12,12 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\AsController;
 use Symfony\Component\Routing\Annotation\Route;
 use TaskManager\Projections\Application\Query\ProjectListQuery;
+use TaskManager\Projections\Application\Query\ProjectParticipantQuery;
 use TaskManager\Projections\Application\Query\ProjectQuery;
 use TaskManager\Projections\Application\Query\ProjectRequestQuery;
 use TaskManager\Projections\Application\Query\TaskListQuery;
 use TaskManager\Projections\Infrastructure\DTO\ProjectListResponseDTO;
+use TaskManager\Projections\Infrastructure\DTO\ProjectParticipantResponseDTO;
 use TaskManager\Projections\Infrastructure\DTO\ProjectRequestResponseDTO;
 use TaskManager\Projections\Infrastructure\DTO\ProjectResponseDTO;
 use TaskManager\Projections\Infrastructure\DTO\TaskListResponseDTO;
@@ -159,5 +161,40 @@ final readonly class ProjectProjectionController
         $projects = $this->queryBus->dispatch(new TaskListQuery($id));
 
         return new JsonResponse(TaskListResponseDTO::createFromProjections($projects));
+    }
+
+    #[Route('/{id}/participants/', name: 'getAllParticipants', methods: ['GET'])]
+    #[OA\Get(
+        description: 'Get all project participants',
+        tags: [
+            'project',
+        ],
+        parameters: [
+            new OA\Parameter(
+                ref: '#/components/parameters/projectId'
+            ),
+        ],
+        responses: [
+            new OA\Response(
+                response: '200',
+                description: 'List of project participants',
+                content: new OA\JsonContent(
+                    type: 'array',
+                    items: new OA\Items(
+                        ref: new Model(type: ProjectParticipantResponseDTO::class)
+                    )
+                )
+            ),
+            new OA\Response(ref: '#components/responses/generic401', response: '401'),
+            new OA\Response(ref: '#components/responses/generic403', response: '403'),
+            new OA\Response(ref: '#components/responses/generic404', response: '404'),
+        ]
+    )]
+    #[Security(name: 'Bearer')]
+    public function getAllParticipants(string $id): JsonResponse
+    {
+        $participants = $this->queryBus->dispatch(new ProjectParticipantQuery($id));
+
+        return new JsonResponse(ProjectParticipantResponseDTO::createFromProjections($participants));
     }
 }
