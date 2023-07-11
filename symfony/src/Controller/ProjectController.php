@@ -204,8 +204,8 @@ final readonly class ProjectController
         return new JsonResponse();
     }
 
-    #[Route('/{id}/remove-participant/{participantId}/', name: 'removeParticipant', methods: ['PATCH'])]
-    #[OA\Patch(
+    #[Route('/{id}/participants/{participantId}/', name: 'removeParticipant', methods: ['DELETE'])]
+    #[OA\Delete(
         description: 'Remove project participant',
         tags: [
             'project',
