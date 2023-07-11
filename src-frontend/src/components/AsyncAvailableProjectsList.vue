@@ -1,11 +1,12 @@
 <script setup>
-import axiosInstance from "../helpers/axios";
-import {reactive, ref} from "vue";
 import ProjectStatus from "./ProjectStatus.vue";
 import RequestStatus from "./RequestStatus.vue";
 import Datetime from "./Datetime.vue";
 import FormError from "./FormError.vue";
+import {useAvailableProjectsStore} from "../stores/availableProjects";
 
+const projectsStore = useAvailableProjectsStore();
+await projectsStore.load();
 /**
  * @type {Object<{
  * id: string,
@@ -22,38 +23,15 @@ import FormError from "./FormError.vue";
  * lastRequestStatus: number
  * }>}
  */
-const projects = reactive({});
-const isJoinLocked = ref({});
-const error = ref('');
-
-await axiosInstance.get('/projects/')
-    .then((response) => {
-      for (const [key, value] of Object.entries(response.data)) {
-        projects[value.id] = value;
-        projects[value.id].finishDate = new Date(value.finishDate);
-      }
-      return response;
-    });
+const projects = projectsStore.projects;
 
 async function onJoin(projectId) {
-  error.value = '';
-  isJoinLocked.value[projectId] = true;
-  await axiosInstance.post(`/projects/${projectId}/requests/`)
-      .then((response) => {
-        projects[projectId].lastRequestStatus = 0;
-        return response;
-      })
-      .catch((e) => {
-        error.value = e.response.data.message;
-      })
-      .finally(() => {
-        isJoinLocked.value[projectId] = false;
-      });
+  await projectsStore.join(projectId);
 }
 </script>
 
 <template>
-  <FormError :error="error" />
+  <FormError :error="projectsStore.error" />
   <table class="table">
     <thead>
       <tr>
@@ -82,7 +60,7 @@ async function onJoin(projectId) {
         <td>{{ project.participantsCount }}</td>
         <td><RequestStatus :status="project.lastRequestStatus" /></td>
         <td>
-          <span v-if="isJoinLocked[project.id]"><div class="spinner-border spinner-border-sm text-dark mx-1" role="status" />Loading...</span>
+          <span v-if="projectsStore.isLocked(project.id)"><div class="spinner-border spinner-border-sm text-dark mx-1" role="status" />Loading...</span>
           <span v-else>
             <a href="#" @click.prevent="onJoin(project.id)" v-if="!project.isOwner && ![0, 1].includes(project.lastRequestStatus) && project.status === 1">Join</a>
           </span>
