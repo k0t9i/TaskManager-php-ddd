@@ -7,11 +7,13 @@ import {ref} from "vue";
 import axiosInstance from "../helpers/axios";
 import LockableButton from "./LockableButton.vue";
 import router from "../router";
+import {useProjectParticipantsStore} from "../stores/projectParticipants";
 
 const route = useRoute();
 const projectStore = useProjectStore();
 const requestsStore = useProjectRequestsStore();
 const tasksStore = useTasksStore();
+const participantsStore = useProjectParticipantsStore();
 const id = route.params.id;
 const isLeaveLocked = ref(false);
 const error = ref('');
@@ -19,6 +21,7 @@ const error = ref('');
 await projectStore.load(id);
 await requestsStore.load(id);
 await tasksStore.load(id);
+await participantsStore.load(id);
 const project = projectStore.project(id);
 
 async function onLeave(id) {
@@ -51,6 +54,9 @@ async function onLeave(id) {
           </li>
           <li class="nav-item">
             <RouterLink :to="{name: 'project_tasks'}" class="nav-link">Tasks ({{ tasksStore.countAll(id) }})</RouterLink>
+          </li>
+          <li class="nav-item">
+            <RouterLink :to="{name: 'project_participants'}" class="nav-link">Participants ({{ participantsStore.countAll(id) }})</RouterLink>
           </li>
         </ul>
         <LockableButton
