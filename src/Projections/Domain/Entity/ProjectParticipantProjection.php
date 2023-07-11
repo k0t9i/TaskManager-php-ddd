@@ -13,7 +13,8 @@ final class ProjectParticipantProjection implements Hashable
         public string $projectId,
         public string $userEmail,
         public string $userFirstname,
-        public string $userLastname
+        public string $userLastname,
+        public int $tasksCount = 0
     ) {
     }
 

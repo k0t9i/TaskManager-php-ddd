@@ -34,7 +34,13 @@ final readonly class ProjectParticipantResponseDTO
                 ref: '#components/schemas/userModel/properties/lastname'
             )]
         )]
-        public string $userLastname
+        public string $userLastname,
+        #[OA\Property(
+            description: 'Count of participant tasks',
+            type: 'int',
+            example: 10
+        )]
+        public int $tasksCount
     ) {
     }
 
@@ -52,7 +58,8 @@ final readonly class ProjectParticipantResponseDTO
                 $projection->userId,
                 $projection->userEmail,
                 $projection->userFirstname,
-                $projection->userLastname
+                $projection->userLastname,
+                $projection->tasksCount
             );
         }
 

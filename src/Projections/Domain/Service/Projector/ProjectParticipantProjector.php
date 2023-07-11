@@ -9,6 +9,7 @@ use TaskManager\Projections\Domain\Entity\ProjectParticipantProjection;
 use TaskManager\Projections\Domain\Entity\UserProjection;
 use TaskManager\Projections\Domain\Event\ProjectParticipantWasAddedEvent;
 use TaskManager\Projections\Domain\Event\ProjectParticipantWasRemovedEvent;
+use TaskManager\Projections\Domain\Event\TaskWasCreatedEvent;
 use TaskManager\Projections\Domain\Event\UserProfileWasChangedEvent;
 use TaskManager\Projections\Domain\Exception\ProjectionDoesNotExistException;
 use TaskManager\Projections\Domain\Repository\ProjectParticipantProjectionRepositoryInterface;
@@ -81,9 +82,22 @@ final class ProjectParticipantProjector extends Projector
     {
         $projections = $this->loadProjectionsAsNeeded($event->getAggregateId());
 
-        foreach ($projections as $projection) {
+        /** @var ProjectParticipantProjection $projection */
+        foreach ($projections->getItems() as $projection) {
             $projection->userFirstname = $event->firstname;
             $projection->userLastname = $event->lastname;
+        }
+    }
+
+    private function whenTaskCreated(TaskWasCreatedEvent $event): void
+    {
+        $projections = $this->loadProjectionsAsNeeded($event->ownerId);
+
+        /** @var ProjectParticipantProjection $projection */
+        foreach ($projections->getItems() as $projection) {
+            if ($projection->projectId === $event->projectId) {
+                ++$projection->tasksCount;
+            }
         }
     }
 
