@@ -16,12 +16,9 @@ final readonly class DoctrineTaskListProjectionRepository implements TaskListPro
     ) {
     }
 
-    /**
-     * @return TaskListProjection[]
-     */
-    public function findAllById(string $id): array
+    public function findById(string $id): ?TaskListProjection
     {
-        return $this->getRepository()->findBy([
+        return $this->getRepository()->findOneBy([
             'id' => $id,
         ]);
     }
@@ -43,17 +40,6 @@ final readonly class DoctrineTaskListProjectionRepository implements TaskListPro
     {
         return $this->getRepository()->findBy([
             'projectId' => $id,
-        ]);
-    }
-
-    /**
-     * @return TaskListProjection[]
-     */
-    public function findAllByProjectIdAndUserId(string $projectId, string $userId): array
-    {
-        return $this->getRepository()->findBy([
-            'projectId' => $projectId,
-            'userId' => $userId,
         ]);
     }
 

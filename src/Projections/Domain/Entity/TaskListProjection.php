@@ -11,7 +11,6 @@ final class TaskListProjection implements Hashable
 {
     public function __construct(
         public string $id,
-        public string $userId,
         public string $name,
         public DateTime $startDate,
         public DateTime $finishDate,
@@ -27,12 +26,6 @@ final class TaskListProjection implements Hashable
 
     public function getHash(): string
     {
-        return $this->userId;
-    }
-
-    public function __clone()
-    {
-        $this->startDate = clone $this->startDate;
-        $this->finishDate = clone $this->finishDate;
+        return $this->id;
     }
 }
