@@ -19,16 +19,6 @@ final readonly class DoctrineTaskProjectionRepository implements TaskProjectionR
     /**
      * @return TaskProjection[]
      */
-    public function findAllById(string $id): array
-    {
-        return $this->getRepository()->findBy([
-            'id' => $id,
-        ]);
-    }
-
-    /**
-     * @return TaskProjection[]
-     */
     public function findAllByProjectId(string $id): array
     {
         return $this->getRepository()->findBy([
@@ -40,14 +30,6 @@ final readonly class DoctrineTaskProjectionRepository implements TaskProjectionR
     {
         return $this->getRepository()->findOneBy([
             'id' => $id,
-        ]);
-    }
-
-    public function findByIdAndUserId(string $id, string $userId): ?TaskProjection
-    {
-        return $this->getRepository()->findOneBy([
-            'id' => $id,
-            'userId' => $userId,
         ]);
     }
 
