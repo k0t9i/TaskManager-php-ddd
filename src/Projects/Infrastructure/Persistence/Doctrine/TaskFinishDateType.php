@@ -17,8 +17,12 @@ final class TaskFinishDateType extends DateTimeType
         return new TaskFinishDate($value);
     }
 
-    public function convertToDatabaseValue($value, AbstractPlatform $platform): string
+    public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
     {
+        if (null === $value) {
+            return null;
+        }
+
         return parent::convertToDatabaseValue($value->getPhpDateTime(), $platform);
     }
 

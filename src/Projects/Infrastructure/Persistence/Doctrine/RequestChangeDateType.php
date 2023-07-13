@@ -17,8 +17,12 @@ final class RequestChangeDateType extends DateTimeType
         return new RequestChangeDate($value);
     }
 
-    public function convertToDatabaseValue($value, AbstractPlatform $platform): string
+    public function convertToDatabaseValue($value, AbstractPlatform $platform): ?string
     {
+        if (null === $value) {
+            return null;
+        }
+
         return parent::convertToDatabaseValue($value->getPhpDateTime(), $platform);
     }
 
