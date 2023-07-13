@@ -7,6 +7,7 @@ namespace TaskManager\Projections\Application\Handler;
 use TaskManager\Projections\Application\Query\TaskListQuery;
 use TaskManager\Projections\Application\Service\CurrentUserExtractorInterface;
 use TaskManager\Projections\Domain\Entity\TaskListProjection;
+use TaskManager\Projections\Domain\Exception\InsufficientPermissionsException;
 use TaskManager\Projections\Domain\Exception\ObjectDoesNotExistException;
 use TaskManager\Projections\Domain\Repository\ProjectProjectionRepositoryInterface;
 use TaskManager\Projections\Domain\Repository\TaskListProjectionRepositoryInterface;
@@ -28,11 +29,16 @@ final readonly class TaskListQueryHandler implements QueryHandlerInterface
     {
         $user = $this->userExtractor->extract();
 
-        $project = $this->projectRepository->findById($query->projectId);
-        if (null === $project) {
+        $projectById = $this->projectRepository->findById($query->projectId);
+        if (null === $projectById) {
             throw new ObjectDoesNotExistException(sprintf('Project "%s" does not exist.', $query->projectId));
         }
 
-        return $this->repository->findAllByProjectIdAndUserId($query->projectId, $user->id);
+        $project = $this->projectRepository->findByIdAndUserId($query->projectId, $user->id);
+        if (null === $project) {
+            throw new InsufficientPermissionsException(sprintf('Insufficient permissions to view the project "%s".', $query->projectId));
+        }
+
+        return $this->repository->findAllByProjectId($query->projectId);
     }
 }

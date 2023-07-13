@@ -8,10 +8,7 @@ use TaskManager\Projections\Domain\Entity\TaskListProjection;
 
 interface TaskListProjectionRepositoryInterface
 {
-    /**
-     * @return TaskListProjection[]
-     */
-    public function findAllById(string $id): array;
+    public function findById(string $id): ?TaskListProjection;
 
     /**
      * @return TaskListProjection[]
@@ -22,11 +19,6 @@ interface TaskListProjectionRepositoryInterface
      * @return TaskListProjection[]
      */
     public function findAllByProjectId(string $id): array;
-
-    /**
-     * @return TaskListProjection[]
-     */
-    public function findAllByProjectIdAndUserId(string $projectId, string $userId): array;
 
     public function save(TaskListProjection $projection): void;
 

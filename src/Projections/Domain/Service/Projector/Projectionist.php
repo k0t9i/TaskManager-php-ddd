@@ -47,20 +47,20 @@ final readonly class Projectionist implements ProjectionistInterface
                 continue;
             }
 
-            $this->transactionManager->withTransaction(function () use ($streamInfo, $projector) {
-                try {
+            try {
+                $this->transactionManager->withTransaction(function () use ($streamInfo, $projector) {
                     while (null !== $event = $streamInfo->stream->next()) {
                         $projector->projectWhen($event);
                     }
 
                     $this->positionHandler->storePosition($projector, $streamInfo->lastPosition);
                     $this->positionHandler->flushPosition($projector);
-                } catch (\Exception $e) {
-                    $this->positionHandler->markAsBroken($projector);
-                    $this->positionHandler->flushPosition($projector);
-                    throw $e;
-                }
-            });
+                });
+            } catch (\Exception $e) {
+                $this->positionHandler->markAsBroken($projector);
+                $this->positionHandler->flushPosition($projector);
+                throw $e;
+            }
 
             $result[] = new ProjectionistResultDTO($projector::class, $streamInfo->stream->eventCount());
         }
