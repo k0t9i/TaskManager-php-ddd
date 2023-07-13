@@ -13,6 +13,8 @@ interface ProjectParticipantProjectionRepositoryInterface
      */
     public function findAllByUserId(string $id): array;
 
+    public function findByProjectAndUserId(string $projectId, string $userId): ?ProjectParticipantProjection;
+
     /**
      * @return ProjectParticipantProjection[]
      */
