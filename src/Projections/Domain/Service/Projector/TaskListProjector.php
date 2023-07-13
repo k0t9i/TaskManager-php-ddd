@@ -65,7 +65,7 @@ final class TaskListProjector extends Projector
             throw new ProjectionDoesNotExistException($event->ownerId, UserProjection::class);
         }
 
-        $this->unitOfWork->addProjection(new TaskListProjection(
+        $this->unitOfWork->loadProjection(new TaskListProjection(
             $event->getAggregateId(),
             $event->name,
             new DateTime($event->startDate),
@@ -107,9 +107,12 @@ final class TaskListProjector extends Projector
         $projections = $this->repository->findAllByOwnerId($event->getAggregateId());
         $this->unitOfWork->loadProjections($projections);
 
-        foreach ($projections as $projection) {
-            $projection->ownerFirstname = $event->firstname;
-            $projection->ownerLastname = $event->lastname;
+        /** @var TaskListProjection $projection */
+        foreach ($this->unitOfWork->getProjections() as $projection) {
+            if ($projection->ownerId === $event->getAggregateId()) {
+                $projection->ownerFirstname = $event->firstname;
+                $projection->ownerLastname = $event->lastname;
+            }
         }
     }
 

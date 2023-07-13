@@ -13,19 +13,26 @@ final class ProjectorUnitOfWork
      */
     private array $projections = [];
 
-    /**
-     * @var Hashable[]
-     */
     private array $deletedProjections = [];
 
+    /**
+     * @return Hashable[]
+     */
     public function getProjections(): array
     {
-        return $this->projections;
+        return array_filter($this->projections, function ($value) {
+            return !isset($this->deletedProjections[$value->getHash()]);
+        });
     }
 
+    /**
+     * @return Hashable[]
+     */
     public function getDeletedProjections(): array
     {
-        return $this->deletedProjections;
+        return array_filter($this->projections, function ($value) {
+            return isset($this->deletedProjections[$value->getHash()]);
+        });
     }
 
     public function flush(): void
@@ -36,32 +43,21 @@ final class ProjectorUnitOfWork
 
     public function getProjection(string $hash): ?Hashable
     {
-        return $this->projections[$hash] ?? $this->deletedProjections[$hash] ?? null;
+        return $this->projections[$hash] ?? null;
     }
 
     /**
      * @param Hashable[] $projections
      */
-    public function loadProjections(array $projections, bool $force = false): void
+    public function loadProjections(array $projections): void
     {
         foreach ($projections as $projection) {
-            $this->addProjection($projection);
+            $this->loadProjection($projection);
         }
     }
 
-    public function loadProjection(Hashable $projection, bool $force = false): void
+    public function loadProjection(Hashable $projection): void
     {
-        if (!$force && isset($this->projections[$projection->getHash()])) {
-            return;
-        }
-        $this->projections[$projection->getHash()] = $projection;
-    }
-
-    public function addProjection(Hashable $projection): void
-    {
-        if (isset($this->projections[$projection->getHash()])) {
-            throw new \RuntimeException(sprintf('Projection %s %s already exists', get_class($projection), $projection->getHash()));
-        }
         $this->projections[$projection->getHash()] = $projection;
     }
 
@@ -71,8 +67,8 @@ final class ProjectorUnitOfWork
             return;
         }
 
-        $this->deletedProjections[$projection->getHash()] = $projection;
+        $this->loadProjection($projection);
 
-        unset($this->projections[$projection->getHash()]);
+        $this->deletedProjections[$projection->getHash()] = $projection->getHash();
     }
 }
