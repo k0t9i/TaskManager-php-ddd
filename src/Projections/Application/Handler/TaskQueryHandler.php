@@ -9,6 +9,7 @@ use TaskManager\Projections\Application\Service\CurrentUserExtractorInterface;
 use TaskManager\Projections\Domain\Entity\TaskProjection;
 use TaskManager\Projections\Domain\Exception\InsufficientPermissionsException;
 use TaskManager\Projections\Domain\Exception\ObjectDoesNotExistException;
+use TaskManager\Projections\Domain\Repository\ProjectProjectionRepositoryInterface;
 use TaskManager\Projections\Domain\Repository\TaskProjectionRepositoryInterface;
 use TaskManager\Shared\Application\Bus\Query\QueryHandlerInterface;
 
@@ -16,6 +17,7 @@ final readonly class TaskQueryHandler implements QueryHandlerInterface
 {
     public function __construct(
         private TaskProjectionRepositoryInterface $repository,
+        private ProjectProjectionRepositoryInterface $projectRepository,
         private CurrentUserExtractorInterface $userExtractor
     ) {
     }
@@ -24,14 +26,14 @@ final readonly class TaskQueryHandler implements QueryHandlerInterface
     {
         $user = $this->userExtractor->extract();
 
-        $taskById = $this->repository->findById($query->id);
-        if (null === $taskById) {
+        $task = $this->repository->findById($query->id);
+        if (null === $task) {
             throw new ObjectDoesNotExistException(sprintf('Task "%s" does not exist.', $query->id));
         }
 
-        $task = $this->repository->findByIdAndUserId($query->id, $user->id);
-        if (null === $task) {
-            throw new InsufficientPermissionsException(sprintf('Insufficient permissions to view the task "%s".', $query->id));
+        $project = $this->projectRepository->findByIdAndUserId($task->projectId, $user->id);
+        if (null === $project) {
+            throw new InsufficientPermissionsException(sprintf('Insufficient permissions to view the project "%s".', $task->projectId));
         }
 
         return $task;

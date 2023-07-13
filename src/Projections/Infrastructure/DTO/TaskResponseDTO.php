@@ -18,6 +18,13 @@ final readonly class TaskResponseDTO
         )]
         public string $id,
         #[OA\Property(
+            description: 'Task owner ID',
+            oneOf: [new OA\Schema(
+                ref: '#/components/schemas/objectId/properties/id'
+            )]
+        )]
+        public string $ownerId,
+        #[OA\Property(
             oneOf: [new OA\Schema(
                 ref: '#components/schemas/taskModel/properties/name'
             )]
@@ -60,6 +67,7 @@ final readonly class TaskResponseDTO
     {
         return new self(
             $projection->id,
+            $projection->ownerId,
             $projection->name,
             $projection->brief,
             $projection->description,

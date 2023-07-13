@@ -11,7 +11,6 @@ final class TaskProjection implements Hashable
 {
     public function __construct(
         public string $id,
-        public string $userId,
         public string $name,
         public string $brief,
         public string $description,
@@ -25,7 +24,7 @@ final class TaskProjection implements Hashable
 
     public function getHash(): string
     {
-        return $this->userId;
+        return $this->id;
     }
 
     public function __clone()

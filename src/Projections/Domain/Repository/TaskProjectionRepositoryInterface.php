@@ -11,16 +11,9 @@ interface TaskProjectionRepositoryInterface
     /**
      * @return TaskProjection[]
      */
-    public function findAllById(string $id): array;
-
-    /**
-     * @return TaskProjection[]
-     */
     public function findAllByProjectId(string $id): array;
 
     public function findById(string $id): ?TaskProjection;
-
-    public function findByIdAndUserId(string $id, string $userId): ?TaskProjection;
 
     public function save(TaskProjection $projection): void;
 
