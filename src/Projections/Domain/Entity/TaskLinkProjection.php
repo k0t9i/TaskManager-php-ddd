@@ -11,13 +11,17 @@ final class TaskLinkProjection implements Hashable
     public function __construct(
         public string $taskId,
         public string $linkedTaskId,
-        public string $linkedTaskName,
-        public string $userId
+        public string $linkedTaskName
     ) {
+    }
+
+    public static function hash(string $taskId, string $linkedTaskId): string
+    {
+        return $taskId.$linkedTaskId;
     }
 
     public function getHash(): string
     {
-        return $this->userId;
+        return self::hash($this->taskId, $this->linkedTaskId);
     }
 }
