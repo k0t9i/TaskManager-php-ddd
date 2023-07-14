@@ -28,9 +28,14 @@ final class ProjectListProjection implements Hashable
     ) {
     }
 
+    public static function hash(string $id, string $userId): string
+    {
+        return $id.$userId;
+    }
+
     public function getHash(): string
     {
-        return $this->userId;
+        return self::hash($this->id, $this->userId);
     }
 
     public function __clone()
