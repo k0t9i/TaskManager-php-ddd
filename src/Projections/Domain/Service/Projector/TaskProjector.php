@@ -54,7 +54,7 @@ final class TaskProjector extends Projector
             throw new ProjectionDoesNotExistException($event->projectId, ProjectProjection::class);
         }
 
-        $this->unitOfWork->addProjection(new TaskProjection(
+        $this->unitOfWork->loadProjection(new TaskProjection(
             $event->getAggregateId(),
             $event->name,
             $event->brief,

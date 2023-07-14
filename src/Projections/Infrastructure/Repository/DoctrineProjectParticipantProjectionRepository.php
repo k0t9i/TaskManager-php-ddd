@@ -26,6 +26,14 @@ final readonly class DoctrineProjectParticipantProjectionRepository implements P
         ]);
     }
 
+    public function findByProjectAndUserId(string $projectId, string $userId): ?ProjectParticipantProjection
+    {
+        return $this->getRepository()->findOneBy([
+            'projectId' => $projectId,
+            'userId' => $userId,
+        ]);
+    }
+
     /**
      * @return ProjectParticipantProjection[]
      */

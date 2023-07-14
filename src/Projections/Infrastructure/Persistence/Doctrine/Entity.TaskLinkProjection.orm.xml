@@ -6,7 +6,6 @@
     <entity name="TaskManager\Projections\Domain\Entity\TaskLinkProjection" table="task_link_projections">
         <id name="taskId" length="36" />
         <id name="linkedTaskId" length="36" />
-        <id name="userId" column="user_id" length="36" />
         <field name="linkedTaskName" length="4000" />
     </entity>
 </doctrine-mapping>

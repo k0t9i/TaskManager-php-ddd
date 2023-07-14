@@ -18,10 +18,7 @@ interface TaskLinkProjectionRepositoryInterface
      */
     public function findAllByLinkedTaskId(string $id): array;
 
-    /**
-     * @return TaskLinkProjection[]
-     */
-    public function findAllByTaskIdAndUserId(string $taskId, string $userId): array;
+    public function findByTaskAndLinkedTaskId(string $taskId, string $linkedTaskId): ?TaskLinkProjection;
 
     public function save(TaskLinkProjection $projection): void;
 

@@ -12,26 +12,26 @@ use TaskManager\Projections\Domain\Event\RequestWasCreatedEvent;
 use TaskManager\Projections\Domain\Exception\ProjectionDoesNotExistException;
 use TaskManager\Projections\Domain\Repository\ProjectProjectionRepositoryInterface;
 use TaskManager\Projections\Domain\Repository\UserRequestProjectionRepositoryInterface;
+use TaskManager\Projections\Domain\Service\ProjectorUnitOfWork;
 use TaskManager\Shared\Domain\ValueObject\DateTime;
 
 final class UserRequestProjector extends Projector
 {
-    /**
-     * @var array<array-key, UserRequestProjection>
-     */
-    private array $projections = [];
-
     public function __construct(
         private readonly UserRequestProjectionRepositoryInterface $repository,
         private readonly ProjectProjectionRepositoryInterface $projectRepository,
+        private readonly ProjectorUnitOfWork $unitOfWork
     ) {
     }
 
     public function flush(): void
     {
-        foreach ($this->projections as $projection) {
-            $this->repository->save($projection);
+        /** @var UserRequestProjection $item */
+        foreach ($this->unitOfWork->getProjections() as $item) {
+            $this->repository->save($item);
         }
+
+        $this->unitOfWork->flush();
     }
 
     public function priority(): int
@@ -49,14 +49,14 @@ final class UserRequestProjector extends Projector
             throw new ProjectionDoesNotExistException($event->getAggregateId(), ProjectProjection::class);
         }
 
-        $this->projections[$event->requestId] = new UserRequestProjection(
+        $this->unitOfWork->loadProjection(new UserRequestProjection(
             $event->requestId,
             $event->userId,
             (int) $event->status,
             new DateTime($event->changeDate),
             $event->getAggregateId(),
             $projectProjection->name
-        );
+        ));
     }
 
     /**
@@ -64,7 +64,7 @@ final class UserRequestProjector extends Projector
      */
     private function whenRequestStatusChanged(RequestStatusWasChangedEvent $event): void
     {
-        $projection = $this->loadProjectionsAsNeeded($event->requestId);
+        $projection = $this->getProjection($event->requestId);
 
         if (null === $projection) {
             throw new ProjectionDoesNotExistException($event->requestId, UserRequestProjection::class);
@@ -76,26 +76,23 @@ final class UserRequestProjector extends Projector
 
     private function whenProjectInformationChanged(ProjectInformationWasChangedEvent $event): void
     {
-        $projectionsByProjectId = $this->repository->findAllByProjectId($event->getAggregateId());
+        $projections = $this->repository->findAllByProjectId($event->getAggregateId());
+        $this->unitOfWork->loadProjections($projections);
 
-        foreach ($projectionsByProjectId as $projectionByProjectId) {
-            $projection = $this->loadProjectionsAsNeeded($projectionByProjectId->id);
-
-            if (null !== $projection) {
-                $projection->projectName = $event->name;
-            }
+        foreach ($projections as $projection) {
+            $projection->projectName = $event->name;
         }
     }
 
-    private function loadProjectionsAsNeeded(string $id): ?UserRequestProjection
+    private function getProjection(string $id): ?UserRequestProjection
     {
-        if (!isset($this->projections[$id])) {
-            $projection = $this->repository->findById($id);
-            if (null !== $projection) {
-                $this->projections[$id] = $projection;
-            }
+        /** @var UserRequestProjection $result */
+        $result = $this->unitOfWork->getProjection($id);
+
+        if (null !== $result) {
+            return $result;
         }
 
-        return $this->projections[$id];
+        return $this->repository->findById($id);
     }
 }

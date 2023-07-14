@@ -4,17 +4,15 @@ declare(strict_types=1);
 
 namespace TaskManager\Projections\Domain\Service\Projector;
 
-use TaskManager\Projections\Domain\Entity\ProjectProjection;
 use TaskManager\Projections\Domain\Entity\ProjectRequestProjection;
 use TaskManager\Projections\Domain\Entity\UserProjection;
-use TaskManager\Projections\Domain\Event\ProjectOwnerWasChangedEvent;
 use TaskManager\Projections\Domain\Event\RequestStatusWasChangedEvent;
 use TaskManager\Projections\Domain\Event\RequestWasCreatedEvent;
 use TaskManager\Projections\Domain\Event\UserProfileWasChangedEvent;
 use TaskManager\Projections\Domain\Exception\ProjectionDoesNotExistException;
-use TaskManager\Projections\Domain\Repository\ProjectProjectionRepositoryInterface;
 use TaskManager\Projections\Domain\Repository\ProjectRequestProjectionRepositoryInterface;
 use TaskManager\Projections\Domain\Repository\UserProjectionRepositoryInterface;
+use TaskManager\Projections\Domain\Service\ProjectorUnitOfWork;
 use TaskManager\Shared\Domain\ValueObject\DateTime;
 
 final class ProjectRequestProjector extends Projector
@@ -27,15 +25,18 @@ final class ProjectRequestProjector extends Projector
     public function __construct(
         private readonly ProjectRequestProjectionRepositoryInterface $repository,
         private readonly UserProjectionRepositoryInterface $userRepository,
-        private readonly ProjectProjectionRepositoryInterface $projectRepository,
+        private readonly ProjectorUnitOfWork $unitOfWork
     ) {
     }
 
     public function flush(): void
     {
-        foreach ($this->projections as $projection) {
-            $this->repository->save($projection);
+        /** @var ProjectRequestProjection $item */
+        foreach ($this->unitOfWork->getProjections() as $item) {
+            $this->repository->save($item);
         }
+
+        $this->unitOfWork->flush();
     }
 
     public function priority(): int
@@ -53,12 +54,7 @@ final class ProjectRequestProjector extends Projector
             throw new ProjectionDoesNotExistException($event->userId, UserProjection::class);
         }
 
-        $projectProjection = $this->projectRepository->findById($event->getAggregateId());
-        if (null === $projectProjection) {
-            throw new ProjectionDoesNotExistException($event->getAggregateId(), ProjectProjection::class);
-        }
-
-        $this->projections[$event->requestId] = new ProjectRequestProjection(
+        $this->unitOfWork->loadProjection(new ProjectRequestProjection(
             $event->requestId,
             $event->userId,
             $userProjection->email,
@@ -66,9 +62,8 @@ final class ProjectRequestProjector extends Projector
             $userProjection->lastname,
             (int) $event->status,
             new DateTime($event->changeDate),
-            $event->getAggregateId(),
-            $projectProjection->ownerId
-        );
+            $event->getAggregateId()
+        ));
     }
 
     /**
@@ -76,7 +71,7 @@ final class ProjectRequestProjector extends Projector
      */
     private function whenRequestStatusChanged(RequestStatusWasChangedEvent $event): void
     {
-        $projection = $this->loadProjectionsAsNeeded($event->requestId);
+        $projection = $this->getProjection($event->requestId);
 
         if (null === $projection) {
             throw new ProjectionDoesNotExistException($event->requestId, ProjectRequestProjection::class);
@@ -88,40 +83,24 @@ final class ProjectRequestProjector extends Projector
 
     private function whenUserProfileChanged(UserProfileWasChangedEvent $event): void
     {
-        $projectionsByUserId = $this->repository->findAllByUserId($event->getAggregateId());
+        $projections = $this->repository->findAllByUserId($event->getAggregateId());
+        $this->unitOfWork->loadProjections($projections);
 
-        foreach ($projectionsByUserId as $projectionByUserId) {
-            $projection = $this->loadProjectionsAsNeeded($projectionByUserId->id);
-
-            if (null !== $projection) {
-                $projection->userFirstname = $event->firstname;
-                $projection->userLastname = $event->lastname;
-            }
+        foreach ($projections as $projection) {
+            $projection->userFirstname = $event->firstname;
+            $projection->userLastname = $event->lastname;
         }
     }
 
-    private function whenProjectOwnerChanged(ProjectOwnerWasChangedEvent $event): void
+    private function getProjection(string $id): ?ProjectRequestProjection
     {
-        $projectionsByUserId = $this->repository->findAllByProjectId($event->getAggregateId());
+        /** @var ProjectRequestProjection $result */
+        $result = $this->unitOfWork->getProjection($id);
 
-        foreach ($projectionsByUserId as $projectionByUserId) {
-            $projection = $this->loadProjectionsAsNeeded($projectionByUserId->id);
-
-            if (null !== $projection) {
-                $projection->ownerId = $event->ownerId;
-            }
-        }
-    }
-
-    private function loadProjectionsAsNeeded(string $id): ?ProjectRequestProjection
-    {
-        if (!isset($this->projections[$id])) {
-            $projection = $this->repository->findById($id);
-            if (null !== $projection) {
-                $this->projections[$id] = $projection;
-            }
+        if (null !== $result) {
+            return $result;
         }
 
-        return $this->projections[$id];
+        return $this->repository->findById($id);
     }
 }

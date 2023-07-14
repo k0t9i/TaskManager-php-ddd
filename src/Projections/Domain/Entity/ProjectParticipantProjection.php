@@ -18,8 +18,13 @@ final class ProjectParticipantProjection implements Hashable
     ) {
     }
 
+    public static function hash(string $projectId, string $userId): string
+    {
+        return $projectId.$userId;
+    }
+
     public function getHash(): string
     {
-        return $this->projectId;
+        return self::hash($this->projectId, $this->userId);
     }
 }
