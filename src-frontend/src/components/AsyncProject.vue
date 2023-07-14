@@ -19,10 +19,12 @@ const isLeaveLocked = ref(false);
 const error = ref('');
 
 await projectStore.load(id);
-await requestsStore.load(id);
+const project = projectStore.project(id);
+if (project.isOwner) {
+  await requestsStore.load(id);
+}
 await tasksStore.load(id);
 await participantsStore.load(id);
-const project = projectStore.project(id);
 
 async function onLeave(id) {
   error.value = '';

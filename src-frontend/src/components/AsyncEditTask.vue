@@ -10,6 +10,7 @@ import {useTasksStore} from "../stores/tasks";
 import TaskStatus from "./TaskStatus.vue";
 import {useTaskStore} from "../stores/task";
 import CommonTaskFormFields from "./CommonTaskFormFields.vue";
+import {useUserStore} from "../stores/user";
 
 const route = useRoute();
 const id = route.params.id;
@@ -18,12 +19,16 @@ const success = ref(false);
 const projectStore = useProjectStore();
 const tasksStore = useTasksStore();
 const taskStore = useTaskStore();
+const userStore = useUserStore();
 
 await projectStore.load(id);
 await tasksStore.load(id);
 await taskStore.load(taskId);
+await userStore.load();
 const project = projectStore.project(id);
 const task = taskStore.task(taskId);
+const user = userStore.user;
+const isTaskEditor = project.isOwner || user.id === task.ownerId;
 
 async function onSubmit() {
   success.value = false;
@@ -43,7 +48,7 @@ async function toggleStatus() {
 
 <template>
   <form @submit.prevent="onSubmit">
-    <fieldset :disabled="taskStore.isLocked(taskId) || project.status === 0 || task.status === 0">
+    <fieldset :disabled="taskStore.isLocked(taskId) || project.status === 0 || task.status === 0 || !isTaskEditor">
       <FormError :error="taskStore.error(taskId)" />
       <FormSuccess v-if="success">Successfully saved.</FormSuccess>
       <div class="mb-3">
@@ -53,13 +58,13 @@ async function toggleStatus() {
             <div class="spinner-border spinner-border-sm mx-1" role="status" />Loading...
           </span>
           <span v-else>
-            <a href="#" v-if="project.status !== 0" @click.prevent="toggleStatus"><TaskStatus :status="task.status" /></a>
+            <a href="#" v-if="project.status !== 0 && isTaskEditor" @click.prevent="toggleStatus"><TaskStatus :status="task.status" /></a>
             <TaskStatus v-else :status="task.status" />
           </span>
         </div>
       </div>
       <CommonTaskFormFields :project="project" :task="task" />
-      <div class="mb-3 text-end">
+      <div class="mb-3 text-end" v-if="isTaskEditor">
         <LockableButton type="submit" class="btn btn-primary" :locked="taskStore.isLocked(taskId)">Save</LockableButton>
       </div>
     </fieldset>

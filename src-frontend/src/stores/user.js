@@ -20,6 +20,7 @@ export const useUserStore = defineStore({
                 STORE_ID,
                 axiosInstance
                     .get(`/users/`).then((response) => {
+                        this.user.id = response.data.id;
                         this.user.email = response.data.email;
                         this.user.firstname = response.data.firstname;
                         this.user.lastname = response.data.lastname;
