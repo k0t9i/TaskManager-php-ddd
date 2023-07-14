@@ -68,15 +68,17 @@ final class ProjectParticipantProjector extends Projector
 
     private function whenUserProfileChanged(UserProfileWasChangedEvent $event): void
     {
-        $projections = $this->repository->findAllByUserId($event->getAggregateId());
-        $this->unitOfWork->loadProjections($projections);
+        $this->unitOfWork->loadProjections(
+            $this->repository->findAllByUserId($event->getAggregateId())
+        );
+        $projections = $this->unitOfWork->getProjections(
+            fn (ProjectParticipantProjection $p) => $p->userId === $event->getAggregateId()
+        );
 
         /** @var ProjectParticipantProjection $projection */
-        foreach ($this->unitOfWork->getProjections() as $projection) {
-            if ($projection->userId === $event->getAggregateId()) {
-                $projection->userFirstname = $event->firstname;
-                $projection->userLastname = $event->lastname;
-            }
+        foreach ($projections as $projection) {
+            $projection->userFirstname = $event->firstname;
+            $projection->userLastname = $event->lastname;
         }
     }
 

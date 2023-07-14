@@ -104,15 +104,17 @@ final class TaskListProjector extends Projector
 
     private function whenUserProfileChanged(UserProfileWasChangedEvent $event): void
     {
-        $projections = $this->repository->findAllByOwnerId($event->getAggregateId());
-        $this->unitOfWork->loadProjections($projections);
+        $this->unitOfWork->loadProjections(
+            $this->repository->findAllByOwnerId($event->getAggregateId())
+        );
+        $projections = $this->unitOfWork->getProjections(
+            fn (TaskListProjection $p) => $p->ownerId === $event->getAggregateId()
+        );
 
         /** @var TaskListProjection $projection */
-        foreach ($this->unitOfWork->getProjections() as $projection) {
-            if ($projection->ownerId === $event->getAggregateId()) {
-                $projection->ownerFirstname = $event->firstname;
-                $projection->ownerLastname = $event->lastname;
-            }
+        foreach ($projections as $projection) {
+            $projection->ownerFirstname = $event->firstname;
+            $projection->ownerLastname = $event->lastname;
         }
     }
 
