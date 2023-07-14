@@ -26,10 +26,4 @@ final class TaskProjection implements Hashable
     {
         return $this->id;
     }
-
-    public function __clone()
-    {
-        $this->startDate = clone $this->startDate;
-        $this->finishDate = clone $this->finishDate;
-    }
 }
