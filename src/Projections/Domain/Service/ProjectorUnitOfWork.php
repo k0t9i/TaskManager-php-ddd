@@ -18,10 +18,18 @@ final class ProjectorUnitOfWork
     /**
      * @return Hashable[]
      */
-    public function getProjections(): array
+    public function getProjections(callable $callback = null): array
     {
-        return array_filter($this->projections, function ($value) {
+        $result = array_filter($this->projections, function ($value) {
             return !isset($this->deletedProjections[$value->getHash()]);
+        });
+
+        if (null === $callback) {
+            return $result;
+        }
+
+        return array_filter($result, function ($value) use ($callback) {
+            return call_user_func($callback, $value);
         });
     }
 
