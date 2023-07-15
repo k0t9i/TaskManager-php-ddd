@@ -14,8 +14,9 @@ RUN echo 'deb [trusted=yes] https://repo.symfony.com/apt/ /' | tee /etc/apt/sour
     && docker-php-ext-install pgsql pdo_pgsql \
     && docker-php-ext-configure intl && docker-php-ext-install intl \
     && docker-php-ext-install opcache \
-    && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer \
     && cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini
+
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 COPY ./docker/configs/php /usr/local/etc/php/conf.d
 
