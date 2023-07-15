@@ -63,6 +63,7 @@ export const useTasksStore = defineStore({
                             this.tasks[projectId][value.id].startDate = new Date(value.startDate);
                             this.tasks[projectId][value.id].finishDate = new Date(value.finishDate);
                         }
+                        return response;
                     })
                     .catch((error) => {
                         this.errors[projectId] = error.response.data.message;

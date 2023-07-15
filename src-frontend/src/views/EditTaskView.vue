@@ -3,7 +3,6 @@ import AsyncEditTask from "../components/AsyncEditTask.vue";
 </script>
 
 <template>
-  <h4 class="my-4">Edit task</h4>
   <Suspense>
     <AsyncEditTask />
     <template #fallback>

@@ -41,6 +41,7 @@ export const useProjectParticipantsStore = defineStore({
                         for (const [key, value] of Object.entries(response.data)) {
                             this.participants[projectId][value.userId] = value;
                         }
+                        return response;
                     })
                     .catch((error) => {
                         this.errors[projectId] = error.response.data.message;

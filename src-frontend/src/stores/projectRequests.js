@@ -45,6 +45,7 @@ export const useProjectRequestsStore = defineStore({
                             this.requests[projectId][value.id] = value;
                             this.requests[projectId][value.id].changeDate = new Date(value.changeDate);
                         }
+                        return response;
                     })
                     .catch((error) => {
                         this.errors[projectId] = error.response.data.message;

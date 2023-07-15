@@ -75,10 +75,6 @@ export const useProjectStore = defineStore({
                 .finally(() => {
                     this.locked[id] = false;
                 });
-        },
-        createEmpty(id) {
-            this.projects[id] = {};
-            return this.projects[id];
         }
     }
 });

@@ -71,7 +71,7 @@ async function onLeave(id) {
         </LockableButton>
       </div>
       <div class="col-md-9">
-        <RouterView />
+        <RouterView :key="route.path" />
       </div>
     </div>
   </div>

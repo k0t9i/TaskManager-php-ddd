@@ -14,7 +14,3 @@ import AsyncProject from "../components/AsyncProject.vue";
     </Suspense>
   </div>
 </template>
-
-<style scoped>
-
-</style>
