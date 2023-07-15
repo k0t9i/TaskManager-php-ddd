@@ -40,7 +40,8 @@ export const useTaskLinksStore = defineStore({
                     this.links[taskId][linkedTaskId] = {
                         taskId: taskId,
                         linkedTaskId: linkedTask.id,
-                        linkedTaskName: linkedTask.name
+                        linkedTaskName: linkedTask.name,
+                        linkedTaskStatus: linkedTask.status
                     };
                     delete this.availableTasks[taskId][linkedTaskId];
 

@@ -82,13 +82,13 @@ async function removeLink(linkedTaskId) {
           <div class="mb-3">
             <label class="form-label">Status</label>
             <div class="h5">
-          <span v-if="taskStore.isLocked(taskId)" class="badge bg-light text-dark">
-            <div class="spinner-border spinner-border-sm mx-1" role="status" />Loading...
-          </span>
+              <span v-if="taskStore.isLocked(taskId)" class="badge bg-light text-dark">
+                <div class="spinner-border spinner-border-sm mx-1" role="status" />Loading...
+              </span>
               <span v-else>
-            <a href="#" v-if="project.status !== 0 && isTaskEditor" @click.prevent="toggleStatus"><TaskStatus :status="task.status" /></a>
-            <TaskStatus v-else :status="task.status" />
-          </span>
+                <a href="#" v-if="project.status !== 0 && isTaskEditor" @click.prevent="toggleStatus"><TaskStatus :status="task.status" /></a>
+                <TaskStatus v-else :status="task.status" />
+              </span>
             </div>
           </div>
           <CommonTaskFormFields :project="project" :task="task" />
@@ -115,6 +115,7 @@ async function removeLink(linkedTaskId) {
         <tr>
           <th scope="col">#</th>
           <th scope="col">Name</th>
+          <th scope="col">Status</th>
           <th scope="col"></th>
         </tr>
         </thead>
@@ -122,6 +123,9 @@ async function removeLink(linkedTaskId) {
         <tr v-for="(link, key, index) in linksStore.getLinks(taskId)">
           <th scope="row">{{ index + 1 }}</th>
           <td><RouterLink :to="{name: 'edit_task', params: { id: id, taskId: link.linkedTaskId }}">{{ link.linkedTaskName }}</RouterLink></td>
+          <td>
+            <TaskStatus :status="link.linkedTaskStatus" />
+          </td>
           <td>
             <span v-if="linksStore.isLocked(link.linkedTaskId)"><div class="spinner-border spinner-border-sm text-dark mx-1" role="status" />Loading...</span>
             <span v-else>
