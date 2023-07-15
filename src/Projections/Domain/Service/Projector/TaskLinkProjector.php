@@ -75,7 +75,7 @@ final class TaskLinkProjector extends Projector
             $this->repository->findAllByLinkedTaskId($event->getAggregateId())
         );
         $projections = $this->unitOfWork->getProjections(
-            fn (TaskLinkProjection $p) => $p->taskId === $event->getAggregateId()
+            fn (TaskLinkProjection $p) => $p->linkedTaskId === $event->getAggregateId()
         );
 
         /** @var TaskLinkProjection $projection */
