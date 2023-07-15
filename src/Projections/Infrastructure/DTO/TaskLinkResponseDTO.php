@@ -30,7 +30,13 @@ final readonly class TaskLinkResponseDTO
                 ref: '#components/schemas/taskModel/properties/name'
             )]
         )]
-        public string $linkedTaskName
+        public string $linkedTaskName,
+        #[OA\Property(
+            oneOf: [new OA\Schema(
+                ref: '#components/schemas/taskModel/properties/status'
+            )]
+        )]
+        public int $linkedTaskStatus
     ) {
     }
 
@@ -47,7 +53,8 @@ final readonly class TaskLinkResponseDTO
             $result[] = new self(
                 $projection->taskId,
                 $projection->linkedTaskId,
-                $projection->linkedTaskName
+                $projection->linkedTaskName,
+                $projection->linkedTaskStatus
             );
         }
 

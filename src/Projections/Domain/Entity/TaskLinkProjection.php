@@ -11,7 +11,8 @@ final class TaskLinkProjection implements Hashable
     public function __construct(
         public string $taskId,
         public string $linkedTaskId,
-        public string $linkedTaskName
+        public string $linkedTaskName,
+        public int $linkedTaskStatus
     ) {
     }
 
