@@ -64,6 +64,12 @@ final class ProjectorUnitOfWork
         }
     }
 
+    public function createProjection(Hashable $projection): void
+    {
+        $this->loadProjection($projection);
+        unset($this->deletedProjections[$projection->getHash()]);
+    }
+
     public function loadProjection(Hashable $projection): void
     {
         $this->projections[$projection->getHash()] = $projection;

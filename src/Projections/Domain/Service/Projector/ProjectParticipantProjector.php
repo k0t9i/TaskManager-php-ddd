@@ -51,7 +51,7 @@ final class ProjectParticipantProjector extends Projector
             throw new ProjectionDoesNotExistException($event->participantId, UserProjection::class);
         }
 
-        $this->unitOfWork->loadProjection(new ProjectParticipantProjection(
+        $this->unitOfWork->createProjection(new ProjectParticipantProjection(
             $event->participantId,
             $event->getAggregateId(),
             $userProjection->email,

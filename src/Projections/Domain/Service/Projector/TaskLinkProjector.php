@@ -53,7 +53,7 @@ final class TaskLinkProjector extends Projector
             throw new ProjectionDoesNotExistException($event->linkedTaskId, TaskProjection::class);
         }
 
-        $this->unitOfWork->loadProjection(new TaskLinkProjection(
+        $this->unitOfWork->createProjection(new TaskLinkProjection(
             $event->getAggregateId(),
             $event->linkedTaskId,
             $taskProjection->name
@@ -75,7 +75,7 @@ final class TaskLinkProjector extends Projector
             $this->repository->findAllByLinkedTaskId($event->getAggregateId())
         );
         $projections = $this->unitOfWork->getProjections(
-            fn (TaskLinkProjection $p) => $p->taskId === $event->getAggregateId()
+            fn (TaskLinkProjection $p) => $p->linkedTaskId === $event->getAggregateId()
         );
 
         /** @var TaskLinkProjection $projection */
