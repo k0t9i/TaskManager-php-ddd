@@ -60,7 +60,7 @@ final class ProjectListProjector extends Projector
         $userProjections = $this->userRepository->findAll();
 
         foreach ($userProjections as $userProjection) {
-            $this->unitOfWork->loadProjection(new ProjectListProjection(
+            $this->unitOfWork->createProjection(new ProjectListProjection(
                 $event->getAggregateId(),
                 $userProjection->id,
                 $event->name,

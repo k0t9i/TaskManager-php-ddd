@@ -49,7 +49,7 @@ final class UserRequestProjector extends Projector
             throw new ProjectionDoesNotExistException($event->getAggregateId(), ProjectProjection::class);
         }
 
-        $this->unitOfWork->loadProjection(new UserRequestProjection(
+        $this->unitOfWork->createProjection(new UserRequestProjection(
             $event->requestId,
             $event->userId,
             (int) $event->status,

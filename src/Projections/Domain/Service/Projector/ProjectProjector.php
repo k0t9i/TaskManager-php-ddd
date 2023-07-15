@@ -43,7 +43,7 @@ final class ProjectProjector extends Projector
      */
     private function whenProjectCreated(ProjectWasCreatedEvent $event): void
     {
-        $this->unitOfWork->loadProjection(new ProjectProjection(
+        $this->unitOfWork->createProjection(new ProjectProjection(
             $event->getAggregateId(),
             $event->ownerId,
             $event->name,
