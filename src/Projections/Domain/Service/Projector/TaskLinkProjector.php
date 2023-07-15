@@ -9,6 +9,7 @@ use TaskManager\Projections\Domain\Entity\TaskProjection;
 use TaskManager\Projections\Domain\Event\TaskInformationWasChangedEvent;
 use TaskManager\Projections\Domain\Event\TaskLinkWasCreated;
 use TaskManager\Projections\Domain\Event\TaskLinkWasDeleted;
+use TaskManager\Projections\Domain\Event\TaskStatusWasChangedEvent;
 use TaskManager\Projections\Domain\Exception\ProjectionDoesNotExistException;
 use TaskManager\Projections\Domain\Repository\TaskLinkProjectionRepositoryInterface;
 use TaskManager\Projections\Domain\Repository\TaskProjectionRepositoryInterface;
@@ -56,7 +57,8 @@ final class TaskLinkProjector extends Projector
         $this->unitOfWork->createProjection(new TaskLinkProjection(
             $event->getAggregateId(),
             $event->linkedTaskId,
-            $taskProjection->name
+            $taskProjection->name,
+            $taskProjection->status
         ));
     }
 
@@ -81,6 +83,24 @@ final class TaskLinkProjector extends Projector
         /** @var TaskLinkProjection $projection */
         foreach ($projections as $projection) {
             $projection->linkedTaskName = $event->name;
+        }
+    }
+
+    /**
+     * @throws \Exception
+     */
+    private function whenLinkedTaskStatusChanged(TaskStatusWasChangedEvent $event): void
+    {
+        $this->unitOfWork->loadProjections(
+            $this->repository->findAllByLinkedTaskId($event->getAggregateId())
+        );
+        $projections = $this->unitOfWork->getProjections(
+            fn (TaskLinkProjection $p) => $p->linkedTaskId === $event->getAggregateId()
+        );
+
+        /** @var TaskLinkProjection $projection */
+        foreach ($projections as $projection) {
+            $projection->linkedTaskStatus = (int) $event->status;
         }
     }
 

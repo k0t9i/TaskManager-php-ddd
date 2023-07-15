@@ -7,5 +7,6 @@
         <id name="taskId" length="36" />
         <id name="linkedTaskId" length="36" />
         <field name="linkedTaskName" length="4000" />
+        <field name="linkedTaskStatus" type="integer" />
     </entity>
 </doctrine-mapping>
