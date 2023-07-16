@@ -14,4 +14,5 @@ enum OperatorEnum: string
     case LessOrEqual = '<=';
     case In = 'IN';
     case NotIn = 'NIN';
+    case Like = 'CONTAINS';
 }
