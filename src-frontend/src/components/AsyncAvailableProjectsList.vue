@@ -4,6 +4,7 @@ import RequestStatus from "./RequestStatus.vue";
 import Datetime from "./Datetime.vue";
 import FormError from "./FormError.vue";
 import {useAvailableProjectsStore} from "../stores/availableProjects";
+import confirmModal from "./confirmModal";
 
 const projectsStore = useAvailableProjectsStore();
 await projectsStore.load();
@@ -62,7 +63,9 @@ async function onJoin(projectId) {
         <td>
           <span v-if="projectsStore.isLocked(project.id)"><div class="spinner-border spinner-border-sm text-dark mx-1" role="status" />Loading...</span>
           <span v-else>
-            <a href="#" @click.prevent="onJoin(project.id)" v-if="!project.isOwner && !project.isParticipating && ![0, 1].includes(project.lastRequestStatus) && project.status === 1">Join</a>
+            <a href="#" @click.prevent='confirmModal.show(() => {
+              onJoin(project.id);
+            }, `Join the project "${project.name}"?`)' v-if="!project.isOwner && !project.isParticipating && ![0, 1].includes(project.lastRequestStatus) && project.status === 1">Join</a>
           </span>
         </td>
       </tr>

@@ -5,6 +5,7 @@ import {useProjectStore} from "../stores/project";
 import FormError from "./FormError.vue";
 import Datetime from "./Datetime.vue";
 import {useProjectRequestsStore} from "../stores/projectRequests";
+import confirmModal from "./confirmModal";
 
 const route = useRoute();
 const id = route.params.id;
@@ -44,8 +45,12 @@ async function onReject(requestId) {
         <div v-else class="dropdown">
           <RequestStatus :status="request.status" :class="{'dropdown-toggle': request.status === 0 && project.status === 1}" data-bs-toggle="dropdown" aria-expanded="false" />
           <ul class="dropdown-menu" v-if="request.status === 0 && project.status === 1">
-            <li><a class="dropdown-item" href="#" @click.prevent="onConfirm(request.id)">Confirm</a></li>
-            <li><a class="dropdown-item" href="#" @click.prevent="onReject(request.id)">Reject</a></li>
+            <li><a class="dropdown-item" href="#" @click.prevent="confirmModal.show(() => {
+              onConfirm(request.id);
+            }, `Confirm ${request.userFirstname} ${request.userLastname}'s request?`)">Confirm</a></li>
+            <li><a class="dropdown-item" href="#" @click.prevent="confirmModal.show(() => {
+              onReject(request.id);
+            }, `Reject ${request.userFirstname} ${request.userLastname}'s request?`)">Reject</a></li>
           </ul>
         </div>
       </td>

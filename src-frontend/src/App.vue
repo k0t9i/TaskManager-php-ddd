@@ -2,6 +2,7 @@
 import {RouterView} from 'vue-router'
 import NavBar from "./components/NavBar.vue";
 import {useAuthStore} from "./stores/auth";
+import ConfirmModal from "./components/ConfirmModal.vue"
 
 const authStore = useAuthStore();
 </script>
@@ -9,6 +10,7 @@ const authStore = useAuthStore();
 <template>
   <NavBar v-if="authStore.token" />
   <RouterView />
+  <ConfirmModal />
 </template>
 
 <style scoped>

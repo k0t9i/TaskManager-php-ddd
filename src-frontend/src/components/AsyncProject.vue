@@ -9,6 +9,7 @@ import LockableButton from "./LockableButton.vue";
 import router from "../router";
 import {useProjectParticipantsStore} from "../stores/projectParticipants";
 import {useUserStore} from "../stores/user";
+import confirmModal from "./confirmModal";
 
 const route = useRoute();
 const projectStore = useProjectStore();
@@ -65,7 +66,9 @@ async function onLeave(id) {
           </li>
         </ul>
         <LockableButton
-            @click.prevent="onLeave(project.id)"
+            @click.prevent='confirmModal.show(() => {
+              onLeave(project.id);
+            }, `Leave the project "${project.name}"?`)'
             v-if="project.id && !project.isOwner && project.status !== 0 && participant && participant.tasksCount === 0"
             class="btn btn-outline-danger btn-sm m-3"
             :locked="isLeaveLocked"

@@ -3,6 +3,7 @@ import {useRoute} from "vue-router";
 import {useProjectStore} from "../stores/project";
 import FormError from "./FormError.vue";
 import {useProjectParticipantsStore} from "../stores/projectParticipants";
+import confirmModal from "./confirmModal";
 
 const route = useRoute();
 const id = route.params.id;
@@ -12,7 +13,6 @@ const participantsStore = useProjectParticipantsStore();
 await participantsStore.load(id);
 await projectStore.load(id);
 const project = projectStore.project(id);
-const participants = participantsStore.getParticipants(id);
 
 async function onRemove(participantId) {
   await participantsStore.remove(id, participantId);
@@ -37,7 +37,7 @@ async function makeOwner(participantId) {
     </tr>
     </thead>
     <tbody>
-    <tr v-for="(participant, key, index) in participants">
+    <tr v-for="(participant, key, index) in participantsStore.getParticipants(id)">
       <th scope="row">{{ index + 1 }}</th>
       <td>{{ participant.userEmail }}</td>
       <td>{{ participant.userFirstname }}</td>
@@ -45,13 +45,17 @@ async function makeOwner(participantId) {
       <td>
         <div v-if="project.status !== 0 && project.isOwner && participant.tasksCount === 0">
           <span v-if="participantsStore.isLocked(participant.userId)"><div class="spinner-border spinner-border-sm text-dark mx-1" role="status" />Loading...</span>
-          <a href="#" v-else @click.prevent="onRemove(participant.userId)">Remove</a>
+          <a href="#" v-else @click.prevent="confirmModal.show(() => {
+            onRemove(participant.userId);
+          }, `Remove ${participant.userFirstname} ${participant.userLastname} from the project?`)">Remove</a>
         </div>
       </td>
       <td>
         <div v-if="project.status !== 0 && project.isOwner">
           <span v-if="projectStore.isLocked(id)"><div class="spinner-border spinner-border-sm text-dark mx-1" role="status" />Loading...</span>
-          <a href="#" v-else @click.prevent="makeOwner(participant.userId)">Make the owner</a>
+          <a href="#" v-else @click.prevent="confirmModal.show(() => {
+            makeOwner(participant.userId);
+          }, `Make ${participant.userFirstname} ${participant.userLastname} the owner of the project?`)">Make the owner</a>
         </div>
       </td>
     </tr>
