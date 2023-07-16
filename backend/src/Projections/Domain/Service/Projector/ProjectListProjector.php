@@ -101,6 +101,7 @@ final class ProjectListProjector extends Projector
             $projection->ownerFullName = $userProjection->getFullName();
             $projection->isOwner = $projection->userId === $event->ownerId;
             if ($projection->isOwner) {
+                $projection->isInvolved = true;
                 $projection->lastRequestStatus = null;
             }
         }
