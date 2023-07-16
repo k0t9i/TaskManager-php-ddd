@@ -75,6 +75,22 @@ export const useProjectStore = defineStore({
                 .finally(() => {
                     this.locked[id] = false;
                 });
+        },
+        async makeOwner(id, newOwnerId) {
+            this.errors[id] = '';
+            this.locked[id] = true;
+
+            return axiosInstance.patch(`/projects/${id}/change-owner/${newOwnerId}/`)
+                .then((response) => {
+                    this.projects[id].isOwner = false;
+                    return response;
+                })
+                .catch((error) => {
+                    this.errors[id] = error.response.data.message;
+                })
+                .finally(() => {
+                    this.locked[id] = false;
+                });
         }
     }
 });

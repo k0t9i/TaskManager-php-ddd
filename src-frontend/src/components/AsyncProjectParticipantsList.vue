@@ -17,6 +17,10 @@ const participants = participantsStore.getParticipants(id);
 async function onRemove(participantId) {
   await participantsStore.remove(id, participantId);
 }
+
+async function makeOwner(participantId) {
+  await projectStore.makeOwner(id, participantId);
+}
 </script>
 
 <template>
@@ -28,6 +32,7 @@ async function onRemove(participantId) {
       <th scope="col">Email</th>
       <th scope="col">Firstname</th>
       <th scope="col">Lastname</th>
+      <th scope="col"></th>
       <th scope="col"></th>
     </tr>
     </thead>
@@ -41,6 +46,12 @@ async function onRemove(participantId) {
         <div v-if="project.status !== 0 && project.isOwner && participant.tasksCount === 0">
           <span v-if="participantsStore.isLocked(participant.userId)"><div class="spinner-border spinner-border-sm text-dark mx-1" role="status" />Loading...</span>
           <a href="#" v-else @click.prevent="onRemove(participant.userId)">Remove</a>
+        </div>
+      </td>
+      <td>
+        <div v-if="project.status !== 0 && project.isOwner">
+          <span v-if="projectStore.isLocked(id)"><div class="spinner-border spinner-border-sm text-dark mx-1" role="status" />Loading...</span>
+          <a href="#" v-else @click.prevent="makeOwner(participant.userId)">Make the owner</a>
         </div>
       </td>
     </tr>
