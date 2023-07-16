@@ -35,9 +35,7 @@ export const useProjectParticipantsStore = defineStore({
                 axiosInstance
                     .get(`/projects/${projectId}/participants/`)
                     .then((response) => {
-                        if (!this.participants[projectId]) {
-                            this.participants[projectId] = {};
-                        }
+                        this.participants[projectId] = {};
                         for (const [key, value] of Object.entries(response.data)) {
                             this.participants[projectId][value.userId] = value;
                         }
