@@ -5,14 +5,17 @@ declare(strict_types=1);
 namespace TaskManager\Projections\Infrastructure\Repository;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ObjectRepository;
+use Doctrine\ORM\EntityRepository;
 use TaskManager\Projections\Domain\Entity\UserRequestProjection;
 use TaskManager\Projections\Domain\Repository\UserRequestProjectionRepositoryInterface;
+use TaskManager\Shared\Domain\Criteria\Criteria;
+use TaskManager\Shared\Infrastructure\Service\CriteriaFinderInterface;
 
 final readonly class DoctrineUserRequestProjectionRepository implements UserRequestProjectionRepositoryInterface
 {
     public function __construct(
-        private EntityManagerInterface $entityManager
+        private EntityManagerInterface $entityManager,
+        private CriteriaFinderInterface $finder,
     ) {
     }
 
@@ -36,11 +39,9 @@ final readonly class DoctrineUserRequestProjectionRepository implements UserRequ
     /**
      * @return UserRequestProjection[]
      */
-    public function findAllByUserId(string $id): array
+    public function findAllByCriteria(Criteria $criteria): array
     {
-        return $this->getRepository()->findBy([
-            'userId' => $id,
-        ]);
+        return $this->finder->findAllByCriteria($this->getRepository(), $criteria);
     }
 
     public function save(UserRequestProjection $projection): void
@@ -49,7 +50,7 @@ final readonly class DoctrineUserRequestProjectionRepository implements UserRequ
         $this->entityManager->flush();
     }
 
-    private function getRepository(): ObjectRepository
+    private function getRepository(): EntityRepository
     {
         return $this->entityManager->getRepository(UserRequestProjection::class);
     }

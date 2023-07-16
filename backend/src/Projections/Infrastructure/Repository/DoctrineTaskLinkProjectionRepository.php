@@ -5,25 +5,26 @@ declare(strict_types=1);
 namespace TaskManager\Projections\Infrastructure\Repository;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ObjectRepository;
+use Doctrine\ORM\EntityRepository;
 use TaskManager\Projections\Domain\Entity\TaskLinkProjection;
 use TaskManager\Projections\Domain\Repository\TaskLinkProjectionRepositoryInterface;
+use TaskManager\Shared\Domain\Criteria\Criteria;
+use TaskManager\Shared\Infrastructure\Service\CriteriaFinderInterface;
 
 final readonly class DoctrineTaskLinkProjectionRepository implements TaskLinkProjectionRepositoryInterface
 {
     public function __construct(
-        private EntityManagerInterface $entityManager
+        private EntityManagerInterface $entityManager,
+        private CriteriaFinderInterface $finder
     ) {
     }
 
     /**
      * @return TaskLinkProjection[]
      */
-    public function findAllByTaskId(string $id): array
+    public function findAllByCriteria(Criteria $criteria): array
     {
-        return $this->getRepository()->findBy([
-            'taskId' => $id,
-        ]);
+        return $this->finder->findAllByCriteria($this->getRepository(), $criteria);
     }
 
     /**
@@ -56,7 +57,7 @@ final readonly class DoctrineTaskLinkProjectionRepository implements TaskLinkPro
         $this->entityManager->flush();
     }
 
-    private function getRepository(): ObjectRepository
+    private function getRepository(): EntityRepository
     {
         return $this->entityManager->getRepository(TaskLinkProjection::class);
     }

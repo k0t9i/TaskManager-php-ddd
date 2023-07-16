@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TaskManager\Projections\Domain\Repository;
 
 use TaskManager\Projections\Domain\Entity\TaskListProjection;
+use TaskManager\Shared\Domain\Criteria\Criteria;
 
 interface TaskListProjectionRepositoryInterface
 {
@@ -18,7 +19,7 @@ interface TaskListProjectionRepositoryInterface
     /**
      * @return TaskListProjection[]
      */
-    public function findAllByProjectId(string $id): array;
+    public function findAllByCriteria(Criteria $criteria): array;
 
     public function countByProjectAndOwnerId(string $projectId, string $ownerId): int;
 

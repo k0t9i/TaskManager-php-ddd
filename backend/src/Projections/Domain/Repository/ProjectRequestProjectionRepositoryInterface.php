@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TaskManager\Projections\Domain\Repository;
 
 use TaskManager\Projections\Domain\Entity\ProjectRequestProjection;
+use TaskManager\Shared\Domain\Criteria\Criteria;
 
 interface ProjectRequestProjectionRepositoryInterface
 {
@@ -18,7 +19,7 @@ interface ProjectRequestProjectionRepositoryInterface
     /**
      * @return ProjectRequestProjection[]
      */
-    public function findAllByProjectId(string $id): array;
+    public function findAllByCriteria(Criteria $criteria): array;
 
     public function save(ProjectRequestProjection $projection): void;
 }

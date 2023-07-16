@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TaskManager\Projections\Domain\Repository;
 
 use TaskManager\Projections\Domain\Entity\UserRequestProjection;
+use TaskManager\Shared\Domain\Criteria\Criteria;
 
 interface UserRequestProjectionRepositoryInterface
 {
@@ -18,7 +19,7 @@ interface UserRequestProjectionRepositoryInterface
     /**
      * @return UserRequestProjection[]
      */
-    public function findAllByUserId(string $id): array;
+    public function findAllByCriteria(Criteria $criteria): array;
 
     public function save(UserRequestProjection $projection): void;
 }

@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace TaskManager\Projections\Domain\Repository;
 
 use TaskManager\Projections\Domain\Entity\TaskLinkProjection;
+use TaskManager\Shared\Domain\Criteria\Criteria;
 
 interface TaskLinkProjectionRepositoryInterface
 {
     /**
      * @return TaskLinkProjection[]
      */
-    public function findAllByTaskId(string $id): array;
+    public function findAllByCriteria(Criteria $criteria): array;
 
     /**
      * @return TaskLinkProjection[]

@@ -12,6 +12,9 @@ use TaskManager\Projections\Domain\Exception\ObjectDoesNotExistException;
 use TaskManager\Projections\Domain\Repository\ProjectProjectionRepositoryInterface;
 use TaskManager\Projections\Domain\Repository\ProjectRequestProjectionRepositoryInterface;
 use TaskManager\Shared\Application\Bus\Query\QueryHandlerInterface;
+use TaskManager\Shared\Domain\Criteria\Criteria;
+use TaskManager\Shared\Domain\Criteria\Operand;
+use TaskManager\Shared\Domain\Criteria\OperatorEnum;
 
 final readonly class ProjectRequestQueryHandler implements QueryHandlerInterface
 {
@@ -38,6 +41,10 @@ final readonly class ProjectRequestQueryHandler implements QueryHandlerInterface
             throw new InsufficientPermissionsException(sprintf('Insufficient permissions to view the project "%s".', $query->projectId));
         }
 
-        return $this->repository->findAllByProjectId($query->projectId);
+        $criteria = new Criteria([
+            new Operand('projectId', OperatorEnum::Equal, $query->projectId),
+        ]);
+
+        return $this->repository->findAllByCriteria($criteria);
     }
 }

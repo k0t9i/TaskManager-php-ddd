@@ -5,14 +5,17 @@ declare(strict_types=1);
 namespace TaskManager\Projections\Infrastructure\Repository;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ObjectRepository;
+use Doctrine\ORM\EntityRepository;
 use TaskManager\Projections\Domain\Entity\ProjectParticipantProjection;
 use TaskManager\Projections\Domain\Repository\ProjectParticipantProjectionRepositoryInterface;
+use TaskManager\Shared\Domain\Criteria\Criteria;
+use TaskManager\Shared\Infrastructure\Service\CriteriaFinderInterface;
 
 final readonly class DoctrineProjectParticipantProjectionRepository implements ProjectParticipantProjectionRepositoryInterface
 {
     public function __construct(
-        private EntityManagerInterface $entityManager
+        private EntityManagerInterface $entityManager,
+        private CriteriaFinderInterface $finder
     ) {
     }
 
@@ -37,11 +40,9 @@ final readonly class DoctrineProjectParticipantProjectionRepository implements P
     /**
      * @return ProjectParticipantProjection[]
      */
-    public function findAllByProjectId(string $id): array
+    public function findAllByCriteria(Criteria $criteria): array
     {
-        return $this->getRepository()->findBy([
-            'projectId' => $id,
-        ]);
+        return $this->finder->findAllByCriteria($this->getRepository(), $criteria);
     }
 
     public function save(ProjectParticipantProjection $projection): void
@@ -56,7 +57,7 @@ final readonly class DoctrineProjectParticipantProjectionRepository implements P
         $this->entityManager->flush();
     }
 
-    private function getRepository(): ObjectRepository
+    private function getRepository(): EntityRepository
     {
         return $this->entityManager->getRepository(ProjectParticipantProjection::class);
     }

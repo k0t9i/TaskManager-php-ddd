@@ -9,6 +9,9 @@ use TaskManager\Projections\Application\Service\CurrentUserExtractorInterface;
 use TaskManager\Projections\Domain\Entity\UserRequestProjection;
 use TaskManager\Projections\Domain\Repository\UserRequestProjectionRepositoryInterface;
 use TaskManager\Shared\Application\Bus\Query\QueryHandlerInterface;
+use TaskManager\Shared\Domain\Criteria\Criteria;
+use TaskManager\Shared\Domain\Criteria\Operand;
+use TaskManager\Shared\Domain\Criteria\OperatorEnum;
 
 final readonly class UserRequestQueryHandler implements QueryHandlerInterface
 {
@@ -25,6 +28,10 @@ final readonly class UserRequestQueryHandler implements QueryHandlerInterface
     {
         $user = $this->userExtractor->extract();
 
-        return $this->repository->findAllByUserId($user->id);
+        $criteria = new Criteria([
+            new Operand('userId', OperatorEnum::Equal, $user->id),
+        ]);
+
+        return $this->repository->findAllByCriteria($criteria);
     }
 }

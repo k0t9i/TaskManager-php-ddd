@@ -13,6 +13,9 @@ use TaskManager\Projections\Domain\Repository\ProjectProjectionRepositoryInterfa
 use TaskManager\Projections\Domain\Repository\TaskLinkProjectionRepositoryInterface;
 use TaskManager\Projections\Domain\Repository\TaskProjectionRepositoryInterface;
 use TaskManager\Shared\Application\Bus\Query\QueryHandlerInterface;
+use TaskManager\Shared\Domain\Criteria\Criteria;
+use TaskManager\Shared\Domain\Criteria\Operand;
+use TaskManager\Shared\Domain\Criteria\OperatorEnum;
 
 final readonly class TaskLinkQueryHandler implements QueryHandlerInterface
 {
@@ -41,6 +44,10 @@ final readonly class TaskLinkQueryHandler implements QueryHandlerInterface
             throw new InsufficientPermissionsException(sprintf('Insufficient permissions to view the project "%s".', $task->projectId));
         }
 
-        return $this->repository->findAllByTaskId($query->taskId);
+        $criteria = new Criteria([
+            new Operand('taskId', OperatorEnum::Equal, $query->taskId),
+        ]);
+
+        return $this->repository->findAllByCriteria($criteria);
     }
 }

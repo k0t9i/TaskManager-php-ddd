@@ -8,11 +8,14 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use TaskManager\Projections\Domain\Entity\TaskListProjection;
 use TaskManager\Projections\Domain\Repository\TaskListProjectionRepositoryInterface;
+use TaskManager\Shared\Domain\Criteria\Criteria;
+use TaskManager\Shared\Infrastructure\Service\CriteriaFinderInterface;
 
 final readonly class DoctrineTaskListProjectionRepository implements TaskListProjectionRepositoryInterface
 {
     public function __construct(
-        private EntityManagerInterface $entityManager
+        private EntityManagerInterface $entityManager,
+        private CriteriaFinderInterface $finder
     ) {
     }
 
@@ -36,11 +39,9 @@ final readonly class DoctrineTaskListProjectionRepository implements TaskListPro
     /**
      * @return TaskListProjection[]
      */
-    public function findAllByProjectId(string $id): array
+    public function findAllByCriteria(Criteria $criteria): array
     {
-        return $this->getRepository()->findBy([
-            'projectId' => $id,
-        ]);
+        return $this->finder->findAllByCriteria($this->getRepository(), $criteria);
     }
 
     /**
