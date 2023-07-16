@@ -1,13 +1,14 @@
 services:
     nginx:
+        container_name: task_manager-nginx
         image: nginx:latest
         ports:
             - '8081:80'
         volumes:
-            - ../docker/configs/nginx:/etc/nginx/conf.d
+            - ../../docker/configs/nginx:/etc/nginx/conf.d
             - ../symfony:/var/www/symfony
             - ../src:/var/www/src
-            - ../logs/nginx:/var/log/nginx
+            - ../../logs/nginx:/var/log/nginx
         working_dir: /var/www
     rabbitmq:
         container_name: ${RABBITMQ_HOST:-task_manager-rabbitmq}
@@ -18,7 +19,7 @@ services:
     phpfpm:
         container_name: task_manager-php
         build:
-            context: ../
+            context: ../../
             dockerfile: ./docker/images/php/Dockerfile
             args:
                 RABBITMQ_QUEUE_NAME: ${RABBITMQ_QUEUE_NAME}
@@ -30,10 +31,9 @@ services:
             - rabbitmq
             - nginx
         volumes:
-            - ../symfony:/var/www/symfony:cached
-            - /var/www/symfony/var/cache
-            - ../src:/var/www/src:cached
-            - ../logs/supervisor:/var/log/supervisor
+            - ../symfony:/var/www/symfony
+            - ../src:/var/www/src
+            - ../../logs/supervisor:/var/log/supervisor
         expose:
             - 9000
     db:
@@ -45,7 +45,7 @@ services:
             POSTGRES_USER: ${DATABASE_USER:-root}
             POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-}
         volumes:
-            - ../data/db:/var/lib/postgresql/data
+            - ../../data/db:/var/lib/postgresql/data
     adminer:
         container_name: task_manager-adminer
         image: adminer:latest
@@ -55,10 +55,10 @@ services:
     frontend:
         container_name: task_manager-frontend
         build:
-            context: ../
+            context: ../../
             dockerfile: ./docker/images/frontend/Dockerfile
         restart: unless-stopped
         volumes:
-            - ../src-frontend:/app
+            - ../../frontend:/app
         ports:
             - 7080:7080

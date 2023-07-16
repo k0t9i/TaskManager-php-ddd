@@ -24,7 +24,10 @@ generate-ssl-keys:
 .PHONY: clean-cache
 clean-cache:
 	docker exec task_manager-php rm -rf symfony/var/cache/
-    docker exec task_manager-php php symfony/bin/console cache:warmup
+
+.PHONY: warmup-cache
+warmup-cache:
+	docker exec task_manager-php php symfony/bin/console cache:warmup
 
 .PHONY: migrate
 migrate:
@@ -35,4 +38,4 @@ supervisor-reload:
 	docker exec task_manager-php supervisorctl reload
 
 .PHONY: setup
-setup: composer-install generate-ssl-keys migrate clean-cache supervisor-reload
+setup: composer-install generate-ssl-keys migrate clean-cache warmup-cache supervisor-reload
