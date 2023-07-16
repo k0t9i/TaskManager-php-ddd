@@ -37,5 +37,9 @@ migrate:
 supervisor-reload:
 	docker exec task_manager-php supervisorctl reload
 
+.PHONY: projections-reload
+projections-reload:
+	docker exec task_manager-php php symfony/bin/console projections:reload -vv
+
 .PHONY: setup
 setup: composer-install generate-ssl-keys migrate clean-cache warmup-cache supervisor-reload
