@@ -137,8 +137,7 @@ final class Project extends AggregateRoot
         $this->owner->ensureUserIsOwner($currentUserId);
 
         $this->owner->ensureUserIsNotOwner($owner->id);
-        $this->participants->ensureUserIsNotParticipant($owner->id);
-        $this->tasks->ensureUserDoesNotHaveTask($this->owner->id, $this->id);
+        $this->participants->ensureUserIsParticipant($owner->id);
 
         /** @var Request $pendingRequest */
         $pendingRequest = $this->requests->findFirst(function (string $key, Request $request) use ($owner) {
@@ -148,13 +147,19 @@ final class Project extends AggregateRoot
             $this->rejectRequest($pendingRequest->getId(), $currentUserId);
         }
 
-        $this->owner = $owner;
+        // Remove new owner from participants
+        $this->removeParticipantInner($owner->id, $currentUserId);
 
+        $oldOwner = $this->owner;
+        $this->owner = $owner;
         $this->registerEvent(new ProjectOwnerWasChangedEvent(
             $this->id->value,
             $this->owner->id->value,
             $currentUserId->value
         ));
+
+        // Add old owner to participants
+        $this->addParticipant($oldOwner->id, $currentUserId);
     }
 
     public function equals(Equatable $other): bool
@@ -169,11 +174,13 @@ final class Project extends AggregateRoot
     public function removeParticipant(ProjectUserId $participantId, ProjectUserId $currentUserId): void
     {
         $this->owner->ensureUserIsOwner($currentUserId);
+        $this->tasks->ensureUserDoesNotHaveTask($participantId, $this->id);
         $this->removeParticipantInner($participantId, $currentUserId);
     }
 
     public function leaveProject(ProjectUserId $participantId): void
     {
+        $this->tasks->ensureUserDoesNotHaveTask($participantId, $this->id);
         $this->removeParticipantInner($participantId, $participantId);
     }
 
@@ -203,17 +210,7 @@ final class Project extends AggregateRoot
     public function confirmRequest(RequestId $id, ProjectUserId $currentUserId): void
     {
         $request = $this->changeRequestStatus($id, new ConfirmedRequestStatus(), $currentUserId);
-
-        $this->participants->addOrUpdateElement(new Participant(
-            $this->id,
-            $request->getUserId()
-        ));
-
-        $this->registerEvent(new ProjectParticipantWasAddedEvent(
-            $this->id->value,
-            $request->getUserId()->value,
-            $currentUserId->value
-        ));
+        $this->addParticipant($request->getUserId(), $currentUserId);
     }
 
     public function rejectRequest(RequestId $id, ProjectUserId $currentUserId): void
@@ -357,7 +354,6 @@ final class Project extends AggregateRoot
     {
         $this->status->ensureAllowsModification();
         $this->participants->ensureUserIsParticipant($participantId);
-        $this->tasks->ensureUserDoesNotHaveTask($participantId, $this->id);
 
         $this->participants->remove($participantId->value);
 
@@ -393,6 +389,20 @@ final class Project extends AggregateRoot
         ));
 
         return $request;
+    }
+
+    private function addParticipant(ProjectUserId $participantId, ProjectUserId $currentUserId): void
+    {
+        $this->participants->addOrUpdateElement(new Participant(
+            $this->id,
+            $participantId
+        ));
+
+        $this->registerEvent(new ProjectParticipantWasAddedEvent(
+            $this->id->value,
+            $participantId->value,
+            $currentUserId->value
+        ));
     }
 
     private function ensureUserIsProjectUser(ProjectUserId $userId): void
