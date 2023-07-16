@@ -56,7 +56,7 @@ final readonly class DoctrineProjectListProjectionRepository implements ProjectL
      */
     public function findAllWhereUserInvolved(string $userId): array
     {
-        //TODO find by criteria
+        // TODO find by criteria
         $queryBuilder = $this->getRepository()->createQueryBuilder('t');
 
         $queryBuilder->where('t.userId = :userId')
