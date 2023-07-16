@@ -37,17 +37,6 @@ final class CriteriaFieldValidator implements CriteriaFieldValidatorInterface
 
     private function checkProperty(\ReflectionClass $reflection, string $propertyName): bool
     {
-        $property = $reflection->hasProperty($propertyName) ? $reflection->getProperty($propertyName) : null;
-        if (null === $property) {
-            return false;
-        }
-
-        $type = $property->getType();
-        if (!($type instanceof \ReflectionNamedType)) {
-            return false;
-        }
-
-        // Only scalar types
-        return !class_exists($type->getName());
+        return $reflection->hasProperty($propertyName);
     }
 }
