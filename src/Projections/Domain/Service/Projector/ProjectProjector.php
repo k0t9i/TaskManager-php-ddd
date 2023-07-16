@@ -73,16 +73,20 @@ final class ProjectProjector extends Projector
         $projections = $this->getProjectionsById($event->getAggregateId());
 
         $oldProjection = null;
+        $newProjection = null;
         foreach ($projections as $projection) {
             if ($projection->userId === $projection->ownerId) {
                 $oldProjection = $projection;
             }
+            if ($projection->userId === $event->ownerId) {
+                $newProjection = $projection;
+                $newProjection->isOwner = true;
+            }
             $projection->ownerId = $event->ownerId;
         }
 
-        $newProjection = clone $oldProjection;
         $this->unitOfWork->deleteProjection($oldProjection);
-        $this->unitOfWork->loadProjection($newProjection);
+        $this->unitOfWork->createProjection($newProjection);
     }
 
     private function whenProjectStatusChanged(ProjectStatusWasChangedEvent $event): void
@@ -98,13 +102,23 @@ final class ProjectProjector extends Projector
     {
         $projections = $this->getProjectionsById($event->getAggregateId());
 
-        foreach ($projections as $projection) {
-            $newProjection = clone $projection;
-            $newProjection->userId = $event->participantId;
-            $newProjection->isOwner = false;
-            $this->unitOfWork->loadProjection($newProjection);
-            break;
+        if (0 === count($projections)) {
+            return;
         }
+
+        foreach ($projections as $projection) {
+            if ($projection->userId === $event->participantId) {
+                $projection->userId = $event->participantId;
+                $projection->isOwner = false;
+                $this->unitOfWork->createProjection($projection);
+                return;
+            }
+        }
+
+        $newProjection = clone array_pop($projections);
+        $newProjection->userId = $event->participantId;
+        $newProjection->isOwner = false;
+        $this->unitOfWork->createProjection($newProjection);
     }
 
     private function whenParticipantRemoved(ProjectParticipantWasRemovedEvent $event): void
