@@ -27,11 +27,6 @@ interface ProjectListProjectionRepositoryInterface
     /**
      * @return ProjectListProjection[]
      */
-    public function findAllWhereUserInvolved(string $userId): array;
-
-    /**
-     * @return ProjectListProjection[]
-     */
     public function findAllByCriteria(Criteria $criteria): array;
 
     public function save(ProjectListProjection $projection): void;

@@ -9,6 +9,8 @@ use TaskManager\Projections\Application\Service\CurrentUserExtractorInterface;
 use TaskManager\Projections\Domain\Entity\ProjectListProjection;
 use TaskManager\Projections\Domain\Repository\ProjectListProjectionRepositoryInterface;
 use TaskManager\Shared\Application\Bus\Query\QueryHandlerInterface;
+use TaskManager\Shared\Domain\Criteria\Operand;
+use TaskManager\Shared\Domain\Criteria\OperatorEnum;
 
 final readonly class UserProjectQueryHandler implements QueryHandlerInterface
 {
@@ -25,6 +27,11 @@ final readonly class UserProjectQueryHandler implements QueryHandlerInterface
     {
         $user = $this->userExtractor->extract();
 
-        return $this->repository->findAllWhereUserInvolved($user->id);
+        $criteria = new \TaskManager\Shared\Domain\Criteria\Criteria([
+            new Operand('userId', OperatorEnum::Equal, $user->id),
+            new Operand('isInvolved', OperatorEnum::Equal, true),
+        ]);
+
+        return $this->repository->findAllByCriteria($criteria);
     }
 }
