@@ -43,7 +43,7 @@ const tasks = tasksStore.getTasks(id);
       <td><TaskStatus :status="task.status" /></td>
       <td><Datetime :value="task.startDate" /></td>
       <td><Datetime :value="task.finishDate" /></td>
-      <td>{{ task.ownerFirstname }} {{ task.ownerLastname }} ({{ task.ownerEmail }})</td>
+      <td>{{ task.ownerFullName }}</td>
       <td>{{ task.linksCount }}</td>
     </tr>
     </tbody>

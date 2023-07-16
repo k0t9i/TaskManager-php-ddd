@@ -15,9 +15,7 @@ final class TaskListProjection implements Hashable
         public DateTime $startDate,
         public DateTime $finishDate,
         public string $ownerId,
-        public string $ownerEmail,
-        public string $ownerFirstname,
-        public string $ownerLastname,
+        public string $ownerFullName,
         public int $status,
         public string $projectId,
         public int $linksCount = 0

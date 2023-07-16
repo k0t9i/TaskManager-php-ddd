@@ -12,9 +12,7 @@ final class ProjectRequestProjection implements Hashable
     public function __construct(
         public string $id,
         public string $userId,
-        public string $userEmail,
-        public string $userFirstname,
-        public string $userLastname,
+        public string $userFullName,
         public int $status,
         public DateTime $changeDate,
         public string $projectId

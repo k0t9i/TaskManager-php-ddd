@@ -9,9 +9,7 @@
         <field name="startDate" column="start_date" type="tm_datetime" />
         <field name="finishDate" column="finish_date" type="tm_datetime" />
         <field name="ownerId" column="owner_id" length="36" />
-        <field name="ownerEmail" column="owner_email" length="4000" />
-        <field name="ownerFirstname" column="owner_firstname" length="4000" />
-        <field name="ownerLastname" column="owner_lastname" length="4000" />
+        <field name="ownerFullName" column="owner_full_name" length="4000" />
         <field name="status" type="integer" />
         <field name="projectId" column="project_id" length="36" />
         <field name="linksCount" column="links_count" type="integer" />

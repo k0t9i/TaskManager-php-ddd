@@ -6,9 +6,7 @@
     <entity name="TaskManager\Projections\Domain\Entity\ProjectRequestProjection" table="project_request_projections">
         <id name="id" length="36" />
         <field name="userId" column="user_id" length="36" />
-        <field name="userEmail" column="user_email" length="4000" />
-        <field name="userFirstname" column="user_firstname" length="4000" />
-        <field name="userLastname" column="user_lastname" length="4000" />
+        <field name="userFullName" column="user_full_name" length="4000" />
         <field name="status" type="integer" />
         <field name="changeDate" column="change_date" type="tm_datetime" />
         <field name="projectId" column="project_id" length="36" />

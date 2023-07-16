@@ -60,7 +60,7 @@ final readonly class DoctrineProjectListProjectionRepository implements ProjectL
         $queryBuilder = $this->getRepository()->createQueryBuilder('t');
 
         $queryBuilder->where('t.userId = :userId')
-            ->andWhere('t.isOwner = true or t.isParticipating = true');
+            ->andWhere('t.isInvolved = true');
 
         $queryBuilder->setParameter('userId', $userId);
 

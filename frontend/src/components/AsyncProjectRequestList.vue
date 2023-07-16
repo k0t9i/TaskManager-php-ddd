@@ -55,7 +55,7 @@ async function onReject(requestId) {
         </div>
       </td>
       <td><Datetime :value="request.changeDate" with-time /></td>
-      <td>{{ request.userFirstname }} {{ request.userLastname }} ({{ request.userEmail }})</td>
+      <td>{{ request.userFullName }}</td>
     </tr>
     </tbody>
   </table>

@@ -71,9 +71,7 @@ final class TaskListProjector extends Projector
             new DateTime($event->startDate),
             new DateTime($event->finishDate),
             $event->ownerId,
-            $userProjection->email,
-            $userProjection->firstname,
-            $userProjection->lastname,
+            $userProjection->getFullName(),
             (int) $event->status,
             $projectProjection->id
         ));
@@ -113,8 +111,7 @@ final class TaskListProjector extends Projector
 
         /** @var TaskListProjection $projection */
         foreach ($projections as $projection) {
-            $projection->ownerFirstname = $event->firstname;
-            $projection->ownerLastname = $event->lastname;
+            $projection->ownerFullName = UserProjection::fullName($event->firstname, $event->lastname);
         }
     }
 

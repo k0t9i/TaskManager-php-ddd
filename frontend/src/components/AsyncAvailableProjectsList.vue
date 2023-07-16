@@ -13,14 +13,12 @@ await projectsStore.load();
  * id: string,
  * name: string,
  * finishDate: Date,
- * ownerEmail: string,
- * ownerFirstname: string,
- * ownerLastname: string,
+ * ownerFullName: string,
  * status: number,
  * tasksCount: number,
  * participantsCount: number,
  * isOwner: boolean,
- * isParticipating: boolean,
+ * isInvolved: boolean,
  * lastRequestStatus: number
  * }>}
  */
@@ -51,11 +49,11 @@ async function onJoin(projectId) {
       <tr v-for="(project, key, index) in projects">
         <th scope="row">{{ index + 1 }}</th>
         <td>
-          <RouterLink :to="{name: 'project', params: { id: project.id }}" v-if="project.isOwner || project.isParticipating">{{ project.name }}</RouterLink>
+          <RouterLink :to="{name: 'project', params: { id: project.id }}" v-if="project.isInvolved">{{ project.name }}</RouterLink>
           <span v-else>{{ project.name }}</span>
         </td>
         <td><Datetime :value="project.finishDate" /></td>
-        <td>{{ project.ownerFirstname }} {{ project.ownerLastname }} ({{ project.ownerEmail }})</td>
+        <td>{{ project.ownerFullName }}</td>
         <td><ProjectStatus :status="project.status" /></td>
         <td>{{ project.tasksCount }}</td>
         <td>{{ project.participantsCount }}</td>
@@ -65,7 +63,7 @@ async function onJoin(projectId) {
           <span v-else>
             <a href="#" @click.prevent='confirmModal.show(() => {
               onJoin(project.id);
-            }, `Join the project "${project.name}"?`)' v-if="!project.isOwner && !project.isParticipating && ![0, 1].includes(project.lastRequestStatus) && project.status === 1">Join</a>
+            }, `Join the project "${project.name}"?`)' v-if="!project.isInvolved && ![0, 1].includes(project.lastRequestStatus) && project.status === 1">Join</a>
           </span>
         </td>
       </tr>

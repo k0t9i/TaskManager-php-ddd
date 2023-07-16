@@ -37,26 +37,12 @@ final readonly class ProjectListResponseDTO
         )]
         public string $ownerId,
         #[OA\Property(
-            description: 'Project owner email',
+            description: 'Project owner full name',
             oneOf: [new OA\Schema(
-                ref: '#components/schemas/userModel/properties/email'
+                ref: '#components/schemas/userModel/properties/fullName'
             )]
         )]
-        public string $ownerEmail,
-        #[OA\Property(
-            description: 'Project owner firstname',
-            oneOf: [new OA\Schema(
-                ref: '#components/schemas/userModel/properties/firstname'
-            )]
-        )]
-        public string $ownerFirstname,
-        #[OA\Property(
-            description: 'Project owner lastname',
-            oneOf: [new OA\Schema(
-                ref: '#components/schemas/userModel/properties/lastname'
-            )]
-        )]
-        public string $ownerLastname,
+        public string $ownerFullName,
         #[OA\Property(
             oneOf: [new OA\Schema(
                 ref: '#components/schemas/projectModel/properties/status'
@@ -88,11 +74,11 @@ final readonly class ProjectListResponseDTO
         )]
         public bool $isOwner,
         #[OA\Property(
-            description: 'Is current user participates in the project?',
+            description: 'Is current user involved in the project?',
             type: 'bool',
             example: true
         )]
-        public bool $isParticipating,
+        public bool $isInvolved,
         #[OA\Property(
             description: 'Last project request status of current user',
             oneOf: [new OA\Schema(
@@ -118,15 +104,13 @@ final readonly class ProjectListResponseDTO
                 $projection->name,
                 $projection->finishDate->getValue(),
                 $projection->ownerId,
-                $projection->ownerEmail,
-                $projection->ownerFirstname,
-                $projection->ownerLastname,
+                $projection->ownerFullName,
                 $projection->status,
                 $projection->tasksCount,
                 $projection->participantsCount,
                 $projection->pendingRequestsCount,
                 $projection->isOwner,
-                $projection->isParticipating,
+                $projection->isInvolved,
                 $projection->lastRequestStatus,
             );
         }

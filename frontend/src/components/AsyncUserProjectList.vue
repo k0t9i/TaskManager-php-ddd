@@ -11,9 +11,7 @@ await userProjectsStore.load();
  * id: string,
  * name: string,
  * finishDate: Date,
- * ownerEmail: string,
- * ownerFirstname: string,
- * ownerLastname: string,
+ * ownerFullName: string,
  * status: number,
  * tasksCount: number,
  * participantsCount: number
@@ -43,7 +41,7 @@ const projects = userProjectsStore.projects;
         <RouterLink :to="{name: 'project', params: { id: project.id }}">{{ project.name }}</RouterLink>
       </td>
       <td><Datetime :value="project.finishDate" /></td>
-      <td>{{ project.ownerFirstname }} {{ project.ownerLastname }} ({{ project.ownerEmail }})</td>
+      <td>{{ project.ownerFullName }}</td>
       <td><ProjectStatus :status="project.status" /></td>
       <td>{{ project.tasksCount }}</td>
       <td>{{ project.participantsCount }}</td>

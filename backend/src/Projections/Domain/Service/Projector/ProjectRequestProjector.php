@@ -57,9 +57,7 @@ final class ProjectRequestProjector extends Projector
         $this->unitOfWork->createProjection(new ProjectRequestProjection(
             $event->requestId,
             $event->userId,
-            $userProjection->email,
-            $userProjection->firstname,
-            $userProjection->lastname,
+            $userProjection->getFullName(),
             (int) $event->status,
             new DateTime($event->changeDate),
             $event->getAggregateId()
@@ -87,8 +85,7 @@ final class ProjectRequestProjector extends Projector
         $this->unitOfWork->loadProjections($projections);
 
         foreach ($projections as $projection) {
-            $projection->userFirstname = $event->firstname;
-            $projection->userLastname = $event->lastname;
+            $projection->userFullName = UserProjection::fullName($event->firstname, $event->lastname);
         }
     }
 

@@ -13,4 +13,14 @@ final class UserProjection
         public string $lastname
     ) {
     }
+
+    public static function fullName(string $firstname, string $lastname): string
+    {
+        return $firstname.' '.$lastname;
+    }
+
+    public function getFullName(): string
+    {
+        return self::fullName($this->firstname, $this->lastname);
+    }
 }

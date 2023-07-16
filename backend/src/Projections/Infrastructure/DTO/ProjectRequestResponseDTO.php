@@ -26,22 +26,10 @@ final readonly class ProjectRequestResponseDTO
         public string $userId,
         #[OA\Property(
             oneOf: [new OA\Schema(
-                ref: '#components/schemas/userModel/properties/email'
+                ref: '#components/schemas/userModel/properties/fullName'
             )]
         )]
-        public string $userEmail,
-        #[OA\Property(
-            oneOf: [new OA\Schema(
-                ref: '#components/schemas/userModel/properties/firstname'
-            )]
-        )]
-        public string $userFirstname,
-        #[OA\Property(
-            oneOf: [new OA\Schema(
-                ref: '#components/schemas/userModel/properties/lastname'
-            )]
-        )]
-        public string $userLastname,
+        public string $userFullName,
         #[OA\Property(
             oneOf: [new OA\Schema(
                 ref: '#components/schemas/requestModel/properties/status'
@@ -70,9 +58,7 @@ final readonly class ProjectRequestResponseDTO
             $result[] = new self(
                 $projection->id,
                 $projection->userId,
-                $projection->userEmail,
-                $projection->userFirstname,
-                $projection->userLastname,
+                $projection->userFullName,
                 $projection->status,
                 $projection->changeDate->getValue()
             );

@@ -43,26 +43,12 @@ final readonly class TaskListResponseDTO
         )]
         public string $ownerId,
         #[OA\Property(
-            description: 'Task owner email',
+            description: 'Task owner full name',
             oneOf: [new OA\Schema(
-                ref: '#components/schemas/userModel/properties/email'
+                ref: '#components/schemas/userModel/properties/fullName'
             )]
         )]
-        public string $ownerEmail,
-        #[OA\Property(
-            description: 'Task owner firstname',
-            oneOf: [new OA\Schema(
-                ref: '#components/schemas/userModel/properties/firstname'
-            )]
-        )]
-        public string $ownerFirstname,
-        #[OA\Property(
-            description: 'Task owner lastname',
-            oneOf: [new OA\Schema(
-                ref: '#components/schemas/userModel/properties/lastname'
-            )]
-        )]
-        public string $ownerLastname,
+        public string $ownerFullName,
         #[OA\Property(
             oneOf: [new OA\Schema(
                 ref: '#components/schemas/taskModel/properties/status'
@@ -94,9 +80,7 @@ final readonly class TaskListResponseDTO
                 $projection->startDate->getValue(),
                 $projection->finishDate->getValue(),
                 $projection->ownerId,
-                $projection->ownerEmail,
-                $projection->ownerFirstname,
-                $projection->ownerLastname,
+                $projection->ownerFullName,
                 $projection->status,
                 $projection->linksCount
             );
