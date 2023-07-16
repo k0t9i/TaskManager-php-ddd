@@ -186,7 +186,7 @@ final class ProjectListProjector extends Projector
             $newProjection->isOwner = false;
             $newProjection->lastRequestStatus = null;
 
-            $this->unitOfWork->loadProjection($newProjection);
+            $this->unitOfWork->createProjection($newProjection);
         }
     }
 
