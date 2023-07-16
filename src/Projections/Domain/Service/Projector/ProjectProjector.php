@@ -111,6 +111,7 @@ final class ProjectProjector extends Projector
                 $projection->userId = $event->participantId;
                 $projection->isOwner = false;
                 $this->unitOfWork->createProjection($projection);
+
                 return;
             }
         }
