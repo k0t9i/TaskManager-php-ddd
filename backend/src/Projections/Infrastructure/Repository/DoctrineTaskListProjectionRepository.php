@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace TaskManager\Projections\Infrastructure\Repository;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ObjectRepository;
+use Doctrine\ORM\EntityRepository;
 use TaskManager\Projections\Domain\Entity\TaskListProjection;
 use TaskManager\Projections\Domain\Repository\TaskListProjectionRepositoryInterface;
 
@@ -73,7 +73,7 @@ final readonly class DoctrineTaskListProjectionRepository implements TaskListPro
         $this->entityManager->flush();
     }
 
-    private function getRepository(): ObjectRepository
+    private function getRepository(): EntityRepository
     {
         return $this->entityManager->getRepository(TaskListProjection::class);
     }
