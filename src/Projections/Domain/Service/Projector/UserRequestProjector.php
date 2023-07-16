@@ -87,7 +87,7 @@ final class UserRequestProjector extends Projector
     private function getProjection(string $id): ?UserRequestProjection
     {
         /** @var UserRequestProjection $result */
-        $result = $this->unitOfWork->getProjection($id);
+        $result = $this->unitOfWork->findProjection($id);
 
         if (null !== $result) {
             return $result;

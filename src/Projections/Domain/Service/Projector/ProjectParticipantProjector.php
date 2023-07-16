@@ -71,7 +71,7 @@ final class ProjectParticipantProjector extends Projector
         $this->unitOfWork->loadProjections(
             $this->repository->findAllByUserId($event->getAggregateId())
         );
-        $projections = $this->unitOfWork->getProjections(
+        $projections = $this->unitOfWork->findProjections(
             fn (ProjectParticipantProjection $p) => $p->userId === $event->getAggregateId()
         );
 
@@ -94,7 +94,7 @@ final class ProjectParticipantProjector extends Projector
     private function getProjection(string $projectId, string $userId): ?ProjectParticipantProjection
     {
         /** @var ProjectParticipantProjection $result */
-        $result = $this->unitOfWork->getProjection(ProjectParticipantProjection::hash($projectId, $userId));
+        $result = $this->unitOfWork->findProjection(ProjectParticipantProjection::hash($projectId, $userId));
 
         if (null !== $result) {
             return $result;

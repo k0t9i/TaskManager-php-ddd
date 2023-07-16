@@ -76,7 +76,7 @@ final class TaskLinkProjector extends Projector
         $this->unitOfWork->loadProjections(
             $this->repository->findAllByLinkedTaskId($event->getAggregateId())
         );
-        $projections = $this->unitOfWork->getProjections(
+        $projections = $this->unitOfWork->findProjections(
             fn (TaskLinkProjection $p) => $p->linkedTaskId === $event->getAggregateId()
         );
 
@@ -94,7 +94,7 @@ final class TaskLinkProjector extends Projector
         $this->unitOfWork->loadProjections(
             $this->repository->findAllByLinkedTaskId($event->getAggregateId())
         );
-        $projections = $this->unitOfWork->getProjections(
+        $projections = $this->unitOfWork->findProjections(
             fn (TaskLinkProjection $p) => $p->linkedTaskId === $event->getAggregateId()
         );
 
@@ -107,7 +107,7 @@ final class TaskLinkProjector extends Projector
     private function getProjection(string $taskId, string $linkedTaskId): ?TaskLinkProjection
     {
         /** @var TaskLinkProjection $result */
-        $result = $this->unitOfWork->getProjection(TaskLinkProjection::hash($taskId, $linkedTaskId));
+        $result = $this->unitOfWork->findProjection(TaskLinkProjection::hash($taskId, $linkedTaskId));
 
         if (null !== $result) {
             return $result;

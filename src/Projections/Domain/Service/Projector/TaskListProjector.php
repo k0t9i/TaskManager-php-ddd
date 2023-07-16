@@ -107,7 +107,7 @@ final class TaskListProjector extends Projector
         $this->unitOfWork->loadProjections(
             $this->repository->findAllByOwnerId($event->getAggregateId())
         );
-        $projections = $this->unitOfWork->getProjections(
+        $projections = $this->unitOfWork->findProjections(
             fn (TaskListProjection $p) => $p->ownerId === $event->getAggregateId()
         );
 
@@ -146,7 +146,7 @@ final class TaskListProjector extends Projector
     private function getProjection(string $id): ?TaskListProjection
     {
         /** @var TaskListProjection $result */
-        $result = $this->unitOfWork->getProjection($id);
+        $result = $this->unitOfWork->findProjection($id);
 
         if (null !== $result) {
             return $result;

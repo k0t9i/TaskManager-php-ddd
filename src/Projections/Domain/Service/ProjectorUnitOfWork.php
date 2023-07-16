@@ -18,18 +18,10 @@ final class ProjectorUnitOfWork
     /**
      * @return Hashable[]
      */
-    public function getProjections(callable $callback = null): array
+    public function getProjections(): array
     {
-        $result = array_filter($this->projections, function ($value) {
+        return array_filter($this->projections, function ($value) {
             return !isset($this->deletedProjections[$value->getHash()]);
-        });
-
-        if (null === $callback) {
-            return $result;
-        }
-
-        return array_filter($result, function ($value) use ($callback) {
-            return call_user_func($callback, $value);
         });
     }
 
@@ -49,9 +41,19 @@ final class ProjectorUnitOfWork
         $this->deletedProjections = [];
     }
 
-    public function getProjection(string $hash): ?Hashable
+    public function findProjection(string $hash): ?Hashable
     {
         return $this->projections[$hash] ?? null;
+    }
+
+    /**
+     * @return Hashable[]
+     */
+    public function findProjections(callable $callback): array
+    {
+        return array_filter($this->projections, function ($value) use ($callback) {
+            return call_user_func($callback, $value);
+        });
     }
 
     /**

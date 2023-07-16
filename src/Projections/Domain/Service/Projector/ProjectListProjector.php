@@ -186,7 +186,7 @@ final class ProjectListProjector extends Projector
             $newProjection->isOwner = false;
             $newProjection->lastRequestStatus = null;
 
-            $this->unitOfWork->loadProjection($newProjection);
+            $this->unitOfWork->createProjection($newProjection);
         }
     }
 
@@ -195,7 +195,7 @@ final class ProjectListProjector extends Projector
         $this->unitOfWork->loadProjections(
             $this->repository->findAllByOwnerId($event->getAggregateId())
         );
-        $projections = $this->unitOfWork->getProjections(
+        $projections = $this->unitOfWork->findProjections(
             fn (ProjectListProjection $p) => $p->ownerId === $event->getAggregateId()
         );
 
@@ -215,7 +215,7 @@ final class ProjectListProjector extends Projector
             $this->repository->findAllById($id)
         );
 
-        return $this->unitOfWork->getProjections(
+        return $this->unitOfWork->findProjections(
             fn (ProjectListProjection $p) => $p->id === $id
         );
     }
