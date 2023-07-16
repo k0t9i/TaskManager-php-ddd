@@ -62,7 +62,7 @@ async function onJoin(projectId) {
         <td>
           <span v-if="projectsStore.isLocked(project.id)"><div class="spinner-border spinner-border-sm text-dark mx-1" role="status" />Loading...</span>
           <span v-else>
-            <a href="#" @click.prevent="onJoin(project.id)" v-if="!project.isOwner && ![0, 1].includes(project.lastRequestStatus) && project.status === 1">Join</a>
+            <a href="#" @click.prevent="onJoin(project.id)" v-if="!project.isOwner && !project.isParticipating && ![0, 1].includes(project.lastRequestStatus) && project.status === 1">Join</a>
           </span>
         </td>
       </tr>
