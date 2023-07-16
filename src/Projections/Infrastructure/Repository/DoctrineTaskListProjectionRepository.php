@@ -43,6 +43,24 @@ final readonly class DoctrineTaskListProjectionRepository implements TaskListPro
         ]);
     }
 
+    /**
+     * @throws \Doctrine\ORM\NoResultException
+     * @throws \Doctrine\ORM\NonUniqueResultException
+     */
+    public function countByProjectAndOwnerId(string $projectId, string $ownerId): int
+    {
+        $queryBuilder = $this->getRepository()->createQueryBuilder('t');
+
+        $queryBuilder->select('count(t.id)')
+            ->where('t.projectId = :projectId')
+            ->andWhere('t.ownerId = :ownerId');
+
+        $queryBuilder->setParameter('projectId', $projectId);
+        $queryBuilder->setParameter('ownerId', $ownerId);
+
+        return $queryBuilder->getQuery()->getSingleScalarResult();
+    }
+
     public function save(TaskListProjection $projection): void
     {
         $this->entityManager->persist($projection);
