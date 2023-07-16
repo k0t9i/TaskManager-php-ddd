@@ -20,6 +20,8 @@ interface TaskListProjectionRepositoryInterface
      */
     public function findAllByProjectId(string $id): array;
 
+    public function countByProjectAndOwnerId(string $projectId, string $ownerId): int;
+
     public function save(TaskListProjection $projection): void;
 
     public function delete(TaskListProjection $projection): void;

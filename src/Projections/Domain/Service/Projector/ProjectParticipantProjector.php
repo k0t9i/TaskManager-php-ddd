@@ -12,6 +12,7 @@ use TaskManager\Projections\Domain\Event\TaskWasCreatedEvent;
 use TaskManager\Projections\Domain\Event\UserProfileWasChangedEvent;
 use TaskManager\Projections\Domain\Exception\ProjectionDoesNotExistException;
 use TaskManager\Projections\Domain\Repository\ProjectParticipantProjectionRepositoryInterface;
+use TaskManager\Projections\Domain\Repository\TaskListProjectionRepositoryInterface;
 use TaskManager\Projections\Domain\Repository\UserProjectionRepositoryInterface;
 use TaskManager\Projections\Domain\Service\ProjectorUnitOfWork;
 
@@ -20,6 +21,7 @@ final class ProjectParticipantProjector extends Projector
     public function __construct(
         private readonly ProjectParticipantProjectionRepositoryInterface $repository,
         private readonly UserProjectionRepositoryInterface $userRepository,
+        private readonly TaskListProjectionRepositoryInterface $taskRepository,
         private readonly ProjectorUnitOfWork $unitOfWork
     ) {
     }
@@ -51,12 +53,15 @@ final class ProjectParticipantProjector extends Projector
             throw new ProjectionDoesNotExistException($event->participantId, UserProjection::class);
         }
 
+        $tasksCount = $this->taskRepository->countByProjectAndOwnerId($event->getAggregateId(), $event->participantId);
+
         $this->unitOfWork->createProjection(new ProjectParticipantProjection(
             $event->participantId,
             $event->getAggregateId(),
             $userProjection->email,
             $userProjection->firstname,
-            $userProjection->lastname
+            $userProjection->lastname,
+            $tasksCount
         ));
     }
 
