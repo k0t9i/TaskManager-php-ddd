@@ -8,12 +8,14 @@ import axiosInstance from "../helpers/axios";
 import LockableButton from "./LockableButton.vue";
 import router from "../router";
 import {useProjectParticipantsStore} from "../stores/projectParticipants";
+import {useUserStore} from "../stores/user";
 
 const route = useRoute();
 const projectStore = useProjectStore();
 const requestsStore = useProjectRequestsStore();
 const tasksStore = useTasksStore();
 const participantsStore = useProjectParticipantsStore();
+const userStore = useUserStore();
 const id = route.params.id;
 const isLeaveLocked = ref(false);
 const error = ref('');
@@ -25,6 +27,7 @@ if (project.isOwner) {
 }
 await tasksStore.load(id);
 await participantsStore.load(id);
+const participant = participantsStore.getParticipants(id)[userStore.user.id];
 
 async function onLeave(id) {
   error.value = '';
@@ -63,7 +66,7 @@ async function onLeave(id) {
         </ul>
         <LockableButton
             @click.prevent="onLeave(project.id)"
-            v-if="project.id && !project.isOwner && project.status !== 0 && tasksStore.countAll(project.id) === 0"
+            v-if="project.id && !project.isOwner && project.status !== 0 && participant && participant.tasksCount === 0"
             class="btn btn-outline-danger btn-sm m-3"
             :locked="isLeaveLocked"
         >
