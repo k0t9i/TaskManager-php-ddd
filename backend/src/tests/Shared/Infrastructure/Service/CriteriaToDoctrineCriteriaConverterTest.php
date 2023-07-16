@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TaskManager\Tests\Shared\Infrastructure\Service;
 
+use Doctrine\Common\Collections\Criteria as DoctrineCriteria;
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\Common\Collections\Expr\CompositeExpression;
 use Doctrine\Common\Collections\Expr\Expression;
@@ -65,7 +66,9 @@ class CriteriaToDoctrineCriteriaConverterTest extends TestCase
 
         $doctrineCriteria = $converter->convert($criteria);
 
+        $this->assertInstanceOf(DoctrineCriteria::class, $doctrineCriteria);
         $comparisons = $this->getFlatComparisonList($doctrineCriteria->getWhereExpression());
+        $this->assertCount(count($operands), $comparisons);
         foreach ($comparisons as $key => $comparison) {
             /** @var Operand $operand */
             $operand = $operands[$key];
@@ -73,13 +76,11 @@ class CriteriaToDoctrineCriteriaConverterTest extends TestCase
             $this->assertEquals($operand->value, $comparison->getValue()->getValue());
             $this->assertEquals($operand->operator->value, $comparison->getOperator());
         }
-        $i = 0;
-        foreach ($doctrineCriteria->getOrderings() as $field => $ordering) {
-            /** @var Operand $operand */
-            $order = $orders[$i];
-            $this->assertEquals($order->property, $field);
-            $this->assertEquals($order->isAsc, 'ASC' === $ordering);
-            ++$i;
+        $orderings = $doctrineCriteria->getOrderings();
+        $this->assertCount(count($orders), $orderings);
+        foreach ($orders as $order) {
+            $this->assertArrayHasKey($order->property, $orderings);
+            $this->assertEquals($order->isAsc, 'ASC' === $orderings[$order->property]);
         }
         $this->assertEquals($offset, $doctrineCriteria->getFirstResult());
         $this->assertEquals($limit, $doctrineCriteria->getMaxResults());
