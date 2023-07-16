@@ -4,8 +4,4 @@ WORKDIR /app
 
 COPY ./src-frontend/package*.json ./
 
-RUN npm install
-
-COPY ./src-frontend .
-
-ENTRYPOINT [ "npm", "run", "dev" ]
+CMD \[ -d "node_modules" \] && npm run dev || npm ci && npm run dev
