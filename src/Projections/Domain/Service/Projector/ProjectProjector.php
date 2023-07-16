@@ -109,7 +109,7 @@ final class ProjectProjector extends Projector
 
     private function whenParticipantRemoved(ProjectParticipantWasRemovedEvent $event): void
     {
-        $projection = $this->unitOfWork->getProjection(
+        $projection = $this->unitOfWork->findProjection(
             ProjectProjection::hash($event->getAggregateId(), $event->participantId)
         );
         if (null === $projection) {
@@ -131,7 +131,7 @@ final class ProjectProjector extends Projector
             $this->repository->findAllById($id)
         );
 
-        return $this->unitOfWork->getProjections(
+        return $this->unitOfWork->findProjections(
             fn (ProjectProjection $p) => $p->id === $id
         );
     }

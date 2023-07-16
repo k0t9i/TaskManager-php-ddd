@@ -102,7 +102,7 @@ final class TaskProjector extends Projector
     private function getProjection(string $id): ?TaskProjection
     {
         /** @var TaskProjection $result */
-        $result = $this->unitOfWork->getProjection($id);
+        $result = $this->unitOfWork->findProjection($id);
 
         if (null !== $result) {
             return $result;
