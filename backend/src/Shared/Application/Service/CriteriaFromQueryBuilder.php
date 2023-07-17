@@ -15,19 +15,13 @@ final class CriteriaFromQueryBuilder implements CriteriaFromQueryBuilderInterfac
 {
     public function build(Criteria $criteria, QueryCriteriaDTO $dto): Criteria
     {
-        foreach ($dto->filters as $filterMetadata => $value) {
-            $parts = explode(':', $filterMetadata);
-
-            $operator = OperatorEnum::Equal;
-            $property = $parts[0];
-            if (count($parts) > 1) {
-                $operator = OperatorEnum::tryFrom(mb_strtolower($parts[1]));
-                if (null === $operator) {
-                    throw new CriteriaFilterOperatorNotExistException($parts[1], $property);
-                }
+        foreach ($dto->filters as $filter) {
+            $operator = OperatorEnum::tryFrom(mb_strtolower($filter->operator));
+            if (null === $operator) {
+                throw new CriteriaFilterOperatorNotExistException($filter->operator, $filter->property);
             }
 
-            $criteria->addOperand(new Operand($property, $operator, $value));
+            $criteria->addOperand(new Operand($filter->property, $operator, $filter->value));
         }
 
         if ($dto->orders) {

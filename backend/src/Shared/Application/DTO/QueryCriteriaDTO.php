@@ -6,6 +6,9 @@ namespace TaskManager\Shared\Application\DTO;
 
 final readonly class QueryCriteriaDTO
 {
+    /**
+     * @param QueryCriteriaFilterDTO[] $filters
+     */
     public function __construct(
         public array $filters,
         public array $orders,
