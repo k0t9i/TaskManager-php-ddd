@@ -18,49 +18,53 @@ final class Criteria
         private ?int $offset = null,
         private ?int $limit = null
     ) {
-        $first = array_shift($filters);
-        $this->expression = new Expression($first);
+        $this->expression = new Expression();
         foreach ($filters as $filter) {
-            $this->expression->andOperand($filter);
+            $this->addOperand($filter);
         }
     }
 
     public function reset(): self
     {
         $this->expression = new Expression();
-        $this->orders = [];
+        $this->resetOrders();
         $this->offset = null;
         $this->limit = null;
 
         return $this;
     }
 
-    public function loadScalarFilters(array $filters): self
+    public function resetOrders(): self
     {
-        foreach ($filters as $name => $value) {
-            $operator = OperatorEnum::Equal;
-            if (is_array($value)) {
-                $operator = OperatorEnum::In;
-            }
-            $this->expression->andOperand(new Operand((string) $name, $operator, $value));
-        }
+        $this->orders = [];
 
         return $this;
     }
 
-    public function loadScalarOrders(array $orders): self
+    public function addOperand(Operand $operand): self
     {
-        foreach ($orders as $name => $isAsc) {
-            $this->orders[] = new Order((string) $name, $isAsc);
-        }
+        $this->expression->andOperand($operand);
 
         return $this;
     }
 
-    public function loadOffsetAndLimit(?int $offset, ?int $limit): self
+    public function addOrder(Order $order): self
+    {
+        $this->orders[] = $order;
+
+        return $this;
+    }
+
+    public function setLimit(?int $limit): self
+    {
+        $this->limit = $limit;
+
+        return $this;
+    }
+
+    public function setOffset(?int $offset): self
     {
         $this->offset = $offset;
-        $this->limit = $limit;
 
         return $this;
     }
