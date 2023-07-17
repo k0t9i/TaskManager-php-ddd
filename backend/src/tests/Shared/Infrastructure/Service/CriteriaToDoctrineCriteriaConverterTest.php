@@ -72,9 +72,10 @@ class CriteriaToDoctrineCriteriaConverterTest extends TestCase
         foreach ($comparisons as $key => $comparison) {
             /** @var Operand $operand */
             $operand = $operands[$key];
+            $operator = CriteriaToDoctrineCriteriaConverter::getComparisonOperator($operand->operator);
             $this->assertEquals($operand->property, $comparison->getField());
             $this->assertEquals($operand->value, $comparison->getValue()->getValue());
-            $this->assertEquals($operand->operator->value, $comparison->getOperator());
+            $this->assertEquals($operator, $comparison->getOperator());
         }
         $orderings = $doctrineCriteria->getOrderings();
         $this->assertCount(count($orders), $orderings);
