@@ -112,4 +112,19 @@ class CriteriaFromQueryBuilderTest extends TestCase
 
         $builder->build($criteria, $dto);
     }
+
+    public function testBuildWithEmptyOrders(): void
+    {
+        $defaultOrderProperty = $this->faker->regexify('.{255}');
+        $criteria = new Criteria([], [
+            new Order($defaultOrderProperty, true),
+        ]);
+        $builder = new CriteriaFromQueryBuilder();
+
+        $builder->build($criteria, new QueryCriteriaDTO([], [], null, null));
+
+        $this->assertCount(1, $criteria->getOrders());
+        $this->assertEquals($defaultOrderProperty, $criteria->getOrders()[0]->property);
+        $this->assertTrue($criteria->getOrders()[0]->isAsc);
+    }
 }

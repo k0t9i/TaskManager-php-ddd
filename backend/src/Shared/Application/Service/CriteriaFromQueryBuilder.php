@@ -30,10 +30,12 @@ final class CriteriaFromQueryBuilder implements CriteriaFromQueryBuilderInterfac
             $criteria->addOperand(new Operand($property, $operator, $value));
         }
 
-        // Reset default ordering
-        $criteria->resetOrders();
-        foreach ($dto->orders as $name => $isAsc) {
-            $criteria->addOrder(new Order($name, (bool) $isAsc));
+        if ($dto->orders) {
+            // Reset default ordering
+            $criteria->resetOrders();
+            foreach ($dto->orders as $name => $isAsc) {
+                $criteria->addOrder(new Order((string) $name, (bool) $isAsc));
+            }
         }
 
         $criteria->setOffset($dto->offset)
