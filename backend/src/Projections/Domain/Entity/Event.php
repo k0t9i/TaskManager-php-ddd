@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace TaskManager\Projections\Domain\Entity;
 
 use TaskManager\Shared\Domain\Event\DomainEventInterface;
+use TaskManager\Shared\Domain\Service\DomainEventFactoryInterface;
 use TaskManager\Shared\Domain\ValueObject\DateTime;
-use TaskManager\Shared\Infrastructure\Service\DomainEventFactoryInterface;
 
 final readonly class Event
 {

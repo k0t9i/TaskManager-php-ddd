@@ -7,8 +7,8 @@ namespace TaskManager\Projections\Domain\Service\EventStore;
 use TaskManager\Projections\Domain\DTO\EventStreamInfoDTO;
 use TaskManager\Projections\Domain\Repository\EventRepositoryInterface;
 use TaskManager\Shared\Domain\Event\DomainEventInterface;
+use TaskManager\Shared\Domain\Service\DomainEventFactoryInterface;
 use TaskManager\Shared\Domain\ValueObject\DateTime;
-use TaskManager\Shared\Infrastructure\Service\DomainEventFactoryInterface;
 
 final readonly class EventStore implements EventStoreInterface
 {

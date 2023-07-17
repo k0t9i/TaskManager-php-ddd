@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TaskManager\Shared\Infrastructure\Service;
 
 use TaskManager\Shared\Domain\Event\DomainEventInterface;
+use TaskManager\Shared\Domain\Service\DomainEventFactoryInterface;
 
 final readonly class DomainEventFactory implements DomainEventFactoryInterface
 {

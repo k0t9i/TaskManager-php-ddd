@@ -6,7 +6,7 @@ namespace TaskManager\Shared\Infrastructure\Event;
 
 use TaskManager\Shared\Application\Bus\Event\DomainEventBusInterface;
 use TaskManager\Shared\Application\Bus\Event\IntegrationEventSubscriberInterface;
-use TaskManager\Shared\Infrastructure\Service\DomainEventFactoryInterface;
+use TaskManager\Shared\Domain\Service\DomainEventFactoryInterface;
 
 final readonly class IntegrationEventSubscriber implements IntegrationEventSubscriberInterface
 {

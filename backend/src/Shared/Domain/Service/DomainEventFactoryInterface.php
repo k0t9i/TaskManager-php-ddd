@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskManager\Shared\Infrastructure\Service;
+namespace TaskManager\Shared\Domain\Service;
 
 use TaskManager\Shared\Domain\Event\DomainEventInterface;
 
