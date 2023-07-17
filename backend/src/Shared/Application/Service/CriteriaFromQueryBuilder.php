@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace TaskManager\Shared\Application\Service;
 
-use TaskManager\Shared\Application\DTO\RequestCriteriaDTO;
+use TaskManager\Shared\Application\DTO\QueryCriteriaDTO;
 use TaskManager\Shared\Domain\Criteria\Criteria;
 use TaskManager\Shared\Domain\Criteria\Operand;
 use TaskManager\Shared\Domain\Criteria\OperatorEnum;
 use TaskManager\Shared\Domain\Criteria\Order;
 use TaskManager\Shared\Domain\Exception\CriteriaFilterOperatorNotExistException;
 
-final class CriteriaFromRequestBuilder implements CriteriaFromRequestBuilderInterface
+final class CriteriaFromQueryBuilder implements CriteriaFromQueryBuilderInterface
 {
-    public function build(Criteria $criteria, RequestCriteriaDTO $dto): Criteria
+    public function build(Criteria $criteria, QueryCriteriaDTO $dto): Criteria
     {
         foreach ($dto->filters as $filterMetadata => $value) {
             $parts = explode(':', $filterMetadata);

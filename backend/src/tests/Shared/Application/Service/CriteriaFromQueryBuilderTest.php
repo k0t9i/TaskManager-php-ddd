@@ -7,15 +7,15 @@ namespace TaskManager\Tests\Shared\Application\Service;
 use Faker\Factory;
 use Faker\Generator;
 use PHPUnit\Framework\TestCase;
-use TaskManager\Shared\Application\DTO\RequestCriteriaDTO;
-use TaskManager\Shared\Application\Service\CriteriaFromRequestBuilder;
+use TaskManager\Shared\Application\DTO\QueryCriteriaDTO;
+use TaskManager\Shared\Application\Service\CriteriaFromQueryBuilder;
 use TaskManager\Shared\Domain\Criteria\Criteria;
 use TaskManager\Shared\Domain\Criteria\LogicalOperatorEnum;
 use TaskManager\Shared\Domain\Criteria\Operand;
 use TaskManager\Shared\Domain\Criteria\Order;
 use TaskManager\Shared\Domain\Exception\CriteriaFilterOperatorNotExistException;
 
-class CriteriaFromRequestBuilderTest extends TestCase
+class CriteriaFromQueryBuilderTest extends TestCase
 {
     private Generator $faker;
 
@@ -31,7 +31,7 @@ class CriteriaFromRequestBuilderTest extends TestCase
         $criteria = new Criteria([], [
             new Order($defaultOrderProperty, true),
         ]);
-        $dto = new RequestCriteriaDTO(
+        $dto = new QueryCriteriaDTO(
             [
                 $this->faker->regexify('[a-zA-Z0-9]{255}') => $this->faker->regexify('.{255}'),
                 $this->faker->regexify('[a-zA-Z0-9]{255}').':eq' => $this->faker->regexify('.{255}'),
@@ -55,7 +55,7 @@ class CriteriaFromRequestBuilderTest extends TestCase
             $this->faker->numberBetween(),
             $this->faker->numberBetween()
         );
-        $builder = new CriteriaFromRequestBuilder();
+        $builder = new CriteriaFromQueryBuilder();
 
         $builder->build($criteria, $dto);
 
@@ -92,7 +92,7 @@ class CriteriaFromRequestBuilderTest extends TestCase
     {
         $property = $this->faker->regexify('[a-zA-Z0-9]{255}');
         $operator = $this->faker->regexify('[a-zA-Z0-9]{255}');
-        $dto = new RequestCriteriaDTO(
+        $dto = new QueryCriteriaDTO(
             [
                 $property.':'.$operator => $this->faker->regexify('.{255}'),
             ],
@@ -101,7 +101,7 @@ class CriteriaFromRequestBuilderTest extends TestCase
             null
         );
         $criteria = new Criteria();
-        $builder = new CriteriaFromRequestBuilder();
+        $builder = new CriteriaFromQueryBuilder();
 
         $this->expectException(CriteriaFilterOperatorNotExistException::class);
         $this->expectExceptionMessage(sprintf(
