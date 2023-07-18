@@ -12,15 +12,18 @@ use TaskManager\Projections\Domain\Exception\ObjectDoesNotExistException;
 use TaskManager\Projections\Domain\Repository\ProjectParticipantProjectionRepositoryInterface;
 use TaskManager\Projections\Domain\Repository\ProjectProjectionRepositoryInterface;
 use TaskManager\Shared\Application\Bus\Query\QueryHandlerInterface;
+use TaskManager\Shared\Application\Service\CriteriaFromQueryBuilderInterface;
 use TaskManager\Shared\Domain\Criteria\Criteria;
 use TaskManager\Shared\Domain\Criteria\Operand;
 use TaskManager\Shared\Domain\Criteria\OperatorEnum;
+use TaskManager\Shared\Domain\Criteria\Order;
 
 final readonly class ProjectParticipantQueryHandler implements QueryHandlerInterface
 {
     public function __construct(
         private ProjectParticipantProjectionRepositoryInterface $repository,
         private ProjectProjectionRepositoryInterface $projectRepository,
+        private CriteriaFromQueryBuilderInterface $criteriaBuilder,
         private CurrentUserExtractorInterface $userExtractor
     ) {
     }
@@ -42,9 +45,14 @@ final readonly class ProjectParticipantQueryHandler implements QueryHandlerInter
             throw new InsufficientPermissionsException(sprintf('Insufficient permissions to view the project "%s".', $query->projectId));
         }
 
-        $criteria = new Criteria([
-            new Operand('projectId', OperatorEnum::Equal, $query->projectId),
-        ]);
+        $criteria = new Criteria();
+
+        $criteria->addOperand(new Operand('projectId', OperatorEnum::Equal, $query->projectId))
+            ->addOrder(new Order('userEmail'))
+            ->addOrder(new Order('userFirstname'))
+            ->addOrder(new Order('userLastname'));
+
+        $this->criteriaBuilder->build($criteria, $query->criteria);
 
         return $this->repository->findAllByCriteria($criteria);
     }

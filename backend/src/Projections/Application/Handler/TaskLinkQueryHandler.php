@@ -13,9 +13,11 @@ use TaskManager\Projections\Domain\Repository\ProjectProjectionRepositoryInterfa
 use TaskManager\Projections\Domain\Repository\TaskLinkProjectionRepositoryInterface;
 use TaskManager\Projections\Domain\Repository\TaskProjectionRepositoryInterface;
 use TaskManager\Shared\Application\Bus\Query\QueryHandlerInterface;
+use TaskManager\Shared\Application\Service\CriteriaFromQueryBuilderInterface;
 use TaskManager\Shared\Domain\Criteria\Criteria;
 use TaskManager\Shared\Domain\Criteria\Operand;
 use TaskManager\Shared\Domain\Criteria\OperatorEnum;
+use TaskManager\Shared\Domain\Criteria\Order;
 
 final readonly class TaskLinkQueryHandler implements QueryHandlerInterface
 {
@@ -23,6 +25,7 @@ final readonly class TaskLinkQueryHandler implements QueryHandlerInterface
         private TaskLinkProjectionRepositoryInterface $repository,
         private TaskProjectionRepositoryInterface $taskRepository,
         private ProjectProjectionRepositoryInterface $projectRepository,
+        private CriteriaFromQueryBuilderInterface $criteriaBuilder,
         private CurrentUserExtractorInterface $userExtractor
     ) {
     }
@@ -44,9 +47,12 @@ final readonly class TaskLinkQueryHandler implements QueryHandlerInterface
             throw new InsufficientPermissionsException(sprintf('Insufficient permissions to view the project "%s".', $task->projectId));
         }
 
-        $criteria = new Criteria([
-            new Operand('taskId', OperatorEnum::Equal, $query->taskId),
-        ]);
+        $criteria = new Criteria();
+
+        $criteria->addOperand(new Operand('taskId', OperatorEnum::Equal, $query->taskId))
+            ->addOrder(new Order('linkedTaskName'));
+
+        $this->criteriaBuilder->build($criteria, $query->criteria);
 
         return $this->repository->findAllByCriteria($criteria);
     }

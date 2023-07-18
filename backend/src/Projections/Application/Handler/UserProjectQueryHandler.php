@@ -9,13 +9,17 @@ use TaskManager\Projections\Application\Service\CurrentUserExtractorInterface;
 use TaskManager\Projections\Domain\Entity\ProjectListProjection;
 use TaskManager\Projections\Domain\Repository\ProjectListProjectionRepositoryInterface;
 use TaskManager\Shared\Application\Bus\Query\QueryHandlerInterface;
+use TaskManager\Shared\Application\Service\CriteriaFromQueryBuilderInterface;
+use TaskManager\Shared\Domain\Criteria\Criteria;
 use TaskManager\Shared\Domain\Criteria\Operand;
 use TaskManager\Shared\Domain\Criteria\OperatorEnum;
+use TaskManager\Shared\Domain\Criteria\Order;
 
 final readonly class UserProjectQueryHandler implements QueryHandlerInterface
 {
     public function __construct(
         private ProjectListProjectionRepositoryInterface $repository,
+        private CriteriaFromQueryBuilderInterface $criteriaBuilder,
         private CurrentUserExtractorInterface $userExtractor
     ) {
     }
@@ -27,10 +31,13 @@ final readonly class UserProjectQueryHandler implements QueryHandlerInterface
     {
         $user = $this->userExtractor->extract();
 
-        $criteria = new \TaskManager\Shared\Domain\Criteria\Criteria([
-            new Operand('userId', OperatorEnum::Equal, $user->id),
-            new Operand('isInvolved', OperatorEnum::Equal, true),
-        ]);
+        $criteria = new Criteria();
+
+        $criteria->addOperand(new Operand('userId', OperatorEnum::Equal, $user->id))
+            ->addOperand(new Operand('isInvolved', OperatorEnum::Equal, true))
+            ->addOrder(new Order('finishDate'));
+
+        $this->criteriaBuilder->build($criteria, $query->criteria);
 
         return $this->repository->findAllByCriteria($criteria);
     }

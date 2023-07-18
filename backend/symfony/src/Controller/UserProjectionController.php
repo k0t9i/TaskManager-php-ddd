@@ -18,6 +18,8 @@ use TaskManager\Projections\Infrastructure\DTO\ProjectListResponseDTO;
 use TaskManager\Projections\Infrastructure\DTO\UserRequestResponseDTO;
 use TaskManager\Projections\Infrastructure\DTO\UserResponseDTO;
 use TaskManager\Shared\Application\Bus\Query\QueryBusInterface;
+use TaskManager\Shared\Infrastructure\Service\DTO\RequestCriteriaDTO;
+use TaskManager\Shared\Infrastructure\Service\QueryCriteriaFromRequestConverterInterface;
 
 #[AsController]
 #[Route('/api/users', name: 'user.')]
@@ -25,7 +27,8 @@ use TaskManager\Shared\Application\Bus\Query\QueryBusInterface;
 final readonly class UserProjectionController
 {
     public function __construct(
-        private QueryBusInterface $queryBus
+        private QueryBusInterface $queryBus,
+        private QueryCriteriaFromRequestConverterInterface $converter
     ) {
     }
 
@@ -78,9 +81,11 @@ final readonly class UserProjectionController
         ]
     )]
     #[Security(name: 'Bearer')]
-    public function getAllRequests(): JsonResponse
+    public function getAllRequests(RequestCriteriaDTO $criteria): JsonResponse
     {
-        $requests = $this->queryBus->dispatch(new UserRequestQuery());
+        $requests = $this->queryBus->dispatch(
+            new UserRequestQuery($this->converter->convert($criteria))
+        );
 
         return new JsonResponse(UserRequestResponseDTO::createFromProjections($requests));
     }
@@ -108,9 +113,11 @@ final readonly class UserProjectionController
         ]
     )]
     #[Security(name: 'Bearer')]
-    public function getAllProjects(): JsonResponse
+    public function getAllProjects(RequestCriteriaDTO $criteria): JsonResponse
     {
-        $projects = $this->queryBus->dispatch(new UserProjectQuery());
+        $projects = $this->queryBus->dispatch(
+            new UserProjectQuery($this->converter->convert($criteria))
+        );
 
         return new JsonResponse(ProjectListResponseDTO::createFromProjections($projects));
     }

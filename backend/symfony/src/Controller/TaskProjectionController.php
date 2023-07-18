@@ -16,6 +16,8 @@ use TaskManager\Projections\Application\Query\TaskQuery;
 use TaskManager\Projections\Infrastructure\DTO\TaskLinkResponseDTO;
 use TaskManager\Projections\Infrastructure\DTO\TaskResponseDTO;
 use TaskManager\Shared\Application\Bus\Query\QueryBusInterface;
+use TaskManager\Shared\Infrastructure\Service\DTO\RequestCriteriaDTO;
+use TaskManager\Shared\Infrastructure\Service\QueryCriteriaFromRequestConverterInterface;
 
 #[AsController]
 #[Route('/api/tasks', name: 'task.')]
@@ -23,7 +25,8 @@ use TaskManager\Shared\Application\Bus\Query\QueryBusInterface;
 final readonly class TaskProjectionController
 {
     public function __construct(
-        private QueryBusInterface $queryBus
+        private QueryBusInterface $queryBus,
+        private QueryCriteriaFromRequestConverterInterface $converter
     ) {
     }
 
@@ -87,9 +90,11 @@ final readonly class TaskProjectionController
         ]
     )]
     #[Security(name: 'Bearer')]
-    public function getAllLinks(string $id): JsonResponse
+    public function getAllLinks(string $id, RequestCriteriaDTO $criteria): JsonResponse
     {
-        $requests = $this->queryBus->dispatch(new TaskLinkQuery($id));
+        $requests = $this->queryBus->dispatch(
+            new TaskLinkQuery($id, $this->converter->convert($criteria))
+        );
 
         return new JsonResponse(TaskLinkResponseDTO::createFromProjections($requests));
     }

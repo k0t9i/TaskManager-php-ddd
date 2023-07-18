@@ -22,6 +22,8 @@ use TaskManager\Projections\Infrastructure\DTO\ProjectRequestResponseDTO;
 use TaskManager\Projections\Infrastructure\DTO\ProjectResponseDTO;
 use TaskManager\Projections\Infrastructure\DTO\TaskListResponseDTO;
 use TaskManager\Shared\Application\Bus\Query\QueryBusInterface;
+use TaskManager\Shared\Infrastructure\Service\DTO\RequestCriteriaDTO;
+use TaskManager\Shared\Infrastructure\Service\QueryCriteriaFromRequestConverterInterface;
 
 #[AsController]
 #[Route('/api/projects', name: 'project.')]
@@ -29,7 +31,8 @@ use TaskManager\Shared\Application\Bus\Query\QueryBusInterface;
 final readonly class ProjectProjectionController
 {
     public function __construct(
-        private QueryBusInterface $queryBus
+        private QueryBusInterface $queryBus,
+        private QueryCriteriaFromRequestConverterInterface $converter
     ) {
     }
 
@@ -55,9 +58,11 @@ final readonly class ProjectProjectionController
         ]
     )]
     #[Security(name: 'Bearer')]
-    public function getAll(): JsonResponse
+    public function getAll(RequestCriteriaDTO $criteria): JsonResponse
     {
-        $projects = $this->queryBus->dispatch(new ProjectListQuery());
+        $projects = $this->queryBus->dispatch(
+            new ProjectListQuery($this->converter->convert($criteria))
+        );
 
         return new JsonResponse(ProjectListResponseDTO::createFromProjections($projects));
     }
@@ -122,9 +127,11 @@ final readonly class ProjectProjectionController
         ]
     )]
     #[Security(name: 'Bearer')]
-    public function getAllRequests(string $id): JsonResponse
+    public function getAllRequests(string $id, RequestCriteriaDTO $criteria): JsonResponse
     {
-        $requests = $this->queryBus->dispatch(new ProjectRequestQuery($id));
+        $requests = $this->queryBus->dispatch(
+            new ProjectRequestQuery($id, $this->converter->convert($criteria))
+        );
 
         return new JsonResponse(ProjectRequestResponseDTO::createFromProjections($requests));
     }
@@ -156,9 +163,11 @@ final readonly class ProjectProjectionController
         ]
     )]
     #[Security(name: 'Bearer')]
-    public function getAllTasks(string $id): JsonResponse
+    public function getAllTasks(string $id, RequestCriteriaDTO $criteria): JsonResponse
     {
-        $projects = $this->queryBus->dispatch(new TaskListQuery($id));
+        $projects = $this->queryBus->dispatch(
+            new TaskListQuery($id, $this->converter->convert($criteria))
+        );
 
         return new JsonResponse(TaskListResponseDTO::createFromProjections($projects));
     }
@@ -191,9 +200,11 @@ final readonly class ProjectProjectionController
         ]
     )]
     #[Security(name: 'Bearer')]
-    public function getAllParticipants(string $id): JsonResponse
+    public function getAllParticipants(string $id, RequestCriteriaDTO $criteria): JsonResponse
     {
-        $participants = $this->queryBus->dispatch(new ProjectParticipantQuery($id));
+        $participants = $this->queryBus->dispatch(
+            new ProjectParticipantQuery($id, $this->converter->convert($criteria))
+        );
 
         return new JsonResponse(ProjectParticipantResponseDTO::createFromProjections($participants));
     }
