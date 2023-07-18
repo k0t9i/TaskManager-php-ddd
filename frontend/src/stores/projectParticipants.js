@@ -32,7 +32,7 @@ export const useProjectParticipantsStore = defineStore({
 
             return cache.request(
                 STORE_ID + ':' + projectId,
-                axiosInstance
+                () => axiosInstance
                     .get(`/projects/${projectId}/participants/`)
                     .then((response) => {
                         this.participants[projectId] = {};

@@ -9,7 +9,7 @@ export const useCacheStore = defineStore({
         promises: {}
     }),
     actions: {
-        async request(id, promise, lifetime = undefined) {
+        async request(id, callback, lifetime = undefined) {
             if (this.lastSuccessRequests[id]) {
                 const delta = Date.now() - this.lastSuccessRequests[id];
                 if (delta < (lifetime ?? DEFAULT_LIFETIME)) {
@@ -22,6 +22,7 @@ export const useCacheStore = defineStore({
             if (this.promises[id]) {
                 return this.promises[id];
             }
+            let promise = callback.apply();
             this.promises[id] = promise;
 
             return promise

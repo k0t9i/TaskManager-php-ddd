@@ -29,7 +29,7 @@ export const useProjectStore = defineStore({
 
             return cache.request(
                 STORE_ID + ':' + id,
-                axiosInstance
+                () => axiosInstance
                     .get(`/projects/${id}/`)
                     .then((response) => {
                         if (this.projects[id]) {

@@ -35,7 +35,7 @@ export const useProjectRequestsStore = defineStore({
 
             return cache.request(
                 STORE_ID + ':' + projectId,
-                axiosInstance
+                () => axiosInstance
                     .get(`/projects/${projectId}/requests/`)
                     .then((response) => {
                         if (!this.requests[projectId]) {

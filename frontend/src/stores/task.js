@@ -29,7 +29,7 @@ export const useTaskStore = defineStore({
 
             return cache.request(
                 STORE_ID + ':' + id,
-                axiosInstance
+                () => axiosInstance
                     .get(`/tasks/${id}/`)
                     .then((response) => {
                         if (this.tasks[id]) {

@@ -18,7 +18,7 @@ export const useUserStore = defineStore({
 
             return cache.request(
                 STORE_ID,
-                axiosInstance
+                () => axiosInstance
                     .get(`/users/`).then((response) => {
                         this.user.id = response.data.id;
                         this.user.email = response.data.email;

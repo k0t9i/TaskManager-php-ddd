@@ -23,7 +23,7 @@ export const useAvailableProjectsStore = defineStore({
 
             return cache.request(
                 STORE_ID,
-                axiosInstance
+                () => axiosInstance
                     .get('/projects/')
                     .then((response) => {
                         for (const [key, value] of Object.entries(response.data)) {

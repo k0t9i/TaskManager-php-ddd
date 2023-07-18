@@ -57,7 +57,7 @@ export const useTaskLinksStore = defineStore({
 
             return cache.request(
                 STORE_ID + ':' + taskId,
-                axiosInstance
+                () => axiosInstance
                     .get(`/tasks/${taskId}/links/`)
                     .then((response) => {
                         if (!this.links[taskId]) {
