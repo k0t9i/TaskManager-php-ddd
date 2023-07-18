@@ -12,7 +12,7 @@ use TaskManager\Projections\Domain\Exception\ObjectDoesNotExistException;
 use TaskManager\Projections\Domain\Repository\ProjectProjectionRepositoryInterface;
 use TaskManager\Projections\Domain\Repository\ProjectRequestProjectionRepositoryInterface;
 use TaskManager\Shared\Application\Bus\Query\QueryHandlerInterface;
-use TaskManager\Shared\Application\Service\CriteriaFromQueryBuilderInterface;
+use TaskManager\Shared\Application\Criteria\CriteriaFromQueryBuilderInterface;
 use TaskManager\Shared\Domain\Criteria\Criteria;
 use TaskManager\Shared\Domain\Criteria\Operand;
 use TaskManager\Shared\Domain\Criteria\OperatorEnum;

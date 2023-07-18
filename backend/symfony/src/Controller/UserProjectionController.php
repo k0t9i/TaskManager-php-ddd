@@ -18,8 +18,8 @@ use TaskManager\Projections\Infrastructure\DTO\ProjectListResponseDTO;
 use TaskManager\Projections\Infrastructure\DTO\UserRequestResponseDTO;
 use TaskManager\Projections\Infrastructure\DTO\UserResponseDTO;
 use TaskManager\Shared\Application\Bus\Query\QueryBusInterface;
-use TaskManager\Shared\Infrastructure\Service\DTO\RequestCriteriaDTO;
-use TaskManager\Shared\Infrastructure\Service\QueryCriteriaFromRequestConverterInterface;
+use TaskManager\Shared\Infrastructure\Criteria\QueryCriteriaFromRequestConverterInterface;
+use TaskManager\Shared\Infrastructure\Criteria\RequestCriteriaDTO;
 
 #[AsController]
 #[Route('/api/users', name: 'user.')]

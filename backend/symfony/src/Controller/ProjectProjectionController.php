@@ -22,8 +22,8 @@ use TaskManager\Projections\Infrastructure\DTO\ProjectRequestResponseDTO;
 use TaskManager\Projections\Infrastructure\DTO\ProjectResponseDTO;
 use TaskManager\Projections\Infrastructure\DTO\TaskListResponseDTO;
 use TaskManager\Shared\Application\Bus\Query\QueryBusInterface;
-use TaskManager\Shared\Infrastructure\Service\DTO\RequestCriteriaDTO;
-use TaskManager\Shared\Infrastructure\Service\QueryCriteriaFromRequestConverterInterface;
+use TaskManager\Shared\Infrastructure\Criteria\QueryCriteriaFromRequestConverterInterface;
+use TaskManager\Shared\Infrastructure\Criteria\RequestCriteriaDTO;
 
 #[AsController]
 #[Route('/api/projects', name: 'project.')]

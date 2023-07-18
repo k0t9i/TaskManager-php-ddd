@@ -9,7 +9,7 @@ use Doctrine\ORM\EntityRepository;
 use TaskManager\Projections\Domain\Entity\TaskListProjection;
 use TaskManager\Projections\Domain\Repository\TaskListProjectionRepositoryInterface;
 use TaskManager\Shared\Domain\Criteria\Criteria;
-use TaskManager\Shared\Infrastructure\Service\CriteriaFinderInterface;
+use TaskManager\Shared\Infrastructure\Criteria\CriteriaFinderInterface;
 
 final readonly class DoctrineTaskListProjectionRepository implements TaskListProjectionRepositoryInterface
 {

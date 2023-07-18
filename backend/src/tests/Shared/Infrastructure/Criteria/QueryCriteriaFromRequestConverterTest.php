@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace TaskManager\Tests\Shared\Infrastructure\Service;
+namespace TaskManager\Tests\Shared\Infrastructure\Criteria;
 
 use Faker\Factory;
 use Faker\Generator;
 use PHPUnit\Framework\TestCase;
-use TaskManager\Shared\Infrastructure\Service\DTO\RequestCriteriaDTO;
-use TaskManager\Shared\Infrastructure\Service\QueryCriteriaFromRequestConverter;
+use TaskManager\Shared\Infrastructure\Criteria\QueryCriteriaFromRequestConverter;
+use TaskManager\Shared\Infrastructure\Criteria\RequestCriteriaDTO;
 
 class QueryCriteriaFromRequestConverterTest extends TestCase
 {

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace TaskManager\Shared\Infrastructure\Service;
+namespace TaskManager\Shared\Infrastructure\Criteria;
 
 use Doctrine\ORM\EntityRepository;
-use TaskManager\Shared\Application\Service\CriteriaFieldValidatorInterface;
+use TaskManager\Shared\Application\Criteria\CriteriaFieldValidatorInterface;
 use TaskManager\Shared\Domain\Criteria\Criteria;
 
 final readonly class CriteriaFinder implements CriteriaFinderInterface

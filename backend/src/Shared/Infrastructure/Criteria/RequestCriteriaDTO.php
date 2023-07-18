@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskManager\Shared\Infrastructure\Service\DTO;
+namespace TaskManager\Shared\Infrastructure\Criteria;
 
 final readonly class RequestCriteriaDTO
 {

@@ -13,7 +13,7 @@ use TaskManager\Projections\Domain\Repository\ProjectProjectionRepositoryInterfa
 use TaskManager\Projections\Domain\Repository\TaskLinkProjectionRepositoryInterface;
 use TaskManager\Projections\Domain\Repository\TaskProjectionRepositoryInterface;
 use TaskManager\Shared\Application\Bus\Query\QueryHandlerInterface;
-use TaskManager\Shared\Application\Service\CriteriaFromQueryBuilderInterface;
+use TaskManager\Shared\Application\Criteria\CriteriaFromQueryBuilderInterface;
 use TaskManager\Shared\Domain\Criteria\Criteria;
 use TaskManager\Shared\Domain\Criteria\Operand;
 use TaskManager\Shared\Domain\Criteria\OperatorEnum;

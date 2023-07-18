@@ -16,8 +16,8 @@ use TaskManager\Projections\Application\Query\TaskQuery;
 use TaskManager\Projections\Infrastructure\DTO\TaskLinkResponseDTO;
 use TaskManager\Projections\Infrastructure\DTO\TaskResponseDTO;
 use TaskManager\Shared\Application\Bus\Query\QueryBusInterface;
-use TaskManager\Shared\Infrastructure\Service\DTO\RequestCriteriaDTO;
-use TaskManager\Shared\Infrastructure\Service\QueryCriteriaFromRequestConverterInterface;
+use TaskManager\Shared\Infrastructure\Criteria\QueryCriteriaFromRequestConverterInterface;
+use TaskManager\Shared\Infrastructure\Criteria\RequestCriteriaDTO;
 
 #[AsController]
 #[Route('/api/tasks', name: 'task.')]

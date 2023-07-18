@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskManager\Shared\Application\DTO;
+namespace TaskManager\Shared\Application\Criteria;
 
 final readonly class QueryCriteriaFilterDTO
 {

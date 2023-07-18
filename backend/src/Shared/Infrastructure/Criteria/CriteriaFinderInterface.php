@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskManager\Shared\Infrastructure\Service;
+namespace TaskManager\Shared\Infrastructure\Criteria;
 
 use Doctrine\ORM\EntityRepository;
 use TaskManager\Shared\Domain\Criteria\Criteria;

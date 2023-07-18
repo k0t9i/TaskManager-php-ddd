@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-namespace TaskManager\Shared\Application\Service;
+namespace TaskManager\Shared\Application\Criteria;
 
-use TaskManager\Shared\Application\DTO\QueryCriteriaDTO;
 use TaskManager\Shared\Domain\Criteria\Criteria;
 use TaskManager\Shared\Domain\Criteria\Operand;
 use TaskManager\Shared\Domain\Criteria\OperatorEnum;

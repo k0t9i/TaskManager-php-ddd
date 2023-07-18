@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-namespace TaskManager\Shared\Infrastructure\Service;
+namespace TaskManager\Shared\Infrastructure\Criteria;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
 use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
-use TaskManager\Shared\Infrastructure\Service\DTO\RequestCriteriaDTO;
 
 final class RequestCriteriaValueResolver implements ValueResolverInterface
 {

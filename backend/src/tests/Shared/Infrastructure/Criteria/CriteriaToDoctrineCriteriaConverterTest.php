@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskManager\Tests\Shared\Infrastructure\Service;
+namespace TaskManager\Tests\Shared\Infrastructure\Criteria;
 
 use Doctrine\Common\Collections\Criteria as DoctrineCriteria;
 use Doctrine\Common\Collections\Expr\Comparison;
@@ -15,7 +15,7 @@ use TaskManager\Shared\Domain\Criteria\Criteria;
 use TaskManager\Shared\Domain\Criteria\Operand;
 use TaskManager\Shared\Domain\Criteria\OperatorEnum;
 use TaskManager\Shared\Domain\Criteria\Order;
-use TaskManager\Shared\Infrastructure\Service\CriteriaToDoctrineCriteriaConverter;
+use TaskManager\Shared\Infrastructure\Criteria\CriteriaToDoctrineCriteriaConverter;
 
 class CriteriaToDoctrineCriteriaConverterTest extends TestCase
 {

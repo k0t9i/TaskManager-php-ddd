@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-namespace TaskManager\Shared\Infrastructure\Service;
+namespace TaskManager\Shared\Infrastructure\Criteria;
 
-use TaskManager\Shared\Application\DTO\QueryCriteriaDTO;
-use TaskManager\Shared\Application\DTO\QueryCriteriaFilterDTO;
+use TaskManager\Shared\Application\Criteria\QueryCriteriaDTO;
+use TaskManager\Shared\Application\Criteria\QueryCriteriaFilterDTO;
 use TaskManager\Shared\Domain\Criteria\OperatorEnum;
-use TaskManager\Shared\Infrastructure\Service\DTO\RequestCriteriaDTO;
 
 final class QueryCriteriaFromRequestConverter implements QueryCriteriaFromRequestConverterInterface
 {
