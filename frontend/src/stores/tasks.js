@@ -20,9 +20,6 @@ export const useTasksStore = defineStore({
         },
         isLocked: (state) => {
             return (id) => state.locked[id];
-        },
-        countAll: (state) => {
-            return (projectId) => Object.entries(state.tasks[projectId] ?? {}).length;
         }
     },
     actions: {

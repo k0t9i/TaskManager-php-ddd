@@ -1,8 +1,6 @@
 <script setup>
 import {useAuthStore} from "../stores/auth";
 import AsyncNavBarUserInfo from "./AsyncNavBarUserInfo.vue";
-import {useUserProjectsStore} from "../stores/userProjects";
-import AsyncNavBarProjectsCount from "./AsyncNavBarProjectsCount.vue";
 
 const authStore = useAuthStore();
 </script>
@@ -17,17 +15,7 @@ const authStore = useAuthStore();
       <div class="collapse navbar-collapse" id="navBar">
         <ul class="navbar-nav mr-auto mb-2 mb-md-0">
           <li class="nav-item dropdown">
-            <li>
-              <RouterLink :to="{name: 'user_projects'}" class="nav-link">
-                My projects
-                <Suspense>
-                  <AsyncNavBarProjectsCount />
-                  <template #fallback>
-                    <div class="spinner-border spinner-border-sm text-light mx-1" role="status" />
-                  </template>
-                </Suspense>
-              </RouterLink>
-            </li>
+            <li><RouterLink :to="{name: 'user_projects'}" class="nav-link">My projects</RouterLink></li>
           </li>
           <li class="nav-item dropdown">
             <li><RouterLink :to="{name: 'user_requests'}" class="nav-link">My requests</RouterLink></li>

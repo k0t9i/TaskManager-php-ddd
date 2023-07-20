@@ -10,9 +10,6 @@ export const useUserProjectsStore = defineStore({
         projects: {},
         error: ''
     }),
-    getters: {
-        countAll: (state) => Object.entries(state.projects).length
-    },
     actions: {
         async create(project) {
             this.error = '';

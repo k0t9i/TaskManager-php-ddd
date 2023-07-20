@@ -20,12 +20,6 @@ export const useProjectRequestsStore = defineStore({
         },
         isLocked: (state) => {
             return (id) => state.locked[id];
-        },
-        countAll: (state) => {
-            return (projectId) => Object.entries(state.requests[projectId] ?? {}).length;
-        },
-        countPending: (state) => {
-            return (projectId) => Object.entries(state.requests[projectId] ?? {}).filter(([key, value]) => value.status === 0).length;
         }
     },
     actions: {

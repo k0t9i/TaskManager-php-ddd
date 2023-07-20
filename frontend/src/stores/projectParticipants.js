@@ -20,9 +20,6 @@ export const useProjectParticipantsStore = defineStore({
         },
         isLocked: (state) => {
             return (id) => state.locked[id];
-        },
-        countAll: (state) => {
-            return (projectId) => Object.entries(state.participants[projectId] ?? {}).length;
         }
     },
     actions: {
