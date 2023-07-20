@@ -28,7 +28,7 @@ export const useTaskStore = defineStore({
             const cache = useCacheStore();
 
             return cache.request(
-                STORE_ID + ':' + id,
+                STORE_ID + id,
                 () => axiosInstance
                     .get(`/tasks/${id}/`)
                     .then((response) => {

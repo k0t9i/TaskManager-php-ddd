@@ -1,6 +1,7 @@
 import {defineStore} from "pinia";
 import axiosInstance from "../helpers/axios";
 import {useCacheStore} from "./cache";
+import {useQueryStore} from "./queryStore";
 
 const STORE_ID = 'availableProjects';
 
@@ -20,11 +21,17 @@ export const useAvailableProjectsStore = defineStore({
         async load() {
             this.error = '';
             const cache = useCacheStore();
+            const queryStore = useQueryStore();
 
             return cache.request(
-                STORE_ID,
+                STORE_ID + queryStore.getHash,
                 () => axiosInstance
-                    .get('/projects/')
+                    .get('/projects/', {
+                        params: {
+                            order: queryStore.getSorts,
+                            filter: queryStore.getFilters
+                        }
+                    })
                     .then((response) => {
                         for (const [key, value] of Object.entries(response.data)) {
                             this.projects[value.id] = value;

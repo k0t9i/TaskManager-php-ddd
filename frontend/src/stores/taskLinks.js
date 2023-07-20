@@ -2,6 +2,7 @@ import {defineStore} from "pinia";
 import axiosInstance from "../helpers/axios";
 import {useCacheStore} from "./cache";
 import {useTasksStore} from "./tasks";
+import {useQueryStore} from "./queryStore";
 
 const STORE_ID = 'taskLinks';
 const tasksStore = useTasksStore();
@@ -54,11 +55,17 @@ export const useTaskLinksStore = defineStore({
         async load(projectId, taskId) {
             this.errors[taskId] = '';
             const cache = useCacheStore();
+            const queryStore = useQueryStore();
 
             return cache.request(
-                STORE_ID + ':' + taskId,
+                STORE_ID + taskId + queryStore.getHash,
                 () => axiosInstance
-                    .get(`/tasks/${taskId}/links/`)
+                    .get(`/tasks/${taskId}/links/`, {
+                        params: {
+                            order: queryStore.getSorts,
+                            filter: queryStore.getFilters
+                        }
+                    })
                     .then((response) => {
                         if (!this.links[taskId]) {
                             this.links[taskId] = {};
