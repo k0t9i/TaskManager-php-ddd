@@ -17,6 +17,11 @@
         </ignoreFiles>
     </projectFiles>
     <issueHandlers>
+        <InternalMethod>
+            <errorLevel type="suppress">
+                <directory name="../src/tests/" />
+            </errorLevel>
+        </InternalMethod>
         <PropertyNotSetInConstructor errorLevel="suppress" />
         <MissingConstructor errorLevel="suppress" />
         <RedundantPropertyInitializationCheck errorLevel="suppress" />
