@@ -9,6 +9,7 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\MappingException;
+use Doctrine\ORM\Query\Expr\Comparison;
 use Doctrine\ORM\Query\Expr\Func;
 use Doctrine\ORM\QueryBuilder;
 use TaskManager\Shared\Domain\Criteria\Criteria;
@@ -65,28 +66,25 @@ final readonly class DoctrineExpressionFromCriteriaBuilder implements DoctrineEx
         $expr = $builder->expr();
 
         $property = $alias.'.'.$operand->property;
-        $param = ':'.str_replace('.', '_', $property);
-        $value = $operand->value;
+        $paramPlaceholder = ':'.str_replace('.', '_', $property);
         if (OperatorEnum::Like === $operand->operator) {
-            $property = $this->castAsString($property);
-            $value = '%'.$value.'%';
+            $value = '%'.$operand->value.'%';
         } else {
             $fieldMapping = $classMetadata->getFieldMapping($operand->property);
             $type = Type::getType($fieldMapping['type']);
-
-            $value = $this->sanitizer->sanitize($type, $value);
+            $value = $this->sanitizer->sanitize($type, $operand->value);
         }
 
         $condition = match ($operand->operator) {
-            OperatorEnum::Equal => null !== $value ? $expr->eq($property, $param) : $expr->isNull($property),
-            OperatorEnum::NotEqual => null !== $value ? $expr->neq($property, $param) : $expr->isNotNull($property),
-            OperatorEnum::Greater => $expr->gt($property, $param),
-            OperatorEnum::GreaterOrEqual => $expr->gte($property, $param),
-            OperatorEnum::Less => $expr->lt($property, $param),
-            OperatorEnum::LessOrEqual => $expr->lte($property, $param),
-            OperatorEnum::In => $expr->in($property, $param),
-            OperatorEnum::NotIn => $expr->notIn($property, $param),
-            OperatorEnum::Like => $expr->like($property, $param)
+            OperatorEnum::Equal => null !== $value ? $expr->eq($property, $paramPlaceholder) : $expr->isNull($property),
+            OperatorEnum::NotEqual => null !== $value ? $expr->neq($property, $paramPlaceholder) : $expr->isNotNull($property),
+            OperatorEnum::Greater => $expr->gt($property, $paramPlaceholder),
+            OperatorEnum::GreaterOrEqual => $expr->gte($property, $paramPlaceholder),
+            OperatorEnum::Less => $expr->lt($property, $paramPlaceholder),
+            OperatorEnum::LessOrEqual => $expr->lte($property, $paramPlaceholder),
+            OperatorEnum::In => $expr->in($property, $paramPlaceholder),
+            OperatorEnum::NotIn => $expr->notIn($property, $paramPlaceholder),
+            OperatorEnum::Like => new Comparison($this->castAsString($property), 'LIKE', $paramPlaceholder)
         };
 
         if (LogicalOperatorEnum::And === $logicalOperator) {
@@ -95,7 +93,7 @@ final readonly class DoctrineExpressionFromCriteriaBuilder implements DoctrineEx
             $builder->orWhere($condition);
         }
         if (!is_string($condition) || null !== $value) {
-            $builder->setParameter($param, $value);
+            $builder->setParameter($paramPlaceholder, $value);
         }
     }
 
