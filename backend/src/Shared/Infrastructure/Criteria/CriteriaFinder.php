@@ -11,7 +11,7 @@ use TaskManager\Shared\Domain\Criteria\Criteria;
 final readonly class CriteriaFinder implements CriteriaFinderInterface
 {
     public function __construct(
-        private CriteriaToDoctrineCriteriaConverterInterface $converter,
+        private DoctrineExpressionFromCriteriaBuilderInterface $builder,
         private CriteriaFieldValidatorInterface $validator
     ) {
     }
@@ -23,8 +23,7 @@ final readonly class CriteriaFinder implements CriteriaFinderInterface
     {
         $this->validator->validate($criteria, $repository->getClassName());
 
-        return $repository->createQueryBuilder('t')
-            ->addCriteria($this->converter->convert($criteria))
+        return $this->builder->build($repository, $criteria)
             ->getQuery()
             ->getResult();
     }
@@ -38,15 +37,14 @@ final readonly class CriteriaFinder implements CriteriaFinderInterface
     {
         $this->validator->validate($criteria, $repository->getClassName());
 
-        $doctrineCriteria = $this->converter->convert($criteria);
+        $operands = [];
+        foreach ($criteria->getExpression()->getOperands() as $item) {
+            $operands[] = $item[1];
+        }
+        $countCriteria = new Criteria($operands);
 
-        $doctrineCriteria->setFirstResult(null);
-        $doctrineCriteria->setMaxResults(null);
-        $doctrineCriteria->orderBy([]);
-
-        return $repository->createQueryBuilder('t')
+        return $this->builder->build($repository, $countCriteria)
             ->select('count(t)')
-            ->addCriteria($doctrineCriteria)
             ->getQuery()
             ->getSingleScalarResult();
     }
@@ -59,8 +57,7 @@ final readonly class CriteriaFinder implements CriteriaFinderInterface
     {
         $this->validator->validate($criteria, $repository->getClassName());
 
-        return $repository->createQueryBuilder('t')
-            ->addCriteria($this->converter->convert($criteria))
+        return $this->builder->build($repository, $criteria)
             ->getQuery()
             ->getOneOrNullResult();
     }
