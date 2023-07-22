@@ -2,6 +2,7 @@ services:
     nginx:
         container_name: task_manager-nginx
         image: nginx:latest
+        restart: always
         ports:
             - '8081:80'
         volumes:
