@@ -16,8 +16,10 @@ use TaskManager\Projections\Application\Query\TaskQuery;
 use TaskManager\Projections\Infrastructure\DTO\TaskLinkResponseDTO;
 use TaskManager\Projections\Infrastructure\DTO\TaskResponseDTO;
 use TaskManager\Shared\Application\Bus\Query\QueryBusInterface;
+use TaskManager\Shared\Application\Paginator\Pagination;
 use TaskManager\Shared\Infrastructure\Criteria\QueryCriteriaFromRequestConverterInterface;
 use TaskManager\Shared\Infrastructure\Criteria\RequestCriteriaDTO;
+use TaskManager\Shared\Infrastructure\Paginator\PaginationResponseDTO;
 
 #[AsController]
 #[Route('/api/tasks', name: 'task.')]
@@ -76,12 +78,24 @@ final readonly class TaskProjectionController
         responses: [
             new OA\Response(
                 response: '200',
-                description: 'List of task links',
+                description: 'List of task links with pagination',
                 content: new OA\JsonContent(
-                    type: 'array',
-                    items: new OA\Items(
-                        ref: new Model(type: TaskLinkResponseDTO::class)
-                    )
+                    allOf: [
+                        new OA\Schema(
+                            ref: '#components/schemas/pagination'
+                        ),
+                        new OA\Schema(
+                            properties: [
+                                new OA\Property(
+                                    property: 'items',
+                                    type: 'array',
+                                    items: new OA\Items(
+                                        ref: new Model(type: TaskLinkResponseDTO::class)
+                                    )
+                                ),
+                            ]
+                        ),
+                    ]
                 )
             ),
             new OA\Response(ref: '#components/responses/generic401', response: '401'),
@@ -92,10 +106,14 @@ final readonly class TaskProjectionController
     #[Security(name: 'Bearer')]
     public function getAllLinks(string $id, RequestCriteriaDTO $criteria): JsonResponse
     {
-        $requests = $this->queryBus->dispatch(
+        /** @var Pagination $pagination */
+        $pagination = $this->queryBus->dispatch(
             new TaskLinkQuery($id, $this->converter->convert($criteria))
         );
 
-        return new JsonResponse(TaskLinkResponseDTO::createFromProjections($requests));
+        return new JsonResponse(PaginationResponseDTO::createFromPagination(
+            $pagination,
+            fn (array $items) => TaskLinkResponseDTO::createFromProjections($items)
+        ));
     }
 }

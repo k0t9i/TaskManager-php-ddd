@@ -33,16 +33,13 @@ export const useProjectRequestsStore = defineStore({
                 STORE_ID + projectId + queryStore.getHash,
                 () => axiosInstance
                     .get(`/projects/${projectId}/requests/`, {
-                        params: {
-                            order: queryStore.getSorts,
-                            filter: queryStore.getFilters
-                        }
+                        params: queryStore.getParams
                     })
                     .then((response) => {
                         if (!this.requests[projectId]) {
                             this.requests[projectId] = {};
                         }
-                        for (const [key, value] of Object.entries(response.data)) {
+                        for (const [key, value] of Object.entries(response.data.items)) {
                             this.requests[projectId][value.id] = value;
                             this.requests[projectId][value.id].changeDate = new Date(value.changeDate);
                         }

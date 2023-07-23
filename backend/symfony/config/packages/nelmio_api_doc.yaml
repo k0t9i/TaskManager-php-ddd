@@ -124,6 +124,31 @@ nelmio_api_doc:
                                 - 0
                                 - 1
                             example: 1
+                pagination:
+                    type: object
+                    properties:
+                        page:
+                            type: object
+                            properties:
+                                total:
+                                    description: 'Total pages'
+                                    type: int
+                                    example: 3
+                                current:
+                                    description: 'Current page'
+                                    type: int
+                                    example: 1
+                                prev:
+                                    description: 'Previous page. Null if does not exist'
+                                    type: int
+                                    example: null
+                                next:
+                                    description: 'Next page. Null if does not exist'
+                                    type: int
+                                    example: 2
+                        items:
+                            type: array
+                            items: [ ]
             responses:
                 createObject:
                     description: 'Returns the ID of the newly created object.'

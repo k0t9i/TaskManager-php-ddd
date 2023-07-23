@@ -33,14 +33,11 @@ export const useProjectParticipantsStore = defineStore({
                 STORE_ID + projectId + queryStore.getHash,
                 () => axiosInstance
                     .get(`/projects/${projectId}/participants/`, {
-                        params: {
-                            order: queryStore.getSorts,
-                            filter: queryStore.getFilters
-                        }
+                        params: queryStore.getParams
                     })
                     .then((response) => {
                         this.participants[projectId] = {};
-                        for (const [key, value] of Object.entries(response.data)) {
+                        for (const [key, value] of Object.entries(response.data.items)) {
                             this.participants[projectId][value.userId] = value;
                         }
                         return response;

@@ -61,16 +61,13 @@ export const useTaskLinksStore = defineStore({
                 STORE_ID + taskId + queryStore.getHash,
                 () => axiosInstance
                     .get(`/tasks/${taskId}/links/`, {
-                        params: {
-                            order: queryStore.getSorts,
-                            filter: queryStore.getFilters
-                        }
+                        params: queryStore.getParams
                     })
                     .then((response) => {
                         if (!this.links[taskId]) {
                             this.links[taskId] = {};
                         }
-                        for (const [key, value] of Object.entries(response.data)) {
+                        for (const [key, value] of Object.entries(response.data.items)) {
                             this.links[taskId][value.linkedTaskId] = value;
                         }
 

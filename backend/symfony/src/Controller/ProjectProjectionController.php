@@ -22,8 +22,10 @@ use TaskManager\Projections\Infrastructure\DTO\ProjectRequestResponseDTO;
 use TaskManager\Projections\Infrastructure\DTO\ProjectResponseDTO;
 use TaskManager\Projections\Infrastructure\DTO\TaskListResponseDTO;
 use TaskManager\Shared\Application\Bus\Query\QueryBusInterface;
+use TaskManager\Shared\Application\Paginator\Pagination;
 use TaskManager\Shared\Infrastructure\Criteria\QueryCriteriaFromRequestConverterInterface;
 use TaskManager\Shared\Infrastructure\Criteria\RequestCriteriaDTO;
+use TaskManager\Shared\Infrastructure\Paginator\PaginationResponseDTO;
 
 #[AsController]
 #[Route('/api/projects', name: 'project.')]
@@ -45,12 +47,24 @@ final readonly class ProjectProjectionController
         responses: [
             new OA\Response(
                 response: '200',
-                description: 'List of user projects',
+                description: 'List of user projects with pagination',
                 content: new OA\JsonContent(
-                    type: 'array',
-                    items: new OA\Items(
-                        ref: new Model(type: ProjectListResponseDTO::class)
-                    )
+                    allOf: [
+                        new OA\Schema(
+                            ref: '#components/schemas/pagination'
+                        ),
+                        new OA\Schema(
+                            properties: [
+                                new OA\Property(
+                                    property: 'items',
+                                    type: 'array',
+                                    items: new OA\Items(
+                                        ref: new Model(type: ProjectListResponseDTO::class)
+                                    )
+                                ),
+                            ]
+                        ),
+                    ]
                 )
             ),
             new OA\Response(ref: '#components/responses/generic401', response: '401'),
@@ -60,11 +74,15 @@ final readonly class ProjectProjectionController
     #[Security(name: 'Bearer')]
     public function getAll(RequestCriteriaDTO $criteria): JsonResponse
     {
-        $projects = $this->queryBus->dispatch(
+        /** @var Pagination $pagination */
+        $pagination = $this->queryBus->dispatch(
             new ProjectListQuery($this->converter->convert($criteria))
         );
 
-        return new JsonResponse(ProjectListResponseDTO::createFromProjections($projects));
+        return new JsonResponse(PaginationResponseDTO::createFromPagination(
+            $pagination,
+            fn (array $items) => ProjectListResponseDTO::createFromProjections($items)
+        ));
     }
 
     #[Route('/{id}/', name: 'get', methods: ['GET'])]
@@ -113,12 +131,24 @@ final readonly class ProjectProjectionController
         responses: [
             new OA\Response(
                 response: '200',
-                description: 'List of project requests',
+                description: 'List of project requests with pagination',
                 content: new OA\JsonContent(
-                    type: 'array',
-                    items: new OA\Items(
-                        ref: new Model(type: ProjectRequestResponseDTO::class)
-                    )
+                    allOf: [
+                        new OA\Schema(
+                            ref: '#components/schemas/pagination'
+                        ),
+                        new OA\Schema(
+                            properties: [
+                                new OA\Property(
+                                    property: 'items',
+                                    type: 'array',
+                                    items: new OA\Items(
+                                        ref: new Model(type: ProjectRequestResponseDTO::class)
+                                    )
+                                ),
+                            ]
+                        ),
+                    ]
                 )
             ),
             new OA\Response(ref: '#components/responses/generic401', response: '401'),
@@ -129,11 +159,15 @@ final readonly class ProjectProjectionController
     #[Security(name: 'Bearer')]
     public function getAllRequests(string $id, RequestCriteriaDTO $criteria): JsonResponse
     {
-        $requests = $this->queryBus->dispatch(
+        /** @var Pagination $pagination */
+        $pagination = $this->queryBus->dispatch(
             new ProjectRequestQuery($id, $this->converter->convert($criteria))
         );
 
-        return new JsonResponse(ProjectRequestResponseDTO::createFromProjections($requests));
+        return new JsonResponse(PaginationResponseDTO::createFromPagination(
+            $pagination,
+            fn (array $items) => ProjectRequestResponseDTO::createFromProjections($items)
+        ));
     }
 
     #[Route('/{id}/tasks/', name: 'getAllTasks', methods: ['GET'])]
@@ -150,12 +184,24 @@ final readonly class ProjectProjectionController
         responses: [
             new OA\Response(
                 response: '200',
-                description: 'List of project tasks',
+                description: 'List of project tasks with pagination',
                 content: new OA\JsonContent(
-                    type: 'array',
-                    items: new OA\Items(
-                        ref: new Model(type: TaskListResponseDTO::class)
-                    )
+                    allOf: [
+                        new OA\Schema(
+                            ref: '#components/schemas/pagination'
+                        ),
+                        new OA\Schema(
+                            properties: [
+                                new OA\Property(
+                                    property: 'items',
+                                    type: 'array',
+                                    items: new OA\Items(
+                                        ref: new Model(type: TaskListResponseDTO::class)
+                                    )
+                                ),
+                            ]
+                        ),
+                    ]
                 )
             ),
             new OA\Response(ref: '#components/responses/generic401', response: '401'),
@@ -165,11 +211,15 @@ final readonly class ProjectProjectionController
     #[Security(name: 'Bearer')]
     public function getAllTasks(string $id, RequestCriteriaDTO $criteria): JsonResponse
     {
-        $projects = $this->queryBus->dispatch(
+        /** @var Pagination $pagination */
+        $pagination = $this->queryBus->dispatch(
             new TaskListQuery($id, $this->converter->convert($criteria))
         );
 
-        return new JsonResponse(TaskListResponseDTO::createFromProjections($projects));
+        return new JsonResponse(PaginationResponseDTO::createFromPagination(
+            $pagination,
+            fn (array $items) => TaskListResponseDTO::createFromProjections($items)
+        ));
     }
 
     #[Route('/{id}/participants/', name: 'getAllParticipants', methods: ['GET'])]
@@ -186,12 +236,24 @@ final readonly class ProjectProjectionController
         responses: [
             new OA\Response(
                 response: '200',
-                description: 'List of project participants',
+                description: 'List of project participants with pagination',
                 content: new OA\JsonContent(
-                    type: 'array',
-                    items: new OA\Items(
-                        ref: new Model(type: ProjectParticipantResponseDTO::class)
-                    )
+                    allOf: [
+                        new OA\Schema(
+                            ref: '#components/schemas/pagination'
+                        ),
+                        new OA\Schema(
+                            properties: [
+                                new OA\Property(
+                                    property: 'items',
+                                    type: 'array',
+                                    items: new OA\Items(
+                                        ref: new Model(type: ProjectParticipantResponseDTO::class)
+                                    )
+                                ),
+                            ]
+                        ),
+                    ]
                 )
             ),
             new OA\Response(ref: '#components/responses/generic401', response: '401'),
@@ -202,10 +264,14 @@ final readonly class ProjectProjectionController
     #[Security(name: 'Bearer')]
     public function getAllParticipants(string $id, RequestCriteriaDTO $criteria): JsonResponse
     {
-        $participants = $this->queryBus->dispatch(
+        /** @var Pagination $pagination */
+        $pagination = $this->queryBus->dispatch(
             new ProjectParticipantQuery($id, $this->converter->convert($criteria))
         );
 
-        return new JsonResponse(ProjectParticipantResponseDTO::createFromProjections($participants));
+        return new JsonResponse(PaginationResponseDTO::createFromPagination(
+            $pagination,
+            fn (array $items) => ProjectParticipantResponseDTO::createFromProjections($items)
+        ));
     }
 }

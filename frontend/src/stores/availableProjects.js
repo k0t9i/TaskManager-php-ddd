@@ -27,13 +27,10 @@ export const useAvailableProjectsStore = defineStore({
                 STORE_ID + queryStore.getHash,
                 () => axiosInstance
                     .get('/projects/', {
-                        params: {
-                            order: queryStore.getSorts,
-                            filter: queryStore.getFilters
-                        }
+                        params: queryStore.getParams
                     })
                     .then((response) => {
-                        for (const [key, value] of Object.entries(response.data)) {
+                        for (const [key, value] of Object.entries(response.data.items)) {
                             this.projects[value.id] = value;
                             this.projects[value.id].finishDate = new Date(value.finishDate);
                         }

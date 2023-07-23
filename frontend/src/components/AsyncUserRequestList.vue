@@ -3,6 +3,7 @@ import RequestStatus from "../components/RequestStatus.vue";
 import {reactive} from "vue";
 import axiosInstance from "../helpers/axios";
 import Datetime from "./Datetime.vue";
+import {useQueryStore} from "../stores/queryStore";
 
 /**
  * @type {{
@@ -12,10 +13,14 @@ import Datetime from "./Datetime.vue";
  * }[]}
  */
 const requests = reactive([]);
+const queryStore = useQueryStore();
 
-await axiosInstance.get('/users/requests/')
+await axiosInstance
+    .get('/users/requests/', {
+      params: queryStore.getParams
+    })
     .then((response) => {
-      for (const [key, value] of Object.entries(response.data)) {
+      for (const [key, value] of Object.entries(response.data.items)) {
         let val = value;
         val.changeDate = new Date(value.changeDate);
         requests.push(val);

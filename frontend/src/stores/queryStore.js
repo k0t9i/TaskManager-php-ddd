@@ -6,17 +6,10 @@ export const useQueryStore = defineStore({
     id: 'queryStore',
     state: () => ({
         filters: {},
-        sorts: {}
+        sorts: {},
+        pages: {}
     }),
     getters: {
-        getFilters: (state) => {
-            const route = useRoute();
-            return state.filters[route.path]
-        },
-        getSorts: (state) => {
-            const route = useRoute();
-            return state.sorts[route.path]
-        },
         getHash: (state) => {
             const route = useRoute();
             let filterHash = state.filters[route.path] !== undefined ?
@@ -25,7 +18,18 @@ export const useQueryStore = defineStore({
             let sortHash = state.sorts[route.path] !== undefined ?
                 JSON.stringify(state.sorts[route.path]) :
                 '';
-            return filterHash + sortHash;
+            let pageHash = state.pages[route.path] !== undefined ?
+                state.pages[route.path] :
+                '';
+            return filterHash + sortHash + pageHash;
+        },
+        getParams:  (state) => {
+            const route = useRoute();
+            return {
+                order: state.sorts[route.path],
+                filter: state.filters[route.path],
+                page: state.pages[route.path]
+            }
         }
     },
     actions: {
@@ -51,6 +55,7 @@ export const useQueryStore = defineStore({
 
                         _this.filters[route.path] = queryFilters;
                     }
+
                     if (query.sort !== undefined) {
                         let sort = query.sort;
                         if (!Array.isArray(sort)) {
@@ -59,6 +64,10 @@ export const useQueryStore = defineStore({
                         sort.sort();
 
                         _this.sorts[route.path] = sort;
+                    }
+
+                    if (query.page !== undefined) {
+                        _this.pages[route.path] = query.page;
                     }
                 }
             );

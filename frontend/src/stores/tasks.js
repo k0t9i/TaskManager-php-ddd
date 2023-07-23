@@ -53,16 +53,13 @@ export const useTasksStore = defineStore({
                 STORE_ID + projectId + queryStore.getHash,
                 () => axiosInstance
                     .get(`/projects/${projectId}/tasks/`, {
-                        params: {
-                            order: queryStore.getSorts,
-                            filter: queryStore.getFilters
-                        }
+                        params: queryStore.getParams
                     })
                     .then((response) => {
                         if (!this.tasks[projectId]) {
                             this.tasks[projectId] = {};
                         }
-                        for (const [key, value] of Object.entries(response.data)) {
+                        for (const [key, value] of Object.entries(response.data.items)) {
                             this.tasks[projectId][value.id] = value;
                             this.tasks[projectId][value.id].startDate = new Date(value.startDate);
                             this.tasks[projectId][value.id].finishDate = new Date(value.finishDate);
