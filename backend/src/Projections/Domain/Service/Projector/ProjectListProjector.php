@@ -118,7 +118,7 @@ final class ProjectListProjector extends Projector
 
     private function whenTaskCreated(TaskWasCreatedEvent $event): void
     {
-        $projections = $this->getProjectionsById($event->getAggregateId());
+        $projections = $this->getProjectionsById($event->projectId);
 
         foreach ($projections as $projection) {
             ++$projection->tasksCount;
