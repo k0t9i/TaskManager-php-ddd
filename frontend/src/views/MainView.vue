@@ -1,6 +1,10 @@
 <script setup>
+import {useRoute} from "vue-router";
+import {useAvailableProjectsStore} from "../stores/availableProjects";
+import Pagination from "../components/Pagination.vue";
 
-import AsyncAvailableProjectsList from "../components/AsyncAvailableProjectsList.vue";
+const route = useRoute();
+const projectsStore = useAvailableProjectsStore();
 </script>
 
 <template>
@@ -11,13 +15,14 @@ import AsyncAvailableProjectsList from "../components/AsyncAvailableProjectsList
     </RouterLink>
     <div>
       <Suspense>
-        <AsyncAvailableProjectsList />
+        <RouterView :key="route.fullPath" />
         <template #fallback>
         <span>
           <div class="spinner-border spinner-border-sm text-dark mx-1" role="status" />Loading...
         </span>
         </template>
       </Suspense>
+      <Pagination :metadata="projectsStore.getPaginationMetadata" :locked="projectsStore.isLoading" />
     </div>
   </div>
 </template>

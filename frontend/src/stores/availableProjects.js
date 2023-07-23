@@ -10,16 +10,25 @@ export const useAvailableProjectsStore = defineStore({
     state: () => ({
         projects: {},
         error: '',
-        locked: {}
+        locked: {},
+        pagination: {},
+        loading: false
     }),
     getters: {
         isLocked: (state) => {
             return (id) => state.locked[id];
+        },
+        isLoading: (state) => {
+            return state.loading;
+        },
+        getPaginationMetadata: (state) => {
+            return state.pagination;
         }
     },
     actions: {
         async load() {
             this.error = '';
+            this.loading = true;
             const cache = useCacheStore();
             const queryStore = useQueryStore();
 
@@ -30,15 +39,22 @@ export const useAvailableProjectsStore = defineStore({
                         params: queryStore.getParams
                     })
                     .then((response) => {
+                        this.projects = {};
                         for (const [key, value] of Object.entries(response.data.items)) {
                             this.projects[value.id] = value;
                             this.projects[value.id].finishDate = new Date(value.finishDate);
                         }
+
+                        this.pagination = response.data.page;
+
                         return response;
                     })
                     .catch((error) => {
                         this.error = error.response.data.message;
                         throw error;
+                    })
+                    .finally(() => {
+                        this.loading = false;
                     })
             );
         },

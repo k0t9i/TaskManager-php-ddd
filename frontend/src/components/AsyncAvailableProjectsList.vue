@@ -31,7 +31,7 @@ async function onJoin(projectId) {
 
 <template>
   <FormError :error="projectsStore.error" />
-  <table class="table">
+  <table class="table" :class="{'loading-content': projectsStore.isLoading}">
     <thead>
       <tr>
         <th scope="col">#</th>

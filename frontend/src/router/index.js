@@ -7,8 +7,14 @@ const router = createRouter({
     routes: [
         {
             path: '/',
-            name: 'main',
-            component: () => import('../views/MainView.vue')
+            component: () => import('../views/MainView.vue'),
+            children: [
+                {
+                    path: '',
+                    name: 'main',
+                    component: () => import('../components/AsyncAvailableProjectsList.vue')
+                }
+            ]
         },
         {
             path: '/profile',
