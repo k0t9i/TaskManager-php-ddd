@@ -11,17 +11,7 @@ export const useQueryStore = defineStore({
     }),
     getters: {
         getHash: (state) => {
-            const route = useRoute();
-            let filterHash = state.filters[route.path] !== undefined ?
-                JSON.stringify(state.filters[route.path]) :
-                '';
-            let sortHash = state.sorts[route.path] !== undefined ?
-                JSON.stringify(state.sorts[route.path]) :
-                '';
-            let pageHash = state.pages[route.path] !== undefined ?
-                state.pages[route.path] :
-                '';
-            return filterHash + sortHash + pageHash;
+            return JSON.stringify(state.getParams);
         },
         getParams:  (state) => {
             const route = useRoute();
