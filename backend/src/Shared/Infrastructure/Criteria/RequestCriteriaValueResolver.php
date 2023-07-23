@@ -19,7 +19,8 @@ final class RequestCriteriaValueResolver implements ValueResolverInterface
 
         $filters = $request->query->all('filter');
         $orders = $request->query->all('order');
+        $page = $request->query->get('page');
 
-        yield new RequestCriteriaDTO($filters, $orders);
+        yield new RequestCriteriaDTO($filters, $orders, null !== $page ? (int) $page : null);
     }
 }

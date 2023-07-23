@@ -6,6 +6,7 @@ namespace TaskManager\Shared\Infrastructure\Criteria;
 
 use TaskManager\Shared\Application\Criteria\QueryCriteriaDTO;
 use TaskManager\Shared\Application\Criteria\QueryCriteriaFilterDTO;
+use TaskManager\Shared\Application\Paginator\Pagination;
 use TaskManager\Shared\Domain\Criteria\OperatorEnum;
 
 final class QueryCriteriaFromRequestConverter implements QueryCriteriaFromRequestConverterInterface
@@ -34,11 +35,13 @@ final class QueryCriteriaFromRequestConverter implements QueryCriteriaFromReques
             $orders[$property] = $isAsc;
         }
 
+        $page = $dto->page ?? 1;
+
         return new QueryCriteriaDTO(
             $filters,
             $orders,
-            null,
-            null
+            ($page - 1) * Pagination::PAGE_SIZE,
+            Pagination::PAGE_SIZE
         );
     }
 }

@@ -43,10 +43,10 @@ final readonly class DoctrineExpressionFromCriteriaBuilder implements DoctrineEx
         }
 
         if (null !== $criteria->getOffset()) {
-            $builder->setFirstResult($criteria->getOffset());
+            $builder->setFirstResult($criteria->getOffset() >= 0 ? $criteria->getOffset() : 0);
         }
         if (null !== $criteria->getLimit()) {
-            $builder->setMaxResults($criteria->getLimit());
+            $builder->setMaxResults($criteria->getLimit() >= 0 ? $criteria->getLimit() : 0);
         }
 
         return $builder;

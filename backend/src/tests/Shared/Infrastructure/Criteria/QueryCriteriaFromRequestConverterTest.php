@@ -7,6 +7,7 @@ namespace TaskManager\Tests\Shared\Infrastructure\Criteria;
 use Faker\Factory;
 use Faker\Generator;
 use PHPUnit\Framework\TestCase;
+use TaskManager\Shared\Application\Paginator\Pagination;
 use TaskManager\Shared\Infrastructure\Criteria\QueryCriteriaFromRequestConverter;
 use TaskManager\Shared\Infrastructure\Criteria\RequestCriteriaDTO;
 
@@ -65,7 +66,8 @@ class QueryCriteriaFromRequestConverterTest extends TestCase
                 $orders[$key] = $value.$orders[$key];
             }
         }
-        $requestCriteria = new RequestCriteriaDTO($filters, array_values($orders));
+        $page = $this->faker->numberBetween();
+        $requestCriteria = new RequestCriteriaDTO($filters, array_values($orders), $page);
         $converter = new QueryCriteriaFromRequestConverter();
 
         $queryCriteria = $converter->convert($requestCriteria);
@@ -85,5 +87,7 @@ class QueryCriteriaFromRequestConverterTest extends TestCase
             $this->assertArrayHasKey($key, $queryCriteria->orders);
             $this->assertEquals($queryCriteria->orders[$key], '-' === $value);
         }
+        $this->assertEquals(($page - 1) * Pagination::PAGE_SIZE, $queryCriteria->offset);
+        $this->assertEquals(Pagination::PAGE_SIZE, $queryCriteria->limit);
     }
 }
