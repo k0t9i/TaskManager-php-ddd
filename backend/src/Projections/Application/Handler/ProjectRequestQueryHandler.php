@@ -6,13 +6,14 @@ namespace TaskManager\Projections\Application\Handler;
 
 use TaskManager\Projections\Application\Query\ProjectRequestQuery;
 use TaskManager\Projections\Application\Service\CurrentUserExtractorInterface;
-use TaskManager\Projections\Domain\Entity\ProjectRequestProjection;
 use TaskManager\Projections\Domain\Exception\InsufficientPermissionsException;
 use TaskManager\Projections\Domain\Exception\ObjectDoesNotExistException;
 use TaskManager\Projections\Domain\Repository\ProjectProjectionRepositoryInterface;
 use TaskManager\Projections\Domain\Repository\ProjectRequestProjectionRepositoryInterface;
 use TaskManager\Shared\Application\Bus\Query\QueryHandlerInterface;
 use TaskManager\Shared\Application\Criteria\CriteriaFromQueryBuilderInterface;
+use TaskManager\Shared\Application\Paginator\Pagination;
+use TaskManager\Shared\Application\Paginator\PaginatorInterface;
 use TaskManager\Shared\Domain\Criteria\Criteria;
 use TaskManager\Shared\Domain\Criteria\Operand;
 use TaskManager\Shared\Domain\Criteria\OperatorEnum;
@@ -24,14 +25,12 @@ final readonly class ProjectRequestQueryHandler implements QueryHandlerInterface
         private ProjectRequestProjectionRepositoryInterface $repository,
         private ProjectProjectionRepositoryInterface $projectRepository,
         private CriteriaFromQueryBuilderInterface $criteriaBuilder,
-        private CurrentUserExtractorInterface $userExtractor
+        private CurrentUserExtractorInterface $userExtractor,
+        private PaginatorInterface $paginator
     ) {
     }
 
-    /**
-     * @return ProjectRequestProjection[]
-     */
-    public function __invoke(ProjectRequestQuery $query): array
+    public function __invoke(ProjectRequestQuery $query): Pagination
     {
         $user = $this->userExtractor->extract();
 
@@ -51,6 +50,6 @@ final readonly class ProjectRequestQueryHandler implements QueryHandlerInterface
 
         $this->criteriaBuilder->build($criteria, $query->criteria);
 
-        return $this->repository->findAllByCriteria($criteria);
+        return $this->paginator->paginate($this->repository, $criteria);
     }
 }

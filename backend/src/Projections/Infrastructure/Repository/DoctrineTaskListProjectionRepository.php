@@ -37,14 +37,6 @@ final readonly class DoctrineTaskListProjectionRepository implements TaskListPro
     }
 
     /**
-     * @return TaskListProjection[]
-     */
-    public function findAllByCriteria(Criteria $criteria): array
-    {
-        return $this->finder->findAllByCriteria($this->getRepository(), $criteria);
-    }
-
-    /**
      * @throws \Doctrine\ORM\NoResultException
      * @throws \Doctrine\ORM\NonUniqueResultException
      */
@@ -72,6 +64,19 @@ final readonly class DoctrineTaskListProjectionRepository implements TaskListPro
     {
         $this->entityManager->remove($projection);
         $this->entityManager->flush();
+    }
+
+    /**
+     * @return TaskListProjection[]
+     */
+    public function findAllByCriteria(Criteria $criteria): array
+    {
+        return $this->finder->findAllByCriteria($this->getRepository(), $criteria);
+    }
+
+    public function findCountByCriteria(Criteria $criteria): int
+    {
+        return $this->finder->findCountByCriteria($this->getRepository(), $criteria);
     }
 
     private function getRepository(): EntityRepository

@@ -36,6 +36,12 @@ final readonly class DoctrineUserRequestProjectionRepository implements UserRequ
         ]);
     }
 
+    public function save(UserRequestProjection $projection): void
+    {
+        $this->entityManager->persist($projection);
+        $this->entityManager->flush();
+    }
+
     /**
      * @return UserRequestProjection[]
      */
@@ -44,10 +50,9 @@ final readonly class DoctrineUserRequestProjectionRepository implements UserRequ
         return $this->finder->findAllByCriteria($this->getRepository(), $criteria);
     }
 
-    public function save(UserRequestProjection $projection): void
+    public function findCountByCriteria(Criteria $criteria): int
     {
-        $this->entityManager->persist($projection);
-        $this->entityManager->flush();
+        return $this->finder->findCountByCriteria($this->getRepository(), $criteria);
     }
 
     private function getRepository(): EntityRepository

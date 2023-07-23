@@ -7,7 +7,10 @@ namespace TaskManager\Projections\Domain\Repository;
 use TaskManager\Projections\Domain\Entity\ProjectParticipantProjection;
 use TaskManager\Shared\Domain\Criteria\Criteria;
 
-interface ProjectParticipantProjectionRepositoryInterface
+/**
+ * @method findAllByCriteria(Criteria $criteria): ProjectParticipantProjection[]
+ */
+interface ProjectParticipantProjectionRepositoryInterface extends PageableRepositoryInterface
 {
     /**
      * @return ProjectParticipantProjection[]
@@ -15,11 +18,6 @@ interface ProjectParticipantProjectionRepositoryInterface
     public function findAllByUserId(string $id): array;
 
     public function findByProjectAndUserId(string $projectId, string $userId): ?ProjectParticipantProjection;
-
-    /**
-     * @return ProjectParticipantProjection[]
-     */
-    public function findAllByCriteria(Criteria $criteria): array;
 
     public function save(ProjectParticipantProjection $projection): void;
 

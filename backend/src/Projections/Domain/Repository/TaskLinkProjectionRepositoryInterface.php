@@ -7,13 +7,11 @@ namespace TaskManager\Projections\Domain\Repository;
 use TaskManager\Projections\Domain\Entity\TaskLinkProjection;
 use TaskManager\Shared\Domain\Criteria\Criteria;
 
-interface TaskLinkProjectionRepositoryInterface
+/**
+ * @method findAllByCriteria(Criteria $criteria): TaskLinkProjection[]
+ */
+interface TaskLinkProjectionRepositoryInterface extends PageableRepositoryInterface
 {
-    /**
-     * @return TaskLinkProjection[]
-     */
-    public function findAllByCriteria(Criteria $criteria): array;
-
     /**
      * @return TaskLinkProjection[]
      */

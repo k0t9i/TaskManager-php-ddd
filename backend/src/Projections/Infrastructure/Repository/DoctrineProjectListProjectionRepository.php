@@ -51,14 +51,6 @@ final readonly class DoctrineProjectListProjectionRepository implements ProjectL
         return $queryBuilder->getQuery()->getResult();
     }
 
-    /**
-     * @return ProjectListProjection[]
-     */
-    public function findAllByCriteria(Criteria $criteria): array
-    {
-        return $this->finder->findAllByCriteria($this->getRepository(), $criteria);
-    }
-
     public function save(ProjectListProjection $projection): void
     {
         $this->entityManager->persist($projection);
@@ -69,6 +61,19 @@ final readonly class DoctrineProjectListProjectionRepository implements ProjectL
     {
         $this->entityManager->remove($projection);
         $this->entityManager->flush();
+    }
+
+    /**
+     * @return ProjectListProjection[]
+     */
+    public function findAllByCriteria(Criteria $criteria): array
+    {
+        return $this->finder->findAllByCriteria($this->getRepository(), $criteria);
+    }
+
+    public function findCountByCriteria(Criteria $criteria): int
+    {
+        return $this->finder->findCountByCriteria($this->getRepository(), $criteria);
     }
 
     private function getRepository(): EntityRepository

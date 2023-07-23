@@ -22,14 +22,6 @@ final readonly class DoctrineTaskLinkProjectionRepository implements TaskLinkPro
     /**
      * @return TaskLinkProjection[]
      */
-    public function findAllByCriteria(Criteria $criteria): array
-    {
-        return $this->finder->findAllByCriteria($this->getRepository(), $criteria);
-    }
-
-    /**
-     * @return TaskLinkProjection[]
-     */
     public function findAllByLinkedTaskId(string $id): array
     {
         return $this->getRepository()->findBy([
@@ -55,6 +47,19 @@ final readonly class DoctrineTaskLinkProjectionRepository implements TaskLinkPro
     {
         $this->entityManager->remove($projection);
         $this->entityManager->flush();
+    }
+
+    /**
+     * @return TaskLinkProjection[]
+     */
+    public function findAllByCriteria(Criteria $criteria): array
+    {
+        return $this->finder->findAllByCriteria($this->getRepository(), $criteria);
+    }
+
+    public function findCountByCriteria(Criteria $criteria): int
+    {
+        return $this->finder->findCountByCriteria($this->getRepository(), $criteria);
     }
 
     private function getRepository(): EntityRepository
