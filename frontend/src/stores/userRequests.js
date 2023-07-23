@@ -3,21 +3,17 @@ import axiosInstance from "../helpers/axios";
 import {useCacheStore} from "./cache";
 import {useQueryStore} from "./queryStore";
 
-const STORE_ID = 'availableProjects';
+const STORE_ID = 'userRequests';
 
-export const useAvailableProjectsStore = defineStore({
+export const useUserRequestsStore = defineStore({
     id: STORE_ID,
     state: () => ({
-        projects: {},
+        requests: [],
         error: '',
-        locked: {},
         pagination: {},
         loading: false
     }),
     getters: {
-        isLocked: (state) => {
-            return (id) => state.locked[id];
-        },
         isLoading: (state) => {
             return state.loading;
         },
@@ -35,14 +31,15 @@ export const useAvailableProjectsStore = defineStore({
             return cache.request(
                 STORE_ID + queryStore.getHash,
                 () => axiosInstance
-                    .get('/projects/', {
+                    .get('/users/requests/', {
                         params: queryStore.getParams
                     })
                     .then((response) => {
-                        this.projects = {};
+                        this.requests = [];
                         for (const [key, value] of Object.entries(response.data.items)) {
-                            this.projects[value.id] = value;
-                            this.projects[value.id].finishDate = new Date(value.finishDate);
+                            let val = value;
+                            val.changeDate = new Date(value.changeDate);
+                            this.requests.push(val);
                         }
 
                         this.pagination = response.data.page;
@@ -56,22 +53,6 @@ export const useAvailableProjectsStore = defineStore({
                 )
                 .finally(() => {
                     this.loading = false;
-                });
-        },
-        async join(id) {
-            this.error = '';
-            this.locked[id] = true;
-
-            return await axiosInstance.post(`/projects/${id}/requests/`)
-                .then((response) => {
-                    this.projects[id].lastRequestStatus = 0;
-                    return response;
-                })
-                .catch((error) => {
-                    this.error = error.response.data.message;
-                })
-                .finally(() => {
-                    this.locked[id] = false;
                 });
         }
     }

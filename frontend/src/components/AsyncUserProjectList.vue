@@ -3,6 +3,7 @@ import ProjectStatus from "./ProjectStatus.vue";
 import Datetime from "./Datetime.vue";
 import FormError from "./FormError.vue";
 import {useUserProjectsStore} from "../stores/userProjects";
+import Pagination from "./Pagination.vue";
 
 const userProjectsStore = useUserProjectsStore();
 await userProjectsStore.load();
@@ -22,7 +23,7 @@ const projects = userProjectsStore.projects;
 
 <template>
   <FormError :error="userProjectsStore.error" />
-  <table class="table">
+  <table class="table" :class="{'loading-content': userProjectsStore.isLoading}">
     <thead>
     <tr>
       <th scope="col">#</th>
@@ -48,4 +49,5 @@ const projects = userProjectsStore.projects;
     </tr>
     </tbody>
   </table>
+  <Pagination :metadata="userProjectsStore.getPaginationMetadata" :locked="userProjectsStore.isLoading" />
 </template>

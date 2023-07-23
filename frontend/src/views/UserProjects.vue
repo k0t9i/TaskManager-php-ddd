@@ -1,5 +1,7 @@
 <script setup>
-import AsyncUserProjectList from "../components/AsyncUserProjectList.vue";
+import {useRoute} from "vue-router";
+
+const route = useRoute();
 </script>
 
 <template>
@@ -10,7 +12,7 @@ import AsyncUserProjectList from "../components/AsyncUserProjectList.vue";
     </RouterLink>
     <div>
       <Suspense>
-        <AsyncUserProjectList />
+        <RouterView :key="route.fullPath" />
         <template #fallback>
         <span>
           <div class="spinner-border spinner-border-sm text-dark mx-1" role="status" />Loading...

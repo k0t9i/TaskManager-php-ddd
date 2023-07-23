@@ -66,13 +66,25 @@ const router = createRouter({
         },
         {
             path: '/user-requests/',
-            name: 'user_requests',
             component: () => import('../views/UserRequests.vue'),
+            children: [
+                {
+                    path: '',
+                    name: 'user_requests',
+                    component: () => import('../components/AsyncUserRequestList.vue')
+                }
+            ]
         },
         {
             path: '/user-projects',
-            name: 'user_projects',
-            component: () => import('../views/UserProjects.vue')
+            component: () => import('../views/UserProjects.vue'),
+            children: [
+                {
+                    path: '',
+                    name: 'user_projects',
+                    component: () => import('../components/AsyncUserProjectList.vue')
+                }
+            ]
         },
         {
             path: '/login',

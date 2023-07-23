@@ -5,6 +5,7 @@ import Datetime from "./Datetime.vue";
 import FormError from "./FormError.vue";
 import {useAvailableProjectsStore} from "../stores/availableProjects";
 import confirmModal from "./confirmModal";
+import Pagination from "./Pagination.vue";
 
 const projectsStore = useAvailableProjectsStore();
 await projectsStore.load();
@@ -69,4 +70,5 @@ async function onJoin(projectId) {
       </tr>
     </tbody>
   </table>
+  <Pagination :metadata="projectsStore.getPaginationMetadata" :locked="projectsStore.isLoading" />
 </template>

@@ -1,9 +1,12 @@
 <script setup>
 import RequestStatus from "../components/RequestStatus.vue";
-import {reactive} from "vue";
-import axiosInstance from "../helpers/axios";
 import Datetime from "./Datetime.vue";
-import {useQueryStore} from "../stores/queryStore";
+import FormError from "./FormError.vue";
+import {useUserRequestsStore} from "../stores/userRequests";
+import Pagination from "./Pagination.vue";
+
+const userRequestsStore = useUserRequestsStore();
+await userRequestsStore.load();
 
 /**
  * @type {{
@@ -12,25 +15,12 @@ import {useQueryStore} from "../stores/queryStore";
  * projectName: string
  * }[]}
  */
-const requests = reactive([]);
-const queryStore = useQueryStore();
-
-await axiosInstance
-    .get('/users/requests/', {
-      params: queryStore.getParams
-    })
-    .then((response) => {
-      for (const [key, value] of Object.entries(response.data.items)) {
-        let val = value;
-        val.changeDate = new Date(value.changeDate);
-        requests.push(val);
-      }
-      return response;
-    });
+const requests = userRequestsStore.requests;
 </script>
 
 <template>
-  <table class="table">
+  <FormError :error="userRequestsStore.error" />
+  <table class="table" :class="{'loading-content': userRequestsStore.isLoading}">
     <thead>
     <tr>
       <th scope="col">#</th>
@@ -48,4 +38,5 @@ await axiosInstance
     </tr>
     </tbody>
   </table>
+  <Pagination :metadata="userRequestsStore.getPaginationMetadata" :locked="userRequestsStore.isLoading" />
 </template>

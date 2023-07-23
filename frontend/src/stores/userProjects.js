@@ -9,8 +9,18 @@ export const useUserProjectsStore = defineStore({
     id: STORE_ID,
     state: () => ({
         projects: {},
-        error: ''
+        error: '',
+        pagination: {},
+        loading: false
     }),
+    getters: {
+        isLoading: (state) => {
+            return state.loading;
+        },
+        getPaginationMetadata: (state) => {
+            return state.pagination;
+        }
+    },
     actions: {
         async create(project) {
             this.error = '';
@@ -30,6 +40,7 @@ export const useUserProjectsStore = defineStore({
         },
         async load() {
             this.error = '';
+            this.loading = true;
             const cache = useCacheStore();
             const queryStore = useQueryStore();
 
@@ -40,17 +51,24 @@ export const useUserProjectsStore = defineStore({
                         params: queryStore.getParams
                     })
                     .then((response) => {
+                        this.projects = {};
                         for (const [key, value] of Object.entries(response.data.items)) {
                             this.projects[value.id] = value;
                             this.projects[value.id].finishDate = new Date(value.finishDate);
                         }
+
+                        this.pagination = response.data.page;
+
                         return response;
                     })
                     .catch((error) => {
                         this.error = error.response.data.message;
                         throw error;
                     })
-            );
+                )
+                .finally(() => {
+                    this.loading = false;
+                });
         }
     }
 });

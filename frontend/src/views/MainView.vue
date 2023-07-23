@@ -1,10 +1,7 @@
 <script setup>
 import {useRoute} from "vue-router";
-import {useAvailableProjectsStore} from "../stores/availableProjects";
-import Pagination from "../components/Pagination.vue";
 
 const route = useRoute();
-const projectsStore = useAvailableProjectsStore();
 </script>
 
 <template>
@@ -22,7 +19,6 @@ const projectsStore = useAvailableProjectsStore();
         </span>
         </template>
       </Suspense>
-      <Pagination :metadata="projectsStore.getPaginationMetadata" :locked="projectsStore.isLoading" />
     </div>
   </div>
 </template>
