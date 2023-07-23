@@ -17,7 +17,7 @@ final class QueryCriteriaFromRequestConverter implements QueryCriteriaFromReques
     {
         $filters = [];
         foreach ($dto->filters as $filterMetadata => $value) {
-            $parts = explode(':', $filterMetadata);
+            $parts = explode(':', (string) $filterMetadata);
 
             $operator = self::DEFAULT_OPERATOR;
             $property = $parts[0];
