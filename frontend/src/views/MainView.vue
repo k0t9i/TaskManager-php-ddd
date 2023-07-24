@@ -1,7 +1,7 @@
 <script setup>
-import {useRoute} from "vue-router";
+import {useQueryStore} from "../stores/queryStore";
 
-const route = useRoute();
+const queryStore = useQueryStore();
 </script>
 
 <template>
@@ -12,7 +12,7 @@ const route = useRoute();
     </RouterLink>
     <div>
       <Suspense>
-        <RouterView :key="route.fullPath" />
+        <RouterView :key="queryStore.getParams" />
         <template #fallback>
         <span>
           <div class="spinner-border spinner-border-sm text-dark mx-1" role="status" />Loading...
