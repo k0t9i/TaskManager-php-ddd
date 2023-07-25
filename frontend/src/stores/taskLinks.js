@@ -13,21 +13,30 @@ export const useTaskLinksStore = defineStore({
         links: {},
         errors: {},
         locked: {},
-        availableTasks: {}
+        availableTasks: {},
+        pagination: {},
+        loading: {}
     }),
     getters: {
         getLinks: (state) => {
-            return (taskId) => state.links[taskId];
+            return (taskId) => state.links[taskId] ?? {};
         },
         error: (state) => {
-            return (taskId) => state.errors[taskId];
+            return (taskId) => state.errors[taskId] ?? '';
         },
         isLocked: (state) => {
-            return (id) => state.locked[id];
+            return (id) => state.locked[id] ?? false;
         },
         getAvailableTasks: (state) => {
-            return (taskId) => state.availableTasks[taskId];
+            return (taskId) => state.availableTasks[taskId] ?? {};
+        }
+        ,
+        isLoading: (state) => {
+            return (taskId) => state.loading[taskId] ?? false;
         },
+        getPaginationMetadata: (state) => {
+            return (taskId) => state.pagination[taskId] ?? {};
+        }
     },
     actions: {
         async create(taskId, linkedTaskId) {
@@ -54,6 +63,7 @@ export const useTaskLinksStore = defineStore({
         },
         async load(projectId, taskId) {
             this.errors[taskId] = '';
+            this.loading[taskId] = true;
             const cache = useCacheStore();
             const queryStore = useQueryStore();
 
@@ -64,12 +74,12 @@ export const useTaskLinksStore = defineStore({
                         params: queryStore.getParams
                     })
                     .then((response) => {
-                        if (!this.links[taskId]) {
-                            this.links[taskId] = {};
-                        }
+                        this.links[taskId] = {};
                         for (const [key, value] of Object.entries(response.data.items)) {
                             this.links[taskId][value.linkedTaskId] = value;
                         }
+
+                        this.pagination[taskId] = response.data.page;
 
                         return tasksStore.load(projectId)
                             .then((response) => {
@@ -82,7 +92,10 @@ export const useTaskLinksStore = defineStore({
                         this.errors[taskId] = error.response.data.message;
                         throw error;
                     })
-            );
+                )
+                .finally(() => {
+                    this.loading[taskId] = false;
+                });
         },
         async remove(projectId, taskId, linkedTaskId) {
             this.errors[taskId] = '';

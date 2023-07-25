@@ -10,22 +10,31 @@ export const useProjectParticipantsStore = defineStore({
     state: () => ({
         participants: {},
         errors: {},
-        locked: {}
+        locked: {},
+        pagination: {},
+        loading: {}
     }),
     getters: {
         getParticipants: (state) => {
             return (projectId) => state.participants[projectId] ?? {};
         },
         error: (state) => {
-            return (projectId) => state.errors[projectId];
+            return (projectId) => state.errors[projectId] ?? '';
         },
         isLocked: (state) => {
-            return (id) => state.locked[id];
+            return (id) => state.locked[id] ?? false;
+        },
+        isLoading: (state) => {
+            return (projectId) => state.loading[projectId] ?? false;
+        },
+        getPaginationMetadata: (state) => {
+            return (projectId) => state.pagination[projectId] ?? {};
         }
     },
     actions: {
         async load(projectId) {
             this.errors[projectId] = '';
+            this.loading[projectId] = true;
             const cache = useCacheStore();
             const queryStore = useQueryStore();
 
@@ -40,13 +49,19 @@ export const useProjectParticipantsStore = defineStore({
                         for (const [key, value] of Object.entries(response.data.items)) {
                             this.participants[projectId][value.userId] = value;
                         }
+
+                        this.pagination[projectId] = response.data.page;
+
                         return response;
                     })
                     .catch((error) => {
                         this.errors[projectId] = error.response.data.message;
                         throw error;
                     })
-            );
+                )
+                .finally(() => {
+                    this.loading[projectId] = false;
+                });
         },
         async remove(projectId, id) {
             this.errors[projectId] = '';

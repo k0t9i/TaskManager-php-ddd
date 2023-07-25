@@ -39,13 +39,25 @@ const router = createRouter({
                 },
                 {
                     path: 'requests',
-                    name: 'project_requests',
-                    component: () => import('../views/ProjectRequests.vue')
+                    component: () => import('../views/ProjectRequests.vue'),
+                    children: [
+                        {
+                            path: '',
+                            name: 'project_requests',
+                            component: () => import('../components/AsyncProjectRequestList.vue')
+                        }
+                    ]
                 },
                 {
                     path: 'tasks',
-                    name: 'project_tasks',
                     component: () => import('../views/ProjectTasks.vue'),
+                    children: [
+                        {
+                            path: '',
+                            name: 'project_tasks',
+                            component: () => import('../components/AsyncProjectTaskList.vue')
+                        }
+                    ]
                 },
                 {
                     path: 'tasks/create',
@@ -55,12 +67,37 @@ const router = createRouter({
                 {
                     path: 'tasks/:taskId',
                     name: 'edit_task',
-                    component: () => import('../views/EditTaskView.vue')
+                    component: () => import('../views/EditTaskView.vue'),
+                    redirect: {name: 'task_info'},
+                    children: [
+                        {
+                            path: 'info',
+                            name: 'task_info',
+                            component: () => import('../components/AsyncEditTask.vue')
+                        },
+                        {
+                            path: 'links',
+                            component: () => import('../views/TaskLinksView.vue'),
+                            children: [
+                                {
+                                    path: '',
+                                    name: 'task_links',
+                                    component: () => import('../components/AsyncTaskLinks.vue')
+                                }
+                            ]
+                        }
+                    ]
                 },
                 {
                     path: 'participants',
-                    name: 'project_participants',
-                    component: () => import('../views/ProjectParticipants.vue')
+                    component: () => import('../views/ProjectParticipants.vue'),
+                    children: [
+                        {
+                            path: '',
+                            name: 'project_participants',
+                            component: () => import('../components/AsyncProjectParticipantsList.vue')
+                        }
+                    ]
                 },
             ]
         },

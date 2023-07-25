@@ -4,6 +4,7 @@ import {useProjectStore} from "../stores/project";
 import FormError from "./FormError.vue";
 import {useProjectParticipantsStore} from "../stores/projectParticipants";
 import confirmModal from "./confirmModal";
+import Pagination from "./Pagination.vue";
 
 const route = useRoute();
 const id = route.params.id;
@@ -25,7 +26,7 @@ async function makeOwner(participantId) {
 
 <template>
   <FormError :error="participantsStore.error(id)" />
-  <table class="table">
+  <table class="table" :class="{'loading-content': participantsStore.isLoading(id)}">
     <thead>
     <tr>
       <th scope="col">#</th>
@@ -61,4 +62,5 @@ async function makeOwner(participantId) {
     </tr>
     </tbody>
   </table>
+  <Pagination :metadata="participantsStore.getPaginationMetadata(id)" :locked="participantsStore.isLoading(id)" />
 </template>

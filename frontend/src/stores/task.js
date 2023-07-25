@@ -13,7 +13,10 @@ export const useTaskStore = defineStore({
     }),
     getters: {
         task: (state) => {
-            return (id) => state.tasks[id];
+            return (id) => {
+                state.tasks[id] = state.tasks[id] ?? {};
+                return state.tasks[id];
+            };
         },
         error: (state) => {
             return (id) => state.errors[id];

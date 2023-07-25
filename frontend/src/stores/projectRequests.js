@@ -10,22 +10,31 @@ export const useProjectRequestsStore = defineStore({
     state: () => ({
         requests: {},
         errors: {},
-        locked: {}
+        locked: {},
+        pagination: {},
+        loading: {}
     }),
     getters: {
         getRequests: (state) => {
-            return (projectId) => state.requests[projectId];
+            return (projectId) => state.requests[projectId] ?? {};
         },
         error: (state) => {
-            return (projectId) => state.errors[projectId];
+            return (projectId) => state.errors[projectId] ?? '';
         },
         isLocked: (state) => {
-            return (id) => state.locked[id];
+            return (id) => state.locked[id] ?? false;
+        },
+        isLoading: (state) => {
+            return (projectId) => state.loading[projectId] ?? false;
+        },
+        getPaginationMetadata: (state) => {
+            return (projectId) => state.pagination[projectId] ?? {};
         }
     },
     actions: {
         async load(projectId) {
             this.errors[projectId] = '';
+            this.loading[projectId] = true;
             const cache = useCacheStore();
             const queryStore = useQueryStore();
 
@@ -36,20 +45,24 @@ export const useProjectRequestsStore = defineStore({
                         params: queryStore.getParams
                     })
                     .then((response) => {
-                        if (!this.requests[projectId]) {
-                            this.requests[projectId] = {};
-                        }
+                        this.requests[projectId] = {};
                         for (const [key, value] of Object.entries(response.data.items)) {
                             this.requests[projectId][value.id] = value;
                             this.requests[projectId][value.id].changeDate = new Date(value.changeDate);
                         }
+
+                        this.pagination[projectId] = response.data.page;
+
                         return response;
                     })
                     .catch((error) => {
                         this.errors[projectId] = error.response.data.message;
                         throw error;
                     })
-            );
+                )
+                .finally(() => {
+                    this.loading[projectId] = false;
+                });
         },
         async confirm(projectId, id) {
             return this.changeStatus(projectId, id, 'confirm', 1);

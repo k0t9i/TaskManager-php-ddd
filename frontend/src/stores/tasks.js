@@ -10,17 +10,25 @@ export const useTasksStore = defineStore({
     state: () => ({
         tasks: {},
         errors: {},
-        locked: {}
+        locked: {},
+        pagination: {},
+        loading: {}
     }),
     getters: {
         getTasks: (state) => {
-            return (projectId) => state.tasks[projectId];
+            return (projectId) => state.tasks[projectId] ?? {};
         },
         error: (state) => {
-            return (projectId) => state.errors[projectId];
+            return (projectId) => state.errors[projectId] ?? '';
         },
         isLocked: (state) => {
-            return (id) => state.locked[id];
+            return (id) => state.locked[id] ?? false;
+        },
+        isLoading: (state) => {
+            return (projectId) => state.loading[projectId] ?? false;
+        },
+        getPaginationMetadata: (state) => {
+            return (projectId) => state.pagination[projectId] ?? {};
         }
     },
     actions: {
@@ -46,6 +54,7 @@ export const useTasksStore = defineStore({
         },
         async load(projectId) {
             this.errors[projectId] = '';
+            this.loading[projectId] = true;
             const cache = useCacheStore();
             const queryStore = useQueryStore();
 
@@ -56,21 +65,25 @@ export const useTasksStore = defineStore({
                         params: queryStore.getParams
                     })
                     .then((response) => {
-                        if (!this.tasks[projectId]) {
-                            this.tasks[projectId] = {};
-                        }
+                        this.tasks[projectId] = {};
                         for (const [key, value] of Object.entries(response.data.items)) {
                             this.tasks[projectId][value.id] = value;
                             this.tasks[projectId][value.id].startDate = new Date(value.startDate);
                             this.tasks[projectId][value.id].finishDate = new Date(value.finishDate);
                         }
+
+                        this.pagination[projectId] = response.data.page;
+
                         return response;
                     })
                     .catch((error) => {
                         this.errors[projectId] = error.response.data.message;
                         throw error;
                     })
-            );
+                )
+                .finally(() => {
+                    this.loading[projectId] = false;
+                });
         }
     }
 });

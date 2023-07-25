@@ -5,6 +5,7 @@ import FormError from "./FormError.vue";
 import Datetime from "./Datetime.vue";
 import {useTasksStore} from "../stores/tasks";
 import TaskStatus from "./TaskStatus.vue";
+import Pagination from "./Pagination.vue";
 
 const route = useRoute();
 const id = route.params.id;
@@ -22,7 +23,7 @@ const tasks = tasksStore.getTasks(id);
     <button @click="navigate" class="btn btn-primary mb-4">Create task</button>
   </RouterLink>
   <FormError :error="tasksStore.error(id)" />
-  <table class="table">
+  <table class="table" :class="{'loading-content': tasksStore.isLoading(id)}">
     <thead>
     <tr>
       <th scope="col">#</th>
@@ -48,4 +49,5 @@ const tasks = tasksStore.getTasks(id);
     </tr>
     </tbody>
   </table>
+  <Pagination :metadata="tasksStore.getPaginationMetadata(id)" :locked="tasksStore.isLoading(id)" />
 </template>

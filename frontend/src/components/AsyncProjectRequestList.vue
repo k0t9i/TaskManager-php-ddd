@@ -6,6 +6,7 @@ import FormError from "./FormError.vue";
 import Datetime from "./Datetime.vue";
 import {useProjectRequestsStore} from "../stores/projectRequests";
 import confirmModal from "./confirmModal";
+import Pagination from "./Pagination.vue";
 
 const route = useRoute();
 const id = route.params.id;
@@ -28,7 +29,7 @@ async function onReject(requestId) {
 
 <template>
   <FormError :error="requestsStore.error(id)" />
-  <table class="table">
+  <table class="table" :class="{'loading-content': requestsStore.isLoading(id)}">
     <thead>
     <tr>
       <th scope="col">#</th>
@@ -59,6 +60,7 @@ async function onReject(requestId) {
     </tr>
     </tbody>
   </table>
+  <Pagination :metadata="requestsStore.getPaginationMetadata(id)" :locked="requestsStore.isLoading(id)" />
 </template>
 
 <style scoped>
