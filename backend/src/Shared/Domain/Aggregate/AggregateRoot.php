@@ -6,6 +6,7 @@ namespace TaskManager\Shared\Domain\Aggregate;
 
 use TaskManager\Shared\Domain\Equatable;
 use TaskManager\Shared\Domain\Event\DomainEventInterface;
+use TaskManager\Shared\Domain\ValueObject\Uuid;
 
 abstract class AggregateRoot implements Equatable
 {
@@ -29,4 +30,6 @@ abstract class AggregateRoot implements Equatable
 
         return $events;
     }
+
+    abstract public function getId(): Uuid;
 }

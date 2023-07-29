@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace TaskManager\Shared\Application\OptimisticLock;
 
+use TaskManager\Shared\Domain\Aggregate\AggregateRoot;
+
 interface OptimisticLockManagerInterface
 {
-    /**
-     * @param class-string $aggregateRootClass
-     */
-    public function lock(string $aggregateRootClass, int $expectedVersion): void;
+    public function lock(AggregateRoot $aggregateRoot, int $expectedVersion): void;
 }

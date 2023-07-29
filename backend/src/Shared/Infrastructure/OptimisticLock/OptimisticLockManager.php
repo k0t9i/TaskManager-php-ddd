@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use TaskManager\Shared\Application\OptimisticLock\OptimisticLock;
 use TaskManager\Shared\Application\OptimisticLock\OptimisticLockManagerInterface;
 use TaskManager\Shared\Application\Service\UuidGeneratorInterface;
+use TaskManager\Shared\Domain\Aggregate\AggregateRoot;
 
 final readonly class OptimisticLockManager implements OptimisticLockManagerInterface
 {
@@ -19,18 +20,17 @@ final readonly class OptimisticLockManager implements OptimisticLockManagerInter
     }
 
     /**
-     * @param class-string $aggregateRootClass
-     *
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\PessimisticLockException
      */
-    public function lock(string $aggregateRootClass, int $expectedVersion): void
+    public function lock(AggregateRoot $aggregateRoot, int $expectedVersion): void
     {
         $lock = $this->entityManager->getRepository(OptimisticLock::class)->findOneBy([
-            'aggregateRoot' => $aggregateRootClass,
+            'aggregateRoot' => $aggregateRoot::class,
+            'aggregateId' => $aggregateRoot->getId()->value
         ]);
         if (null === $lock) {
-            $lock = new OptimisticLock($aggregateRootClass);
+            $lock = new OptimisticLock($aggregateRoot::class, $aggregateRoot->getId()->value);
         } else {
             $this->entityManager->lock($lock, LockMode::OPTIMISTIC, $expectedVersion);
         }

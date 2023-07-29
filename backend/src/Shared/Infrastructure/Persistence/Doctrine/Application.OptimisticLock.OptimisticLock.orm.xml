@@ -5,6 +5,7 @@
                           https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
     <entity name="TaskManager\Shared\Application\OptimisticLock\OptimisticLock" table="optimistic_locks">
         <id name="aggregateRoot" column="aggregate_root" length="4000" />
+        <id name="aggregateId" column="aggregate_id" length="36" />
         <field name="version" type="integer" version="true" />
         <field name="uuid" length="36" />
     </entity>

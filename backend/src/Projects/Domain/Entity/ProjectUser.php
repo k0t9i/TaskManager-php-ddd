@@ -7,6 +7,7 @@ namespace TaskManager\Projects\Domain\Entity;
 use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
 use TaskManager\Shared\Domain\Aggregate\AggregateRoot;
 use TaskManager\Shared\Domain\Equatable;
+use TaskManager\Shared\Domain\ValueObject\Uuid;
 
 final class ProjectUser extends AggregateRoot
 {
@@ -19,5 +20,10 @@ final class ProjectUser extends AggregateRoot
     {
         return $other instanceof self
             && $other->id->equals($this->id);
+    }
+
+    public function getId(): Uuid
+    {
+        return $this->id;
     }
 }

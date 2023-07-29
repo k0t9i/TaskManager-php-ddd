@@ -14,7 +14,8 @@ final class OptimisticLock
      * @param class-string $aggregateRoot
      */
     public function __construct(
-        public readonly string $aggregateRoot
+        public readonly string $aggregateRoot,
+        public readonly string $aggregateId
     ) {
     }
 }
