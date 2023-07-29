@@ -113,7 +113,7 @@ final readonly class TaskProjectionController
 
         return new JsonResponse(PaginationResponseDTO::createFromPagination(
             $pagination,
-            fn (array $items) => TaskLinkResponseDTO::createFromProjections($items)
+            fn (array $items) => TaskLinkResponseDTO::createList($items)
         ));
     }
 }

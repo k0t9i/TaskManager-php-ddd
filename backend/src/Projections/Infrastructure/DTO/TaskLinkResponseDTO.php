@@ -5,39 +5,45 @@ declare(strict_types=1);
 namespace TaskManager\Projections\Infrastructure\DTO;
 
 use OpenApi\Attributes as OA;
+use TaskManager\Projections\Domain\DTO\TaskLinkMemento;
 use TaskManager\Projections\Domain\Entity\TaskLinkProjection;
 
 final readonly class TaskLinkResponseDTO
 {
-    public function __construct(
-        #[OA\Property(
-            description: 'TaskId ID',
-            oneOf: [new OA\Schema(
-                ref: '#/components/schemas/objectId/properties/id'
-            )]
+    #[OA\Property(
+        description: 'TaskId ID',
+        oneOf: [new OA\Schema(
+            ref: '#/components/schemas/objectId/properties/id'
         )]
-        public string $taskId,
-        #[OA\Property(
-            description: 'Linked task ID',
-            oneOf: [new OA\Schema(
-                ref: '#/components/schemas/objectId/properties/id'
-            )]
+    )]
+    public string $taskId;
+    #[OA\Property(
+        description: 'Linked task ID',
+        oneOf: [new OA\Schema(
+            ref: '#/components/schemas/objectId/properties/id'
         )]
-        public string $linkedTaskId,
-        #[OA\Property(
-            description: 'Linked task name',
-            oneOf: [new OA\Schema(
-                ref: '#components/schemas/taskModel/properties/name'
-            )]
+    )]
+    public string $linkedTaskId;
+    #[OA\Property(
+        description: 'Linked task name',
+        oneOf: [new OA\Schema(
+            ref: '#components/schemas/taskModel/properties/name'
         )]
-        public string $linkedTaskName,
-        #[OA\Property(
-            oneOf: [new OA\Schema(
-                ref: '#components/schemas/taskModel/properties/status'
-            )]
+    )]
+    public string $linkedTaskName;
+    #[OA\Property(
+        oneOf: [new OA\Schema(
+            ref: '#components/schemas/taskModel/properties/status'
         )]
-        public int $linkedTaskStatus
-    ) {
+    )]
+    public int $linkedTaskStatus;
+
+    public function __construct(TaskLinkMemento $memento)
+    {
+        $this->taskId = $memento->taskId;
+        $this->linkedTaskId = $memento->linkedTaskId;
+        $this->linkedTaskName = $memento->linkedTaskName;
+        $this->linkedTaskStatus = $memento->linkedTaskStatus;
     }
 
     /**
@@ -45,17 +51,12 @@ final readonly class TaskLinkResponseDTO
      *
      * @return self[]
      */
-    public static function createFromProjections(array $projections): array
+    public static function createList(array $projections): array
     {
         $result = [];
 
         foreach ($projections as $projection) {
-            $result[] = new self(
-                $projection->taskId,
-                $projection->linkedTaskId,
-                $projection->linkedTaskName,
-                $projection->linkedTaskStatus
-            );
+            $result[] = new self($projection->createMemento());
         }
 
         return $result;

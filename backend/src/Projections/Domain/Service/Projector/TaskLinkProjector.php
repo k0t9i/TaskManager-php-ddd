@@ -14,6 +14,7 @@ use TaskManager\Projections\Domain\Exception\ProjectionDoesNotExistException;
 use TaskManager\Projections\Domain\Repository\TaskLinkProjectionRepositoryInterface;
 use TaskManager\Projections\Domain\Repository\TaskProjectionRepositoryInterface;
 use TaskManager\Projections\Domain\Service\ProjectorUnitOfWork;
+use TaskManager\Shared\Domain\Hashable;
 
 final class TaskLinkProjector extends Projector
 {
@@ -54,7 +55,7 @@ final class TaskLinkProjector extends Projector
             throw new ProjectionDoesNotExistException($event->linkedTaskId, TaskProjection::class);
         }
 
-        $this->unitOfWork->createProjection(new TaskLinkProjection(
+        $this->unitOfWork->createProjection(TaskLinkProjection::create(
             $event->getAggregateId(),
             $event->linkedTaskId,
             $taskProjection->name,
@@ -64,7 +65,7 @@ final class TaskLinkProjector extends Projector
 
     private function whenTaskLinkDeleted(TaskLinkWasDeleted $event): void
     {
-        $projection = $this->getProjection($event->getAggregateId(), $event->linkedTaskId);
+        $projection = $this->getProjectionTaskAndLinkedTaskId($event->getAggregateId(), $event->linkedTaskId);
         $this->unitOfWork->deleteProjection($projection);
     }
 
@@ -73,16 +74,10 @@ final class TaskLinkProjector extends Projector
      */
     private function whenLinkedTaskInformationChanged(TaskInformationWasChangedEvent $event): void
     {
-        $this->unitOfWork->loadProjections(
-            $this->repository->findAllByLinkedTaskId($event->getAggregateId())
-        );
-        $projections = $this->unitOfWork->findProjections(
-            fn (TaskLinkProjection $p) => $p->linkedTaskId === $event->getAggregateId()
-        );
+        $projections = $this->getProjectionsByLinkedTaskId($event->getAggregateId());
 
-        /** @var TaskLinkProjection $projection */
         foreach ($projections as $projection) {
-            $projection->linkedTaskName = $event->name;
+            $projection->changeLinkedTaskInformation($event->name);
         }
     }
 
@@ -91,28 +86,40 @@ final class TaskLinkProjector extends Projector
      */
     private function whenLinkedTaskStatusChanged(TaskStatusWasChangedEvent $event): void
     {
-        $this->unitOfWork->loadProjections(
-            $this->repository->findAllByLinkedTaskId($event->getAggregateId())
-        );
-        $projections = $this->unitOfWork->findProjections(
-            fn (TaskLinkProjection $p) => $p->linkedTaskId === $event->getAggregateId()
-        );
+        $projections = $this->getProjectionsByLinkedTaskId($event->getAggregateId());
 
-        /** @var TaskLinkProjection $projection */
         foreach ($projections as $projection) {
-            $projection->linkedTaskStatus = (int) $event->status;
+            $projection->changeLinkedTaskStatus($event->status);
         }
     }
 
-    private function getProjection(string $taskId, string $linkedTaskId): ?TaskLinkProjection
+    /**
+     * @return TaskLinkProjection|null
+     */
+    private function getProjectionTaskAndLinkedTaskId(string $taskId, string $linkedTaskId): ?Hashable
     {
-        /** @var TaskLinkProjection $result */
-        $result = $this->unitOfWork->findProjection(TaskLinkProjection::hash($taskId, $linkedTaskId));
+        $projection = $this->repository->findByTaskAndLinkedTaskId($taskId, $linkedTaskId);
 
-        if (null !== $result) {
-            return $result;
+        if (null !== $projection) {
+            $this->unitOfWork->loadProjection($projection);
         }
 
-        return $this->repository->findByTaskAndLinkedTaskId($taskId, $linkedTaskId);
+        return $this->unitOfWork->findProjection(
+            TaskLinkProjection::hash($taskId, $linkedTaskId)
+        );
+    }
+
+    /**
+     * @return TaskLinkProjection[]
+     */
+    private function getProjectionsByLinkedTaskId(string $taskId): array
+    {
+        $this->unitOfWork->loadProjections(
+            $this->repository->findAllByLinkedTaskId($taskId)
+        );
+
+        return $this->unitOfWork->findProjections(
+            fn (TaskLinkProjection $p) => $p->isLinkedTask($taskId)
+        );
     }
 }
