@@ -103,6 +103,11 @@ final class ProjectProjection implements Hashable
         return $this->name;
     }
 
+    public function isForUser(string $userId): bool
+    {
+        return $this->userId === $userId;
+    }
+
     public function isUserOwner(string $userId): bool
     {
         return $this->ownerId === $userId;

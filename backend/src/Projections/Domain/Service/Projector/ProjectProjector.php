@@ -76,7 +76,7 @@ final class ProjectProjector extends Projector
 
         foreach ($projections as $projection) {
             $projection->changeOwner($event->ownerId);
-            if ($projection->userId === $event->ownerId) {
+            if ($projection->isForUser($event->ownerId)) {
                 $this->unitOfWork->undeleteProjection($projection);
             }
         }

@@ -62,7 +62,6 @@ final class ProjectListProjection implements Hashable
             $ownerId,
             $ownerFullName,
             (int) $status,
-            $userId === $ownerId,
             $userId === $ownerId
         );
     }

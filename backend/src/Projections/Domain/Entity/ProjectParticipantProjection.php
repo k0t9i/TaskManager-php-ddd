@@ -69,8 +69,8 @@ final class ProjectParticipantProjection implements Hashable
         );
     }
 
-    public function getUserId(): string
+    public function isForUser(string $userId): bool
     {
-        return $this->userId;
+        return $this->userId === $userId;
     }
 }

@@ -105,7 +105,7 @@ final class ProjectParticipantProjector extends Projector
         );
 
         return $this->unitOfWork->findProjections(
-            fn (ProjectParticipantProjection $p) => $p->getUserId() === $userId
+            fn (ProjectParticipantProjection $p) => $p->isForUser($userId)
         );
     }
 
