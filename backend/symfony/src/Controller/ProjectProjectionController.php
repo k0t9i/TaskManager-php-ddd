@@ -166,7 +166,7 @@ final readonly class ProjectProjectionController
 
         return new JsonResponse(PaginationResponseDTO::createFromPagination(
             $pagination,
-            fn (array $items) => ProjectRequestResponseDTO::createFromProjections($items)
+            fn (array $items) => ProjectRequestResponseDTO::createList($items)
         ));
     }
 
