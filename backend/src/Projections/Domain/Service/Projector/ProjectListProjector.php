@@ -21,7 +21,6 @@ use TaskManager\Projections\Domain\Exception\ProjectionDoesNotExistException;
 use TaskManager\Projections\Domain\Repository\ProjectListProjectionRepositoryInterface;
 use TaskManager\Projections\Domain\Repository\UserProjectionRepositoryInterface;
 use TaskManager\Projections\Domain\Service\ProjectorUnitOfWork;
-use TaskManager\Shared\Domain\ValueObject\DateTime;
 
 final class ProjectListProjector extends Projector
 {
@@ -60,16 +59,14 @@ final class ProjectListProjector extends Projector
         $userProjections = $this->userRepository->findAll();
 
         foreach ($userProjections as $userProjection) {
-            $this->unitOfWork->createProjection(new ProjectListProjection(
+            $this->unitOfWork->createProjection(ProjectListProjection::create(
                 $event->getAggregateId(),
                 $userProjection->id,
                 $event->name,
-                new DateTime($event->finishDate),
+                $event->finishDate,
                 $event->ownerId,
                 $ownerProjection->getFullName(),
-                (int) $event->status,
-                $userProjection->id === $event->ownerId,
-                $userProjection->id === $event->ownerId,
+                $event->status
             ));
         }
     }
@@ -82,8 +79,7 @@ final class ProjectListProjector extends Projector
         $projections = $this->getProjectionsById($event->getAggregateId());
 
         foreach ($projections as $projection) {
-            $projection->name = $event->name;
-            $projection->finishDate = new DateTime($event->finishDate);
+            $projection->changeInformation($event->name, $event->finishDate);
         }
     }
 
@@ -97,13 +93,7 @@ final class ProjectListProjector extends Projector
         }
 
         foreach ($projections as $projection) {
-            $projection->ownerId = $event->ownerId;
-            $projection->ownerFullName = $userProjection->getFullName();
-            $projection->isOwner = $projection->userId === $event->ownerId;
-            if ($projection->isOwner) {
-                $projection->isInvolved = true;
-                $projection->lastRequestStatus = null;
-            }
+            $projection->changeOwner($event->ownerId, $userProjection->getFullName());
         }
     }
 
@@ -112,7 +102,7 @@ final class ProjectListProjector extends Projector
         $projections = $this->getProjectionsById($event->getAggregateId());
 
         foreach ($projections as $projection) {
-            $projection->status = (int) $event->status;
+            $projection->changeStatus($event->status);
         }
     }
 
@@ -121,7 +111,7 @@ final class ProjectListProjector extends Projector
         $projections = $this->getProjectionsById($event->projectId);
 
         foreach ($projections as $projection) {
-            ++$projection->tasksCount;
+            $projection->addTask();
         }
     }
 
@@ -130,10 +120,7 @@ final class ProjectListProjector extends Projector
         $projections = $this->getProjectionsById($event->getAggregateId());
 
         foreach ($projections as $projection) {
-            ++$projection->pendingRequestsCount;
-            if ($projection->userId === $event->userId) {
-                $projection->lastRequestStatus = (int) $event->status;
-            }
+            $projection->createRequest($event->userId, $event->status);
         }
     }
 
@@ -142,10 +129,7 @@ final class ProjectListProjector extends Projector
         $projections = $this->getProjectionsById($event->getAggregateId());
 
         foreach ($projections as $projection) {
-            --$projection->pendingRequestsCount;
-            if ($projection->userId === $event->userId) {
-                $projection->lastRequestStatus = (int) $event->status;
-            }
+            $projection->changeRequestStatus($event->userId, $event->status);
         }
     }
 
@@ -154,10 +138,7 @@ final class ProjectListProjector extends Projector
         $projections = $this->getProjectionsById($event->getAggregateId());
 
         foreach ($projections as $projection) {
-            ++$projection->participantsCount;
-            if ($projection->userId === $event->participantId) {
-                $projection->isInvolved = true;
-            }
+            $projection->addParticipant($event->participantId);
         }
     }
 
@@ -166,11 +147,7 @@ final class ProjectListProjector extends Projector
         $projections = $this->getProjectionsById($event->getAggregateId());
 
         foreach ($projections as $projection) {
-            --$projection->participantsCount;
-            if ($projection->userId === $event->participantId) {
-                $projection->isInvolved = false;
-                $projection->lastRequestStatus = null;
-            }
+            $projection->removeParticipant($event->participantId);
         }
     }
 
@@ -179,13 +156,9 @@ final class ProjectListProjector extends Projector
         $ownersProjects = $this->repository->findAllOwnersProjects();
 
         foreach ($ownersProjects as $ownersProject) {
-            $newProjection = clone $ownersProject;
-            $newProjection->userId = $event->getAggregateId();
-            $newProjection->isOwner = false;
-            $newProjection->isInvolved = false;
-            $newProjection->lastRequestStatus = null;
-
-            $this->unitOfWork->createProjection($newProjection);
+            $this->unitOfWork->createProjection(
+                $ownersProject->cloneForUser($event->getAggregateId())
+            );
         }
     }
 
@@ -195,12 +168,12 @@ final class ProjectListProjector extends Projector
             $this->repository->findAllByOwnerId($event->getAggregateId())
         );
         $projections = $this->unitOfWork->findProjections(
-            fn (ProjectListProjection $p) => $p->ownerId === $event->getAggregateId()
+            fn (ProjectListProjection $p) => $p->isUserOwner($event->getAggregateId())
         );
 
         /** @var ProjectListProjection $projection */
         foreach ($projections as $projection) {
-            $projection->ownerFullName = UserProjection::fullName($event->firstname, $event->lastname);
+            $projection->changeOwnerFullName(UserProjection::fullName($event->firstname, $event->lastname));
         }
     }
 
@@ -214,7 +187,7 @@ final class ProjectListProjector extends Projector
         );
 
         return $this->unitOfWork->findProjections(
-            fn (ProjectListProjection $p) => $p->id === $id
+            fn (ProjectListProjection $p) => $p->getId() === $id
         );
     }
 }

@@ -73,7 +73,7 @@ final class TaskListProjector extends Projector
             $event->ownerId,
             $userProjection->getFullName(),
             (int) $event->status,
-            $projectProjection->id
+            $projectProjection->getId()
         ));
     }
 

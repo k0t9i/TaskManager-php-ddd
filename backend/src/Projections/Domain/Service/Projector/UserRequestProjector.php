@@ -55,7 +55,7 @@ final class UserRequestProjector extends Projector
             (int) $event->status,
             new DateTime($event->changeDate),
             $event->getAggregateId(),
-            $projectProjection->name
+            $projectProjection->getName()
         ));
     }
 

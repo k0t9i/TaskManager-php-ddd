@@ -69,7 +69,7 @@ final class ProjectorUnitOfWork
     public function createProjection(Hashable $projection): void
     {
         $this->loadProjection($projection);
-        unset($this->deletedProjections[$projection->getHash()]);
+        $this->undeleteProjection($projection);
     }
 
     public function loadProjection(Hashable $projection): void
@@ -86,5 +86,10 @@ final class ProjectorUnitOfWork
         $this->loadProjection($projection);
 
         $this->deletedProjections[$projection->getHash()] = $projection->getHash();
+    }
+
+    public function undeleteProjection(Hashable $projection): void
+    {
+        unset($this->deletedProjections[$projection->getHash()]);
     }
 }

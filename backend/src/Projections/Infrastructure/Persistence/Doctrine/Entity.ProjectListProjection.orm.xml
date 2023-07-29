@@ -11,7 +11,6 @@
         <field name="ownerId" column="owner_id" length="36" />
         <field name="ownerFullName" column="owner_full_name" length="4000" />
         <field name="status" type="integer" />
-        <field name="isOwner" column="is_owner" type="boolean" />
         <field name="isInvolved" column="is_involved" type="boolean" />
         <field name="tasksCount" column="tasks_count" type="integer" />
         <field name="participantsCount" column="participants_count" type="integer" />

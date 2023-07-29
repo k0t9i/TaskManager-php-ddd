@@ -13,7 +13,7 @@ use TaskManager\Projections\Domain\Event\ProjectStatusWasChangedEvent;
 use TaskManager\Projections\Domain\Event\ProjectWasCreatedEvent;
 use TaskManager\Projections\Domain\Repository\ProjectProjectionRepositoryInterface;
 use TaskManager\Projections\Domain\Service\ProjectorUnitOfWork;
-use TaskManager\Shared\Domain\ValueObject\DateTime;
+use TaskManager\Shared\Domain\Hashable;
 
 final class ProjectProjector extends Projector
 {
@@ -43,14 +43,14 @@ final class ProjectProjector extends Projector
      */
     private function whenProjectCreated(ProjectWasCreatedEvent $event): void
     {
-        $this->unitOfWork->createProjection(new ProjectProjection(
+        $this->unitOfWork->createProjection(ProjectProjection::create(
             $event->getAggregateId(),
             $event->ownerId,
             $event->name,
             $event->description,
-            new DateTime($event->finishDate),
+            $event->finishDate,
             $event->ownerId,
-            (int) $event->status
+            $event->status
         ));
     }
 
@@ -62,9 +62,11 @@ final class ProjectProjector extends Projector
         $projections = $this->getProjectionsById($event->getAggregateId());
 
         foreach ($projections as $projection) {
-            $projection->name = $event->name;
-            $projection->description = $event->description;
-            $projection->finishDate = new DateTime($event->finishDate);
+            $projection->changeInformation(
+                $event->name,
+                $event->description,
+                $event->finishDate
+            );
         }
     }
 
@@ -72,21 +74,12 @@ final class ProjectProjector extends Projector
     {
         $projections = $this->getProjectionsById($event->getAggregateId());
 
-        $oldProjection = null;
-        $newProjection = null;
         foreach ($projections as $projection) {
-            if ($projection->userId === $projection->ownerId) {
-                $oldProjection = $projection;
-            }
+            $projection->changeOwner($event->ownerId);
             if ($projection->userId === $event->ownerId) {
-                $newProjection = $projection;
-                $newProjection->isOwner = true;
+                $this->unitOfWork->undeleteProjection($projection);
             }
-            $projection->ownerId = $event->ownerId;
         }
-
-        $this->unitOfWork->deleteProjection($oldProjection);
-        $this->unitOfWork->createProjection($newProjection);
     }
 
     private function whenProjectStatusChanged(ProjectStatusWasChangedEvent $event): void
@@ -94,42 +87,26 @@ final class ProjectProjector extends Projector
         $projections = $this->getProjectionsById($event->getAggregateId());
 
         foreach ($projections as $projection) {
-            $projection->status = (int) $event->status;
+            $projection->changeStatus($event->status);
         }
     }
 
     private function whenParticipantAdded(ProjectParticipantWasAddedEvent $event): void
     {
-        $projections = $this->getProjectionsById($event->getAggregateId());
+        $projection = $this->getProjectionById($event->getAggregateId());
 
-        if (0 === count($projections)) {
+        if (null === $projection) {
             return;
         }
 
-        foreach ($projections as $projection) {
-            if ($projection->userId === $event->participantId) {
-                $projection->userId = $event->participantId;
-                $projection->isOwner = false;
-                $this->unitOfWork->createProjection($projection);
-
-                return;
-            }
-        }
-
-        $newProjection = clone array_pop($projections);
-        $newProjection->userId = $event->participantId;
-        $newProjection->isOwner = false;
-        $this->unitOfWork->createProjection($newProjection);
+        $this->unitOfWork->createProjection(
+            $projection->cloneForUser($event->participantId)
+        );
     }
 
     private function whenParticipantRemoved(ProjectParticipantWasRemovedEvent $event): void
     {
-        $projection = $this->unitOfWork->findProjection(
-            ProjectProjection::hash($event->getAggregateId(), $event->participantId)
-        );
-        if (null === $projection) {
-            $projection = $this->repository->findByIdAndUserId($event->getAggregateId(), $event->participantId);
-        }
+        $projection = $this->getProjectionByIdAndUserId($event->getAggregateId(), $event->participantId);
         if (null === $projection) {
             return;
         }
@@ -147,7 +124,45 @@ final class ProjectProjector extends Projector
         );
 
         return $this->unitOfWork->findProjections(
-            fn (ProjectProjection $p) => $p->id === $id
+            fn (ProjectProjection $p) => $p->getId() === $id
         );
+    }
+
+    /**
+     * @return ProjectProjection|null
+     */
+    private function getProjectionByIdAndUserId(string $id, string $userId): ?Hashable
+    {
+        $projection = $this->repository->findByIdAndUserId($id, $userId);
+
+        if (null !== $projection) {
+            $this->unitOfWork->loadProjection($projection);
+        }
+
+        return $this->unitOfWork->findProjection(
+            ProjectProjection::hash($id, $userId)
+        );
+    }
+
+    /**
+     * @return ProjectProjection|null
+     */
+    private function getProjectionById(string $id): ?Hashable
+    {
+        $projection = $this->repository->findById($id);
+
+        if (null !== $projection) {
+            $this->unitOfWork->loadProjection($projection);
+        }
+
+        $projections = $this->unitOfWork->findProjections(
+            fn (ProjectProjection $p) => $p->getId() === $id
+        );
+
+        if (0 === count($projections)) {
+            return null;
+        }
+
+        return array_values($projections)[0];
     }
 }

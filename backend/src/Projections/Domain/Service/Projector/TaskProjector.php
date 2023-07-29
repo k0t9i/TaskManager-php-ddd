@@ -63,7 +63,7 @@ final class TaskProjector extends Projector
             new DateTime($event->finishDate),
             $event->ownerId,
             (int) $event->status,
-            $projectProjection->id
+            $projectProjection->getId()
         ));
     }
 

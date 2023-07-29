@@ -129,7 +129,7 @@ final readonly class UserProjectionController
                                     property: 'items',
                                     type: 'array',
                                     items: new OA\Items(
-                                        ref: new Model(type: UserRequestResponseDTO::class)
+                                        ref: new Model(type: ProjectListResponseDTO::class)
                                     )
                                 ),
                             ]
@@ -152,7 +152,7 @@ final readonly class UserProjectionController
 
         return new JsonResponse(PaginationResponseDTO::createFromPagination(
             $pagination,
-            fn (array $items) => ProjectListResponseDTO::createFromProjections($items)
+            fn (array $items) => ProjectListResponseDTO::createList($items)
         ));
     }
 }

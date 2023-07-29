@@ -81,7 +81,7 @@ final readonly class ProjectProjectionController
 
         return new JsonResponse(PaginationResponseDTO::createFromPagination(
             $pagination,
-            fn (array $items) => ProjectListResponseDTO::createFromProjections($items)
+            fn (array $items) => ProjectListResponseDTO::createList($items)
         ));
     }
 
@@ -114,7 +114,7 @@ final readonly class ProjectProjectionController
     {
         $project = $this->queryBus->dispatch(new ProjectQuery($id));
 
-        return new JsonResponse(ProjectResponseDTO::createFromProjection($project));
+        return new JsonResponse(ProjectResponseDTO::create($project));
     }
 
     #[Route('/{id}/requests/', name: 'getAllRequests', methods: ['GET'])]

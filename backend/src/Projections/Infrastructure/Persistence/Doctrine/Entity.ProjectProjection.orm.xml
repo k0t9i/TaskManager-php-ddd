@@ -11,6 +11,5 @@
         <field name="finishDate" column="finish_date" type="tm_datetime" />
         <field name="ownerId" column="owner_id" length="36" />
         <field name="status" type="integer" />
-        <field name="isOwner" column="is_owner" type="boolean" />
     </entity>
 </doctrine-mapping>
