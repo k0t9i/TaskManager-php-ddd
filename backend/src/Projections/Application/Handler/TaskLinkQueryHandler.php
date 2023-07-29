@@ -41,9 +41,9 @@ final readonly class TaskLinkQueryHandler implements QueryHandlerInterface
             throw new ObjectDoesNotExistException(sprintf('Task "%s" does not exist.', $query->taskId));
         }
 
-        $project = $this->projectRepository->findByIdAndUserId($task->projectId, $user->id);
+        $project = $this->projectRepository->findByIdAndUserId($task->getProjectId(), $user->id);
         if (null === $project) {
-            throw new InsufficientPermissionsException(sprintf('Insufficient permissions to view the project "%s".', $task->projectId));
+            throw new InsufficientPermissionsException(sprintf('Insufficient permissions to view the project "%s".', $task->getProjectId()));
         }
 
         $criteria = new Criteria();

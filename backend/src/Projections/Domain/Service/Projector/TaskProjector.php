@@ -13,7 +13,7 @@ use TaskManager\Projections\Domain\Exception\ProjectionDoesNotExistException;
 use TaskManager\Projections\Domain\Repository\ProjectProjectionRepositoryInterface;
 use TaskManager\Projections\Domain\Repository\TaskProjectionRepositoryInterface;
 use TaskManager\Projections\Domain\Service\ProjectorUnitOfWork;
-use TaskManager\Shared\Domain\ValueObject\DateTime;
+use TaskManager\Shared\Domain\Hashable;
 
 final class TaskProjector extends Projector
 {
@@ -54,15 +54,15 @@ final class TaskProjector extends Projector
             throw new ProjectionDoesNotExistException($event->projectId, ProjectProjection::class);
         }
 
-        $this->unitOfWork->createProjection(new TaskProjection(
+        $this->unitOfWork->createProjection(TaskProjection::create(
             $event->getAggregateId(),
             $event->name,
             $event->brief,
             $event->description,
-            new DateTime($event->startDate),
-            new DateTime($event->finishDate),
+            $event->startDate,
+            $event->finishDate,
             $event->ownerId,
-            (int) $event->status,
+            $event->status,
             $projectProjection->getId()
         ));
     }
@@ -72,24 +72,22 @@ final class TaskProjector extends Projector
      */
     private function whenTaskInformationChanged(TaskInformationWasChangedEvent $event): void
     {
-        $projection = $this->getProjection($event->getAggregateId());
-        $this->ensureProjectionExists($event->getAggregateId(), $projection);
-        $this->unitOfWork->loadProjection($projection);
+        $projection = $this->getProjectionById($event->getAggregateId());
 
-        $projection->name = $event->name;
-        $projection->brief = $event->brief;
-        $projection->description = $event->description;
-        $projection->startDate = new DateTime($event->startDate);
-        $projection->finishDate = new DateTime($event->finishDate);
+        $projection->changeInformation(
+            $event->name,
+            $event->brief,
+            $event->description,
+            $event->startDate,
+            $event->finishDate
+        );
     }
 
     private function whenTaskStatusChanged(TaskStatusWasChangedEvent $event): void
     {
-        $projection = $this->getProjection($event->getAggregateId());
-        $this->ensureProjectionExists($event->getAggregateId(), $projection);
-        $this->unitOfWork->loadProjection($projection);
+        $projection = $this->getProjectionById($event->getAggregateId());
 
-        $projection->status = (int) $event->status;
+        $projection->changeStatus($event->status);
     }
 
     private function ensureProjectionExists(string $id, ?TaskProjection $projection): void
@@ -99,15 +97,20 @@ final class TaskProjector extends Projector
         }
     }
 
-    private function getProjection(string $id): ?TaskProjection
+    /**
+     * @return TaskProjection
+     */
+    private function getProjectionById(string $id): Hashable
     {
-        /** @var TaskProjection $result */
-        $result = $this->unitOfWork->findProjection($id);
+        $projection = $this->repository->findById($id);
 
-        if (null !== $result) {
-            return $result;
+        if (null !== $projection) {
+            $this->unitOfWork->loadProjection($projection);
         }
 
-        return $this->repository->findById($id);
+        $result = $this->unitOfWork->findProjection($id);
+        $this->ensureProjectionExists($id, $result);
+
+        return $result;
     }
 }

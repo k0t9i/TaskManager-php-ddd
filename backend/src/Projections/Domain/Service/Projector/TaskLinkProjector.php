@@ -58,8 +58,8 @@ final class TaskLinkProjector extends Projector
         $this->unitOfWork->createProjection(TaskLinkProjection::create(
             $event->getAggregateId(),
             $event->linkedTaskId,
-            $taskProjection->name,
-            $taskProjection->status
+            $taskProjection->getName(),
+            $taskProjection->getStatus()
         ));
     }
 

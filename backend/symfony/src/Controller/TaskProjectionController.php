@@ -61,7 +61,7 @@ final readonly class TaskProjectionController
     {
         $task = $this->queryBus->dispatch(new TaskQuery($id));
 
-        return new JsonResponse(TaskResponseDTO::createFromProjection($task));
+        return new JsonResponse(TaskResponseDTO::create($task));
     }
 
     #[Route('/{id}/links/', name: 'getAllLinks', methods: ['GET'])]
