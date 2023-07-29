@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace TaskManager\Projections\Domain\Service\Projector;
 
 use TaskManager\Projections\Domain\DTO\ProjectionistResultDTO;
-use TaskManager\Projections\Domain\Repository\TransactionManagerInterface;
 use TaskManager\Projections\Domain\Service\EventStore\EventStoreInterface;
+use TaskManager\Shared\Domain\Service\TransactionManagerInterface;
 
 final readonly class Projectionist implements ProjectionistInterface
 {

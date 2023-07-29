@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TaskManager\Projections\Domain\Repository;
+namespace TaskManager\Shared\Domain\Service;
 
 interface TransactionManagerInterface
 {

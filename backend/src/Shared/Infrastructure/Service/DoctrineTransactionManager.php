@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace TaskManager\Projections\Infrastructure\Repository;
+namespace TaskManager\Shared\Infrastructure\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
-use TaskManager\Projections\Domain\Repository\TransactionManagerInterface;
+use TaskManager\Shared\Domain\Service\TransactionManagerInterface;
 
 final readonly class DoctrineTransactionManager implements TransactionManagerInterface
 {
