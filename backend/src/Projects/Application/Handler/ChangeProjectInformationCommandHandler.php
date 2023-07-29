@@ -7,7 +7,7 @@ namespace TaskManager\Projects\Application\Handler;
 use TaskManager\Projects\Application\Command\ChangeProjectInformationCommand;
 use TaskManager\Projects\Application\Service\CurrentUserExtractorInterface;
 use TaskManager\Projects\Application\Service\ProjectFinderInterface;
-use TaskManager\Projects\Domain\Repository\ProjectRepositoryInterface;
+use TaskManager\Projects\Application\Service\ProjectSaverInterface;
 use TaskManager\Projects\Domain\ValueObject\ProjectDescription;
 use TaskManager\Projects\Domain\ValueObject\ProjectFinishDate;
 use TaskManager\Projects\Domain\ValueObject\ProjectId;
@@ -19,7 +19,7 @@ use TaskManager\Shared\Application\Bus\Event\IntegrationEventBusInterface;
 final readonly class ChangeProjectInformationCommandHandler implements CommandHandlerInterface
 {
     public function __construct(
-        private ProjectRepositoryInterface $repository,
+        private ProjectSaverInterface $saver,
         private ProjectFinderInterface $finder,
         private CurrentUserExtractorInterface $userExtractor,
         private IntegrationEventBusInterface $eventBus,
@@ -40,7 +40,7 @@ final readonly class ChangeProjectInformationCommandHandler implements CommandHa
             $currentUser->id
         );
 
-        $this->repository->save($project);
+        $newVersion = $this->saver->save($project, (int) $command->version);
         $this->eventBus->dispatch(...$project->releaseEvents());
     }
 }

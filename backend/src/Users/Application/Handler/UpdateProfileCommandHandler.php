@@ -10,6 +10,7 @@ use TaskManager\Shared\Application\Service\AuthenticatorServiceInterface;
 use TaskManager\Shared\Application\Service\PasswordHasherInterface;
 use TaskManager\Shared\Domain\Exception\UserDoesNotExistException;
 use TaskManager\Users\Application\Command\UpdateProfileCommand;
+use TaskManager\Users\Application\Service\UserSaverInterface;
 use TaskManager\Users\Domain\Exception\PasswordAndRepeatPasswordDoNotMatchException;
 use TaskManager\Users\Domain\Repository\UserRepositoryInterface;
 use TaskManager\Users\Domain\ValueObject\UserFirstname;
@@ -21,6 +22,7 @@ final readonly class UpdateProfileCommandHandler implements CommandHandlerInterf
 {
     public function __construct(
         private UserRepositoryInterface $repository,
+        private UserSaverInterface $saver,
         private PasswordHasherInterface $passwordHasher,
         private AuthenticatorServiceInterface $authenticator,
         private IntegrationEventBusInterface $eventBus
@@ -48,7 +50,7 @@ final readonly class UpdateProfileCommandHandler implements CommandHandlerInterf
             $hashedPassword
         );
 
-        $this->repository->save($user);
+        $newVersion = $this->saver->save($user, (int) $command->version);
         $this->eventBus->dispatch(...$user->releaseEvents());
     }
 }

@@ -8,7 +8,7 @@ use TaskManager\Projects\Application\Command\ChangeTaskInformationCommand;
 use TaskManager\Projects\Application\Service\CurrentUserExtractorInterface;
 use TaskManager\Projects\Application\Service\ProjectFinderInterface;
 use TaskManager\Projects\Application\Service\TaskFinderInterface;
-use TaskManager\Projects\Domain\Repository\TaskRepositoryInterface;
+use TaskManager\Projects\Application\Service\TaskSaverInterface;
 use TaskManager\Projects\Domain\ValueObject\TaskBrief;
 use TaskManager\Projects\Domain\ValueObject\TaskDescription;
 use TaskManager\Projects\Domain\ValueObject\TaskFinishDate;
@@ -22,7 +22,7 @@ use TaskManager\Shared\Application\Bus\Event\IntegrationEventBusInterface;
 final readonly class ChangeTaskInformationCommandHandler implements CommandHandlerInterface
 {
     public function __construct(
-        private TaskRepositoryInterface $repository,
+        private TaskSaverInterface $saver,
         private TaskFinderInterface $finder,
         private ProjectFinderInterface $projectFinder,
         private CurrentUserExtractorInterface $userExtractor,
@@ -48,7 +48,7 @@ final readonly class ChangeTaskInformationCommandHandler implements CommandHandl
             $currentUser->id
         );
 
-        $this->repository->save($task);
+        $newVersion = $this->saver->save($task, (int) $command->version);
         $this->eventBus->dispatch(...$task->releaseEvents());
     }
 }

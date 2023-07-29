@@ -23,11 +23,11 @@ final readonly class OptimisticLockManager implements OptimisticLockManagerInter
      * @throws \Doctrine\ORM\OptimisticLockException
      * @throws \Doctrine\ORM\PessimisticLockException
      */
-    public function lock(AggregateRoot $aggregateRoot, int $expectedVersion): void
+    public function lock(AggregateRoot $aggregateRoot, int $expectedVersion): int
     {
         $lock = $this->entityManager->getRepository(OptimisticLock::class)->findOneBy([
             'aggregateRoot' => $aggregateRoot::class,
-            'aggregateId' => $aggregateRoot->getId()->value
+            'aggregateId' => $aggregateRoot->getId()->value,
         ]);
         if (null === $lock) {
             $lock = new OptimisticLock($aggregateRoot::class, $aggregateRoot->getId()->value);
@@ -39,5 +39,7 @@ final readonly class OptimisticLockManager implements OptimisticLockManagerInter
 
         $this->entityManager->persist($lock);
         $this->entityManager->flush();
+
+        return $lock->version;
     }
 }

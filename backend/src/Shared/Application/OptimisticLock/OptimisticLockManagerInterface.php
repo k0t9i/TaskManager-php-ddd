@@ -8,5 +8,5 @@ use TaskManager\Shared\Domain\Aggregate\AggregateRoot;
 
 interface OptimisticLockManagerInterface
 {
-    public function lock(AggregateRoot $aggregateRoot, int $expectedVersion): void;
+    public function lock(AggregateRoot $aggregateRoot, int $expectedVersion): int;
 }
