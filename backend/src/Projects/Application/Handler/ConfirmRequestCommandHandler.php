@@ -34,6 +34,6 @@ final readonly class ConfirmRequestCommandHandler implements CommandHandlerInter
         );
 
         $this->repository->save($project);
-        $this->eventBus->dispatch(...$project->releaseEvents());
+        $this->eventBus->dispatch($project->releaseEvents());
     }
 }

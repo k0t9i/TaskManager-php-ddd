@@ -30,6 +30,6 @@ final readonly class CloseProjectCommandHandler implements CommandHandlerInterfa
         $project->close($currentUser->id);
 
         $this->repository->save($project);
-        $this->eventBus->dispatch(...$project->releaseEvents());
+        $this->eventBus->dispatch($project->releaseEvents());
     }
 }

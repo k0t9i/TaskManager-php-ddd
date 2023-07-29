@@ -32,6 +32,6 @@ final readonly class LimitTaskDatesOnProjectTaskFinishDateChanged implements Dom
         );
 
         $this->repository->save($task);
-        $this->eventBus->dispatch(...$task->releaseEvents());
+        $this->eventBus->dispatch($task->releaseEvents());
     }
 }

@@ -27,6 +27,6 @@ final readonly class UndraftTaskOnProjectTaskCreated implements DomainEventSubsc
         $task->undraft();
 
         $this->repository->save($task);
-        $this->eventBus->dispatch(...$task->releaseEvents());
+        $this->eventBus->dispatch($task->releaseEvents());
     }
 }

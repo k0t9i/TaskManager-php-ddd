@@ -32,6 +32,6 @@ final readonly class CreateProjectTaskOnTaskCreated implements DomainEventSubscr
         );
 
         $this->repository->save($project);
-        $this->eventBus->dispatch(...$project->releaseEvents());
+        $this->eventBus->dispatch($project->releaseEvents());
     }
 }

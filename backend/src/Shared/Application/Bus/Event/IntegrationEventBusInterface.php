@@ -8,5 +8,8 @@ use TaskManager\Shared\Domain\Event\DomainEventInterface;
 
 interface IntegrationEventBusInterface
 {
-    public function dispatch(DomainEventInterface ...$events): void;
+    /**
+     * @param DomainEventInterface[] $events
+     */
+    public function dispatch(array $events, int $version = null): void;
 }

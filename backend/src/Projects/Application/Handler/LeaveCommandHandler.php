@@ -30,6 +30,6 @@ final readonly class LeaveCommandHandler implements CommandHandlerInterface
         $project->leaveProject($currentUser->id);
 
         $this->repository->save($project);
-        $this->eventBus->dispatch(...$project->releaseEvents());
+        $this->eventBus->dispatch($project->releaseEvents());
     }
 }

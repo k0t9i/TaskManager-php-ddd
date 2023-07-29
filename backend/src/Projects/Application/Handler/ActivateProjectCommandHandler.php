@@ -30,6 +30,6 @@ final readonly class ActivateProjectCommandHandler implements CommandHandlerInte
         $project->activate($currentUser->id);
 
         $this->repository->save($project);
-        $this->eventBus->dispatch(...$project->releaseEvents());
+        $this->eventBus->dispatch($project->releaseEvents());
     }
 }

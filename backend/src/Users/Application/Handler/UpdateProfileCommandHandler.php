@@ -51,6 +51,6 @@ final readonly class UpdateProfileCommandHandler implements CommandHandlerInterf
         );
 
         $newVersion = $this->saver->save($user, (int) $command->version);
-        $this->eventBus->dispatch(...$user->releaseEvents());
+        $this->eventBus->dispatch($user->releaseEvents(), $newVersion);
     }
 }

@@ -31,6 +31,6 @@ final readonly class CreateBackLinkOnTaskLinkCreated implements DomainEventSubsc
         );
 
         $this->repository->save($task);
-        $this->eventBus->dispatch(...$task->releaseEvents());
+        $this->eventBus->dispatch($task->releaseEvents());
     }
 }

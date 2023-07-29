@@ -43,6 +43,6 @@ final readonly class CreateProjectCommandHandler implements CommandHandlerInterf
         );
 
         $this->projectRepository->save($project);
-        $this->eventBus->dispatch(...$project->releaseEvents());
+        $this->eventBus->dispatch($project->releaseEvents());
     }
 }

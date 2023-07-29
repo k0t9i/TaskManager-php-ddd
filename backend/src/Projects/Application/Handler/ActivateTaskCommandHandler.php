@@ -33,6 +33,6 @@ final readonly class ActivateTaskCommandHandler implements CommandHandlerInterfa
         $project->activateTask($task, $currentUser->id);
 
         $this->repository->save($task);
-        $this->eventBus->dispatch(...$task->releaseEvents());
+        $this->eventBus->dispatch($task->releaseEvents());
     }
 }

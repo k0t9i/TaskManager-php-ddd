@@ -34,6 +34,6 @@ final readonly class RemoveParticipantCommandHandler implements CommandHandlerIn
         );
 
         $this->repository->save($project);
-        $this->eventBus->dispatch(...$project->releaseEvents());
+        $this->eventBus->dispatch($project->releaseEvents());
     }
 }

@@ -34,6 +34,6 @@ final readonly class CreateRequestCommandHandler implements CommandHandlerInterf
         );
 
         $this->repository->save($project);
-        $this->eventBus->dispatch(...$project->releaseEvents());
+        $this->eventBus->dispatch($project->releaseEvents());
     }
 }

@@ -37,6 +37,6 @@ final readonly class DeleteTaskLinkCommandHandler implements CommandHandlerInter
         );
 
         $this->repository->save($task);
-        $this->eventBus->dispatch(...$task->releaseEvents());
+        $this->eventBus->dispatch($task->releaseEvents());
     }
 }

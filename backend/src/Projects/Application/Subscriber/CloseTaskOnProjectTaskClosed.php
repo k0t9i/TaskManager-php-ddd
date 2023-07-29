@@ -28,6 +28,6 @@ final readonly class CloseTaskOnProjectTaskClosed implements DomainEventSubscrib
         $task->closeAsNeeded(new ProjectUserId($event->getPerformerId()));
 
         $this->repository->save($task);
-        $this->eventBus->dispatch(...$task->releaseEvents());
+        $this->eventBus->dispatch($task->releaseEvents());
     }
 }

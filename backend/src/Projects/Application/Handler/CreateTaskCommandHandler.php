@@ -50,6 +50,6 @@ final readonly class CreateTaskCommandHandler implements CommandHandlerInterface
         );
 
         $this->repository->save($task);
-        $this->eventBus->dispatch(...$task->releaseEvents());
+        $this->eventBus->dispatch($task->releaseEvents());
     }
 }

@@ -14,14 +14,16 @@ final readonly class IntegrationEvent implements IntegrationEventInterface
     private string $occurredOn;
     private string $performerId;
     private string $domainEventName;
+    private ?int $version;
 
-    public function __construct(DomainEventInterface $domainEvent)
+    public function __construct(DomainEventInterface $domainEvent, ?int $version)
     {
         $this->aggregateId = $domainEvent->getAggregateId();
         $this->body = $domainEvent->toPrimitives();
         $this->occurredOn = $domainEvent->getOccurredOn();
         $this->performerId = $domainEvent->getPerformerId();
         $this->domainEventName = $domainEvent::getEventName();
+        $this->version = $version;
     }
 
     public function getAggregateId(): string
@@ -47,5 +49,10 @@ final readonly class IntegrationEvent implements IntegrationEventInterface
     public function getDomainEventName(): string
     {
         return $this->domainEventName;
+    }
+
+    public function getVersion(): ?int
+    {
+        return $this->version;
     }
 }

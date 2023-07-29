@@ -15,10 +15,13 @@ final readonly class SymfonyIntegrationEventBus implements IntegrationEventBusIn
     {
     }
 
-    public function dispatch(DomainEventInterface ...$events): void
+    /**
+     * @param DomainEventInterface[] $events
+     */
+    public function dispatch(array $events, int $version = null): void
     {
         foreach ($events as $event) {
-            $integrationEvent = new IntegrationEvent($event);
+            $integrationEvent = new IntegrationEvent($event, $version);
 
             $this->integrationEventBus->dispatch($integrationEvent);
         }

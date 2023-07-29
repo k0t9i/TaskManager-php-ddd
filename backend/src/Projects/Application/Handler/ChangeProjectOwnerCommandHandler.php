@@ -42,6 +42,6 @@ final readonly class ChangeProjectOwnerCommandHandler implements CommandHandlerI
         );
 
         $this->repository->save($project);
-        $this->eventBus->dispatch(...$project->releaseEvents());
+        $this->eventBus->dispatch($project->releaseEvents());
     }
 }

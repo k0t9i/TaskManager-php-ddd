@@ -33,6 +33,6 @@ final readonly class CloseTaskCommandHandler implements CommandHandlerInterface
         $project->closeTask($task, $currentUser->id);
 
         $this->repository->save($task);
-        $this->eventBus->dispatch(...$task->releaseEvents());
+        $this->eventBus->dispatch($task->releaseEvents());
     }
 }

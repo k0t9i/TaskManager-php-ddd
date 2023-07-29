@@ -41,6 +41,6 @@ final readonly class ChangeProjectInformationCommandHandler implements CommandHa
         );
 
         $newVersion = $this->saver->save($project, (int) $command->version);
-        $this->eventBus->dispatch(...$project->releaseEvents());
+        $this->eventBus->dispatch($project->releaseEvents(), $newVersion);
     }
 }
