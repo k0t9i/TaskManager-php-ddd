@@ -62,6 +62,12 @@ doctrine:
                 is_bundle: false
                 prefix: TaskManager\Projections\Domain
                 alias: TaskManagerProjections
+            TaskManagerShared:
+                type: xml
+                dir: '%kernel.project_dir%/../src/Shared/Infrastructure/Persistence/Doctrine'
+                is_bundle: false
+                prefix: TaskManager\Shared
+                alias: TaskManagerShared
 
 when@test:
     doctrine:
