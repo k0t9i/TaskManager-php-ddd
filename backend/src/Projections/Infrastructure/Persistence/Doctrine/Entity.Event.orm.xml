@@ -10,5 +10,6 @@
         <field name="body" type="text" />
         <field name="performerId" column="performer_id" length="36" />
         <field name="occurredOn" column="occurred_on" type="tm_datetime" />
+        <field name="version" type="integer" nullable="true" />
     </entity>
 </doctrine-mapping>

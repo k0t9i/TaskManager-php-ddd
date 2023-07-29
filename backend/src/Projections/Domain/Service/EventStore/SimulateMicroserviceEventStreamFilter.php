@@ -6,6 +6,7 @@ namespace TaskManager\Projections\Domain\Service\EventStore;
 
 use TaskManager\Shared\Domain\Event\DomainEventInterface;
 
+// For development purposes only: app domains pretend to be microservices
 final class SimulateMicroserviceEventStreamFilter implements EventStreamFilterInterface
 {
     public function isSuitable(DomainEventInterface $domainEvent): bool

@@ -16,14 +16,15 @@ final readonly class Event
         private string $aggregateId,
         private string $body,
         private string $performerId,
-        private DateTime $occurredOn
+        private DateTime $occurredOn,
+        private ?int $version
     ) {
     }
 
     /**
      * @throws \Exception
      */
-    public static function fromDomainEvent(string $id, DomainEventInterface $domainEvent): self
+    public static function fromDomainEvent(string $id, DomainEventInterface $domainEvent, ?int $version): self
     {
         return new self(
             $id,
@@ -31,7 +32,8 @@ final readonly class Event
             $domainEvent->getAggregateId(),
             json_encode($domainEvent->toPrimitives()),
             $domainEvent->getPerformerId(),
-            new DateTime($domainEvent->getOccurredOn())
+            new DateTime($domainEvent->getOccurredOn()),
+            $version
         );
     }
 
