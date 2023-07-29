@@ -15,6 +15,7 @@ use TaskManager\Projections\Domain\Repository\ProjectParticipantProjectionReposi
 use TaskManager\Projections\Domain\Repository\TaskListProjectionRepositoryInterface;
 use TaskManager\Projections\Domain\Repository\UserProjectionRepositoryInterface;
 use TaskManager\Projections\Domain\Service\ProjectorUnitOfWork;
+use TaskManager\Shared\Domain\Hashable;
 
 final class ProjectParticipantProjector extends Projector
 {
@@ -55,7 +56,7 @@ final class ProjectParticipantProjector extends Projector
 
         $tasksCount = $this->taskRepository->countByProjectAndOwnerId($event->getAggregateId(), $event->participantId);
 
-        $this->unitOfWork->createProjection(new ProjectParticipantProjection(
+        $this->unitOfWork->createProjection(ProjectParticipantProjection::create(
             $event->participantId,
             $event->getAggregateId(),
             $userProjection->email,
@@ -67,44 +68,60 @@ final class ProjectParticipantProjector extends Projector
 
     private function whenProjectParticipantRemoved(ProjectParticipantWasRemovedEvent $event): void
     {
-        $projection = $this->getProjection($event->getAggregateId(), $event->participantId);
+        $projection = $this->getProjectionByProjectAndUserId($event->getAggregateId(), $event->participantId);
+        if (null === $projection) {
+            return;
+        }
+
         $this->unitOfWork->deleteProjection($projection);
     }
 
     private function whenUserProfileChanged(UserProfileWasChangedEvent $event): void
     {
-        $this->unitOfWork->loadProjections(
-            $this->repository->findAllByUserId($event->getAggregateId())
-        );
-        $projections = $this->unitOfWork->findProjections(
-            fn (ProjectParticipantProjection $p) => $p->userId === $event->getAggregateId()
-        );
+        $projections = $this->getProjectionsByUserId($event->getAggregateId());
 
-        /** @var ProjectParticipantProjection $projection */
         foreach ($projections as $projection) {
-            $projection->userFirstname = $event->firstname;
-            $projection->userLastname = $event->lastname;
+            $projection->changeUserInformation($event->firstname, $event->lastname);
         }
     }
 
     private function whenTaskCreated(TaskWasCreatedEvent $event): void
     {
-        $projection = $this->getProjection($event->projectId, $event->ownerId);
-        if (null !== $projection) {
-            $this->unitOfWork->loadProjection($projection);
-            ++$projection->tasksCount;
+        $projection = $this->getProjectionByProjectAndUserId($event->projectId, $event->ownerId);
+        if (null === $projection) {
+            return;
         }
+
+        $projection->addTask();
     }
 
-    private function getProjection(string $projectId, string $userId): ?ProjectParticipantProjection
+    /**
+     * @return ProjectParticipantProjection[]
+     */
+    private function getProjectionsByUserId(string $userId): array
     {
-        /** @var ProjectParticipantProjection $result */
-        $result = $this->unitOfWork->findProjection(ProjectParticipantProjection::hash($projectId, $userId));
+        $this->unitOfWork->loadProjections(
+            $this->repository->findAllByUserId($userId)
+        );
 
-        if (null !== $result) {
-            return $result;
+        return $this->unitOfWork->findProjections(
+            fn (ProjectParticipantProjection $p) => $p->getUserId() === $userId
+        );
+    }
+
+    /**
+     * @return ProjectParticipantProjection|null
+     */
+    private function getProjectionByProjectAndUserId(string $projectId, string $userId): ?Hashable
+    {
+        $projection = $this->repository->findByProjectAndUserId($projectId, $userId);
+
+        if (null !== $projection) {
+            $this->unitOfWork->loadProjection($projection);
         }
 
-        return $this->repository->findByProjectAndUserId($projectId, $userId);
+        return $this->unitOfWork->findProjection(
+            ProjectParticipantProjection::hash($projectId, $userId)
+        );
     }
 }
