@@ -18,7 +18,7 @@ use TaskManager\Projections\Domain\Repository\ProjectProjectionRepositoryInterfa
 use TaskManager\Projections\Domain\Repository\TaskListProjectionRepositoryInterface;
 use TaskManager\Projections\Domain\Repository\UserProjectionRepositoryInterface;
 use TaskManager\Projections\Domain\Service\ProjectorUnitOfWork;
-use TaskManager\Shared\Domain\ValueObject\DateTime;
+use TaskManager\Shared\Domain\Hashable;
 
 final class TaskListProjector extends Projector
 {
@@ -65,14 +65,14 @@ final class TaskListProjector extends Projector
             throw new ProjectionDoesNotExistException($event->ownerId, UserProjection::class);
         }
 
-        $this->unitOfWork->createProjection(new TaskListProjection(
+        $this->unitOfWork->createProjection(TaskListProjection::create(
             $event->getAggregateId(),
             $event->name,
-            new DateTime($event->startDate),
-            new DateTime($event->finishDate),
+            $event->startDate,
+            $event->finishDate,
             $event->ownerId,
             $userProjection->getFullName(),
-            (int) $event->status,
+            $event->status,
             $projectProjection->getId()
         ));
     }
@@ -82,55 +82,39 @@ final class TaskListProjector extends Projector
      */
     private function whenTaskInformationChanged(TaskInformationWasChangedEvent $event): void
     {
-        $projection = $this->getProjection($event->getAggregateId());
-        $this->ensureProjectionExists($event->getAggregateId(), $projection);
-        $this->unitOfWork->loadProjection($projection);
+        $projection = $this->getProjectionById($event->getAggregateId());
 
-        $projection->name = $event->name;
-        $projection->startDate = new DateTime($event->startDate);
-        $projection->finishDate = new DateTime($event->finishDate);
+        $projection->changeInformation($event->name, $event->startDate, $event->finishDate);
     }
 
     private function whenTaskStatusChanged(TaskStatusWasChangedEvent $event): void
     {
-        $projection = $this->getProjection($event->getAggregateId());
-        $this->ensureProjectionExists($event->getAggregateId(), $projection);
-        $this->unitOfWork->loadProjection($projection);
+        $projection = $this->getProjectionById($event->getAggregateId());
 
-        $projection->status = (int) $event->status;
+        $projection->changeStatus($event->status);
     }
 
     private function whenUserProfileChanged(UserProfileWasChangedEvent $event): void
     {
-        $this->unitOfWork->loadProjections(
-            $this->repository->findAllByOwnerId($event->getAggregateId())
-        );
-        $projections = $this->unitOfWork->findProjections(
-            fn (TaskListProjection $p) => $p->ownerId === $event->getAggregateId()
-        );
+        $projections = $this->getProjectionsByOwnerId($event->getAggregateId());
 
-        /** @var TaskListProjection $projection */
         foreach ($projections as $projection) {
-            $projection->ownerFullName = UserProjection::fullName($event->firstname, $event->lastname);
+            $projection->changeOwnerInformation(UserProjection::fullName($event->firstname, $event->lastname));
         }
     }
 
     private function whenTaskLinkCreated(TaskLinkWasCreated $event): void
     {
-        $projection = $this->getProjection($event->getAggregateId());
-        $this->ensureProjectionExists($event->getAggregateId(), $projection);
-        $this->unitOfWork->loadProjection($projection);
+        $projection = $this->getProjectionById($event->getAggregateId());
 
-        ++$projection->linksCount;
+        $projection->createLink();
     }
 
     private function whenTaskLinkDeleted(TaskLinkWasDeleted $event): void
     {
-        $projection = $this->getProjection($event->getAggregateId());
-        $this->ensureProjectionExists($event->getAggregateId(), $projection);
-        $this->unitOfWork->loadProjection($projection);
+        $projection = $this->getProjectionById($event->getAggregateId());
 
-        --$projection->linksCount;
+        $projection->deleteLink();
     }
 
     private function ensureProjectionExists(string $id, ?TaskListProjection $projection): void
@@ -140,15 +124,34 @@ final class TaskListProjector extends Projector
         }
     }
 
-    private function getProjection(string $id): ?TaskListProjection
+    /**
+     * @return TaskListProjection
+     */
+    private function getProjectionById(string $id): Hashable
     {
-        /** @var TaskListProjection $result */
-        $result = $this->unitOfWork->findProjection($id);
+        $projection = $this->repository->findById($id);
 
-        if (null !== $result) {
-            return $result;
+        if (null !== $projection) {
+            $this->unitOfWork->loadProjection($projection);
         }
 
-        return $this->repository->findById($id);
+        $result = $this->unitOfWork->findProjection($id);
+        $this->ensureProjectionExists($id, $result);
+
+        return $result;
+    }
+
+    /**
+     * @return TaskListProjection[]
+     */
+    private function getProjectionsByOwnerId(string $ownerId): array
+    {
+        $this->unitOfWork->loadProjections(
+            $this->repository->findAllByOwnerId($ownerId)
+        );
+
+        return $this->unitOfWork->findProjections(
+            fn (TaskListProjection $p) => $p->isUserOwner($ownerId)
+        );
     }
 }
