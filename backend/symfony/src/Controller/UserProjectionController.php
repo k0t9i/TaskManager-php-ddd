@@ -104,7 +104,7 @@ final readonly class UserProjectionController
 
         return new JsonResponse(PaginationResponseDTO::createFromPagination(
             $pagination,
-            fn (array $items) => UserRequestResponseDTO::createFromProjections($items)
+            fn (array $items) => UserRequestResponseDTO::createList($items)
         ));
     }
 
