@@ -17,7 +17,7 @@ final readonly class TaskInformationDTO
             )]
         )]
         #[Groups(['create', 'update'])]
-        #[Assert\NotBlank(groups: ['create'])]
+        #[Assert\NotBlank]
         public string $name = '',
         #[OA\Property(
             oneOf: [new OA\Schema(
@@ -45,8 +45,16 @@ final readonly class TaskInformationDTO
                 ref: '#components/schemas/taskModel/properties/finishDate'
             )]
         )]
-        #[Groups(['create', 'update'])]
-        public string $finishDate = ''
+        #[Assert\NotBlank]
+        public string $finishDate = '',
+        #[OA\Property(
+            oneOf: [new OA\Schema(
+                ref: '#components/schemas/version'
+            )]
+        )]
+        #[Groups(['update'])]
+        #[Assert\NotBlank]
+        public string $version = ''
     ) {
     }
 }

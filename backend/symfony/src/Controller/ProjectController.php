@@ -102,7 +102,8 @@ final readonly class ProjectController
             $id,
             $dto->name,
             $dto->description,
-            $dto->finishDate
+            $dto->finishDate,
+            $dto->version
         );
 
         $this->commandBus->dispatch($command);

@@ -149,6 +149,10 @@ nelmio_api_doc:
                         items:
                             type: array
                             items: [ ]
+                version:
+                    description: 'Object version '
+                    type: 'integer'
+                    example: 1
             responses:
                 createObject:
                     description: 'Returns the ID of the newly created object.'

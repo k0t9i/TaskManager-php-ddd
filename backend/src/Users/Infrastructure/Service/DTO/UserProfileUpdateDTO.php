@@ -39,6 +39,13 @@ final readonly class UserProfileUpdateDTO
         )]
         #[Assert\NotBlank]
         public string $repeatPassword = '',
+        #[OA\Property(
+            oneOf: [new OA\Schema(
+                ref: '#components/schemas/version'
+            )]
+        )]
+        #[Assert\NotBlank]
+        public string $version = ''
     ) {
     }
 }

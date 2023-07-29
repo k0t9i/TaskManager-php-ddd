@@ -63,7 +63,8 @@ final readonly class TaskController
             $dto->brief,
             $dto->description,
             $dto->startDate,
-            $dto->finishDate
+            $dto->finishDate,
+            $dto->version
         );
 
         $this->commandBus->dispatch($command);

@@ -14,7 +14,8 @@ final readonly class ChangeTaskInformationCommand implements CommandInterface
         public string $brief,
         public string $description,
         public string $startDate,
-        public string $finishDate
+        public string $finishDate,
+        public string $version
     ) {
     }
 }

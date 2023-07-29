@@ -12,7 +12,8 @@ final readonly class ChangeProjectInformationCommand implements CommandInterface
         public string $id,
         public string $name,
         public string $description,
-        public string $finishDate
+        public string $finishDate,
+        public string $version
     ) {
     }
 }

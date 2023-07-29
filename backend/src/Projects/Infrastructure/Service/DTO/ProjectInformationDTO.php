@@ -17,7 +17,7 @@ final readonly class ProjectInformationDTO
             )]
         )]
         #[Groups(['create', 'update'])]
-        #[Assert\NotBlank(groups: ['create'])]
+        #[Assert\NotBlank]
         public string $name = '',
         #[OA\Property(
             oneOf: [new OA\Schema(
@@ -32,7 +32,15 @@ final readonly class ProjectInformationDTO
             )]
         )]
         #[Groups(['create', 'update'])]
-        public string $finishDate = ''
+        public string $finishDate = '',
+        #[OA\Property(
+            oneOf: [new OA\Schema(
+                ref: '#components/schemas/version'
+            )]
+        )]
+        #[Groups(['update'])]
+        #[Assert\NotBlank]
+        public string $version = ''
     ) {
     }
 }

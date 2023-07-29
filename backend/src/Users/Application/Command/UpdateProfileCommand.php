@@ -12,7 +12,8 @@ final readonly class UpdateProfileCommand implements CommandInterface
         public string $firstname,
         public string $lastname,
         public ?string $password,
-        public ?string $repeatPassword
+        public ?string $repeatPassword,
+        public string $version
     ) {
     }
 }

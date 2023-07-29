@@ -50,7 +50,8 @@ final readonly class UserController
             $dto->firstname,
             $dto->lastname,
             $dto->password,
-            $dto->repeatPassword
+            $dto->repeatPassword,
+            $dto->version
         );
 
         $this->commandBus->dispatch($command);
