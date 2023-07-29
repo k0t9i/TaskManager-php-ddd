@@ -39,7 +39,7 @@ final readonly class ProjectRequestQueryHandler implements QueryHandlerInterface
             throw new ObjectDoesNotExistException(sprintf('Project "%s" does not exist.', $query->projectId));
         }
 
-        if (!$project->isUserOwner($user->id)) {
+        if (!$project->isUserOwner($user->getId())) {
             throw new InsufficientPermissionsException(sprintf('Insufficient permissions to view the project "%s".', $query->projectId));
         }
 

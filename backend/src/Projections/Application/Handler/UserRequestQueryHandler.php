@@ -32,7 +32,7 @@ final readonly class UserRequestQueryHandler implements QueryHandlerInterface
 
         $criteria = new Criteria();
 
-        $criteria->addOperand(new Operand('userId', OperatorEnum::Equal, $user->id))
+        $criteria->addOperand(new Operand('userId', OperatorEnum::Equal, $user->getId()))
             ->addOrder(new Order('changeDate'));
 
         $this->criteriaBuilder->build($criteria, $query->criteria);

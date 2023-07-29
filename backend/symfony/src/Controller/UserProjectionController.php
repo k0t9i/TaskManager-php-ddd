@@ -57,7 +57,7 @@ final readonly class UserProjectionController
     {
         $user = $this->queryBus->dispatch(new UserProfileQuery());
 
-        return new JsonResponse(UserResponseDTO::createFromProjection($user));
+        return new JsonResponse(UserResponseDTO::create($user));
     }
 
     #[Route('/requests/', name: 'getAllRequests', methods: ['GET'])]

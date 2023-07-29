@@ -61,7 +61,7 @@ final class ProjectListProjector extends Projector
         foreach ($userProjections as $userProjection) {
             $this->unitOfWork->createProjection(ProjectListProjection::create(
                 $event->getAggregateId(),
-                $userProjection->id,
+                $userProjection->getId(),
                 $event->name,
                 $event->finishDate,
                 $event->ownerId,

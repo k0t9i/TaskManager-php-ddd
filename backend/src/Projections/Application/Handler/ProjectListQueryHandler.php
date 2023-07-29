@@ -32,7 +32,7 @@ final readonly class ProjectListQueryHandler implements QueryHandlerInterface
 
         $criteria = new Criteria();
 
-        $criteria->addOperand(new Operand('userId', OperatorEnum::Equal, $user->id))
+        $criteria->addOperand(new Operand('userId', OperatorEnum::Equal, $user->getId()))
             ->addOrder(new Order('finishDate'));
 
         $this->criteriaBuilder->build($criteria, $query->criteria);

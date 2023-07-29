@@ -59,9 +59,9 @@ final class ProjectParticipantProjector extends Projector
         $this->unitOfWork->createProjection(ProjectParticipantProjection::create(
             $event->participantId,
             $event->getAggregateId(),
-            $userProjection->email,
-            $userProjection->firstname,
-            $userProjection->lastname,
+            $userProjection->getEmail(),
+            $userProjection->getFirstname(),
+            $userProjection->getLastname(),
             $tasksCount
         ));
     }

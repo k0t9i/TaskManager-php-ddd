@@ -35,7 +35,7 @@ final class UserProjector extends Projector
 
     private function whenUserCreated(UserWasCreatedEvent $event): void
     {
-        $this->projections[$event->getAggregateId()] = new UserProjection(
+        $this->projections[$event->getAggregateId()] = UserProjection::create(
             $event->getAggregateId(),
             $event->email,
             $event->firstname,
@@ -45,16 +45,15 @@ final class UserProjector extends Projector
 
     private function whenUserProfileChanged(UserProfileWasChangedEvent $event): void
     {
-        $projection = $this->projections[$event->getAggregateId()] ??
-            $this->repository->findById($event->getAggregateId());
+        $id = $event->getAggregateId();
+        $projection = $this->projections[$id] ?? $this->repository->findById($id);
 
         if (null === $projection) {
-            throw new ProjectionDoesNotExistException($event->getAggregateId(), UserProjection::class);
+            throw new ProjectionDoesNotExistException($id, UserProjection::class);
         }
 
-        $projection->firstname = $event->firstname;
-        $projection->lastname = $event->lastname;
+        $projection->changeInformation($event->firstname, $event->lastname);
 
-        $this->projections[$event->getAggregateId()] = $projection;
+        $this->projections[$id] = $projection;
     }
 }

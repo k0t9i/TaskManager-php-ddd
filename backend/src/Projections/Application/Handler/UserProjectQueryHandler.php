@@ -32,7 +32,7 @@ final readonly class UserProjectQueryHandler implements QueryHandlerInterface
 
         $criteria = new Criteria();
 
-        $criteria->addOperand(new Operand('userId', OperatorEnum::Equal, $user->id))
+        $criteria->addOperand(new Operand('userId', OperatorEnum::Equal, $user->getId()))
             ->addOperand(new Operand('isInvolved', OperatorEnum::Equal, true))
             ->addOrder(new Order('finishDate'));
 

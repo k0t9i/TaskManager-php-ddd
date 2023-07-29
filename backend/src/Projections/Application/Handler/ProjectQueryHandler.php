@@ -29,7 +29,7 @@ final readonly class ProjectQueryHandler implements QueryHandlerInterface
             throw new ObjectDoesNotExistException(sprintf('Project "%s" does not exist.', $query->id));
         }
 
-        $project = $this->repository->findByIdAndUserId($query->id, $user->id);
+        $project = $this->repository->findByIdAndUserId($query->id, $user->getId());
         if (null === $project) {
             throw new InsufficientPermissionsException(sprintf('Insufficient permissions to view the project "%s".', $query->id));
         }
