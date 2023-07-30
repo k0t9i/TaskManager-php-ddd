@@ -6,10 +6,12 @@ namespace TaskManager\Shared\Infrastructure\OptimisticLock;
 
 use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\OptimisticLockException as DoctrineOptimisticLockException;
 use TaskManager\Shared\Application\OptimisticLock\OptimisticLock;
 use TaskManager\Shared\Application\OptimisticLock\OptimisticLockManagerInterface;
 use TaskManager\Shared\Application\Service\UuidGeneratorInterface;
 use TaskManager\Shared\Domain\Aggregate\AggregateRoot;
+use TaskManager\Shared\Domain\Exception\OptimisticLockException;
 
 final readonly class OptimisticLockManager implements OptimisticLockManagerInterface
 {
@@ -29,17 +31,22 @@ final readonly class OptimisticLockManager implements OptimisticLockManagerInter
             'aggregateRoot' => $aggregateRoot::class,
             'aggregateId' => $aggregateRoot->getId()->value,
         ]);
-        if (null === $lock) {
-            $lock = new OptimisticLock($aggregateRoot::class, $aggregateRoot->getId()->value);
-        } else {
-            $this->entityManager->lock($lock, LockMode::OPTIMISTIC, $expectedVersion);
+
+        try {
+            if (null === $lock) {
+                $lock = new OptimisticLock($aggregateRoot::class, $aggregateRoot->getId()->value);
+            } else {
+                $this->entityManager->lock($lock, LockMode::OPTIMISTIC, $expectedVersion);
+            }
+
+            $lock->uuid = $this->uuidGenerator->generate();
+
+            $this->entityManager->persist($lock);
+            $this->entityManager->flush();
+
+            return $lock->version;
+        } catch (DoctrineOptimisticLockException) {
+            throw new OptimisticLockException();
         }
-
-        $lock->uuid = $this->uuidGenerator->generate();
-
-        $this->entityManager->persist($lock);
-        $this->entityManager->flush();
-
-        return $lock->version;
     }
 }
