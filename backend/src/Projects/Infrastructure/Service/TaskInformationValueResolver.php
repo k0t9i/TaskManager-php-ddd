@@ -22,7 +22,7 @@ final class TaskInformationValueResolver extends ValueResolver
             $attributes['description'] ?? '',
             $attributes['startDate'] ?? '',
             $attributes['finishDate'] ?? '',
-            (string) $attributes['version'] ?? ''
+            $attributes['version'] ?? ''
         );
     }
 }

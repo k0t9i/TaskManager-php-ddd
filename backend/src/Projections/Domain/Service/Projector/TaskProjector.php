@@ -92,13 +92,6 @@ final class TaskProjector extends Projector
         $projection->changeStatus($event->status);
     }
 
-    private function ensureProjectionExists(string $id, ?TaskProjection $projection): void
-    {
-        if (null === $projection) {
-            throw new ProjectionDoesNotExistException($id, TaskProjection::class);
-        }
-    }
-
     /**
      * @return TaskProjection
      */
@@ -111,7 +104,9 @@ final class TaskProjector extends Projector
         }
 
         $result = $this->unitOfWork->findProjection($id);
-        $this->ensureProjectionExists($id, $result);
+        if (null === $result) {
+            throw new ProjectionDoesNotExistException($id, TaskProjection::class);
+        }
 
         return $result;
     }

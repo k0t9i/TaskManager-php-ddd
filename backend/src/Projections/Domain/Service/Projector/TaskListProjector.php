@@ -117,13 +117,6 @@ final class TaskListProjector extends Projector
         $projection->deleteLink();
     }
 
-    private function ensureProjectionExists(string $id, ?TaskListProjection $projection): void
-    {
-        if (null === $projection) {
-            throw new ProjectionDoesNotExistException($id, TaskListProjection::class);
-        }
-    }
-
     /**
      * @return TaskListProjection
      */
@@ -136,7 +129,9 @@ final class TaskListProjector extends Projector
         }
 
         $result = $this->unitOfWork->findProjection($id);
-        $this->ensureProjectionExists($id, $result);
+        if (null === $result) {
+            throw new ProjectionDoesNotExistException($id, TaskListProjection::class);
+        }
 
         return $result;
     }

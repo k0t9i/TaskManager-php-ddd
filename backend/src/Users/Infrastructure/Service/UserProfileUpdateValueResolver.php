@@ -21,7 +21,7 @@ final class UserProfileUpdateValueResolver extends ValueResolver
             $attributes['lastname'] ?? '',
             $attributes['password'] ?? '',
             $attributes['repeatPassword'] ?? '',
-            (string) $attributes['version'] ?? ''
+            $attributes['version'] ?? ''
         );
     }
 }

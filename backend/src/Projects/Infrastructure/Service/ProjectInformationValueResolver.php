@@ -20,7 +20,7 @@ final class ProjectInformationValueResolver extends ValueResolver
             $attributes['name'] ?? '',
             $attributes['description'] ?? '',
             $attributes['finishDate'] ?? '',
-            (string) $attributes['version'] ?? ''
+            (string) $attributes['version']
         );
     }
 }
