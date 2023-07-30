@@ -35,7 +35,7 @@ final readonly class ProjectInformationDTO
         public string $finishDate = '',
         #[OA\Property(
             oneOf: [new OA\Schema(
-                ref: '#components/schemas/version'
+                ref: '#components/schemas/version/properties/version'
             )]
         )]
         #[Groups(['update'])]

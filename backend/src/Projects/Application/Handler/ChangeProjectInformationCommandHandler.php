@@ -26,7 +26,7 @@ final readonly class ChangeProjectInformationCommandHandler implements CommandHa
     ) {
     }
 
-    public function __invoke(ChangeProjectInformationCommand $command): void
+    public function __invoke(ChangeProjectInformationCommand $command): int
     {
         $currentUser = $this->userExtractor->extract();
         $project = $this->finder->find(new ProjectId($command->id));
@@ -40,10 +40,14 @@ final readonly class ChangeProjectInformationCommandHandler implements CommandHa
             $currentUser->id
         );
 
+        $version = (int) $command->version;
+
         $events = $project->releaseEvents();
         if (0 !== count($events)) {
-            $newVersion = $this->saver->save($project, (int) $command->version);
-            $this->eventBus->dispatch($events, $newVersion);
+            $version = $this->saver->save($project, $version);
+            $this->eventBus->dispatch($events, $version);
         }
+
+        return $version;
     }
 }

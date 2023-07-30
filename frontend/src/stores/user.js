@@ -38,6 +38,10 @@ export const useUserStore = defineStore({
             this.locked = true;
             return axiosInstance
                 .patch(`/users/`, this.user)
+                .then((response) => {
+                    this.user.version = response.data.version;
+                    return response;
+                })
                 .catch((error) => {
                     this.error = error.response.data.message;
                 })

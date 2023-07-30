@@ -41,7 +41,7 @@ final readonly class UserProfileUpdateDTO
         public string $repeatPassword = '',
         #[OA\Property(
             oneOf: [new OA\Schema(
-                ref: '#components/schemas/version'
+                ref: '#components/schemas/version/properties/version'
             )]
         )]
         #[Assert\NotBlank]

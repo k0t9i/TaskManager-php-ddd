@@ -73,6 +73,10 @@ export const useTaskStore = defineStore({
             this.locked[id] = true;
             return axiosInstance
                 .patch(`/tasks/${id}/`, this.tasks[id])
+                .then((response) => {
+                    this.tasks[id].version = response.data.version;
+                    return response;
+                })
                 .catch((error) => {
                     this.errors[id] = error.response.data.message;
                 })

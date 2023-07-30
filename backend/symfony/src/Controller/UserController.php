@@ -37,7 +37,7 @@ final readonly class UserController
             'user',
         ],
         responses: [
-            new OA\Response(ref: '#components/responses/generic200', response: '200'),
+            new OA\Response(ref: '#components/responses/version', response: '200'),
             new OA\Response(ref: '#components/responses/generic401', response: '401'),
             new OA\Response(ref: '#components/responses/generic403', response: '403'),
             new OA\Response(ref: '#components/responses/generic422', response: '422'),
@@ -54,8 +54,10 @@ final readonly class UserController
             $dto->version
         );
 
-        $this->commandBus->dispatch($command);
+        $version = $this->commandBus->dispatch($command);
 
-        return new JsonResponse();
+        return new JsonResponse([
+            'version' => $version,
+        ]);
     }
 }

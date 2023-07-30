@@ -150,9 +150,12 @@ nelmio_api_doc:
                             type: array
                             items: [ ]
                 version:
-                    description: 'Object version '
-                    type: 'integer'
-                    example: 1
+                    type: object
+                    properties:
+                        version:
+                            description: 'Object version'
+                            type: int
+                            example: 1
             responses:
                 createObject:
                     description: 'Returns the ID of the newly created object.'
@@ -169,6 +172,12 @@ nelmio_api_doc:
                                 properties:
                                     token:
                                         type: string
+                version:
+                    description: 'Returns the current version of the updated object.'
+                    content:
+                        application/json:
+                            schema:
+                                ref: '#/components/schemas/version'
                 generic200:
                     description: 'Successful operation'
                 generic201:

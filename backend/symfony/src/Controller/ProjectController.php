@@ -88,7 +88,7 @@ final readonly class ProjectController
             ),
         ],
         responses: [
-            new OA\Response(ref: '#components/responses/generic200', response: '200'),
+            new OA\Response(ref: '#components/responses/version', response: '200'),
             new OA\Response(ref: '#components/responses/generic401', response: '401'),
             new OA\Response(ref: '#components/responses/generic403', response: '403'),
             new OA\Response(ref: '#components/responses/generic404', response: '404'),
@@ -106,9 +106,11 @@ final readonly class ProjectController
             $dto->version
         );
 
-        $this->commandBus->dispatch($command);
+        $version = $this->commandBus->dispatch($command);
 
-        return new JsonResponse();
+        return new JsonResponse([
+            'version' => $version,
+        ]);
     }
 
     #[Route('/{id}/activate/', name: 'activate', methods: ['PATCH'])]

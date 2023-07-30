@@ -29,7 +29,7 @@ final readonly class UpdateProfileCommandHandler implements CommandHandlerInterf
     ) {
     }
 
-    public function __invoke(UpdateProfileCommand $command): void
+    public function __invoke(UpdateProfileCommand $command): int
     {
         $userId = new UserId($this->authenticator->getUserId());
         $user = $this->repository->findById($userId);
@@ -50,10 +50,14 @@ final readonly class UpdateProfileCommandHandler implements CommandHandlerInterf
             $hashedPassword
         );
 
+        $version = (int) $command->version;
+
         $events = $user->releaseEvents();
         if (0 !== count($events)) {
-            $newVersion = $this->saver->save($user, (int) $command->version);
-            $this->eventBus->dispatch($events, $newVersion);
+            $version = $this->saver->save($user, $version);
+            $this->eventBus->dispatch($events, $version);
         }
+
+        return $version;
     }
 }

@@ -30,7 +30,7 @@ final readonly class ChangeTaskInformationCommandHandler implements CommandHandl
     ) {
     }
 
-    public function __invoke(ChangeTaskInformationCommand $command): void
+    public function __invoke(ChangeTaskInformationCommand $command): int
     {
         $currentUser = $this->userExtractor->extract();
         $task = $this->finder->find(new TaskId($command->id));
@@ -48,10 +48,14 @@ final readonly class ChangeTaskInformationCommandHandler implements CommandHandl
             $currentUser->id
         );
 
+        $version = (int) $command->version;
+
         $events = $task->releaseEvents();
         if (0 !== count($events)) {
-            $newVersion = $this->saver->save($task, (int) $command->version);
-            $this->eventBus->dispatch($events, $newVersion);
+            $version = $this->saver->save($task, $version);
+            $this->eventBus->dispatch($events, $version);
         }
+
+        return $version;
     }
 }

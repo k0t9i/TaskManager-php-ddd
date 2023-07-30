@@ -53,6 +53,10 @@ export const useProjectStore = defineStore({
             this.locked[id] = true;
             return axiosInstance
                 .patch(`/projects/${id}/`, this.projects[id])
+                .then((response) => {
+                    this.projects[id].version = response.data.version;
+                    return response;
+                })
                 .catch((error) => {
                     this.errors[id] = error.response.data.message;
                 })
