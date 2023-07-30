@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace TaskManager\Projections\Domain\Service\EventStore;
 
-use TaskManager\Shared\Domain\Event\DomainEventInterface;
+use TaskManager\Projections\Domain\DTO\DomainEventEnvelope;
 
 final readonly class EventStreamFactory implements EventStreamFactoryInterface
 {
@@ -13,28 +13,28 @@ final readonly class EventStreamFactory implements EventStreamFactoryInterface
     }
 
     /**
-     * @param DomainEventInterface[] $events
+     * @param DomainEventEnvelope[] $envelopes
      */
-    public function createStream(array $events): EventStreamInterface
+    public function createStream(array $envelopes): EventStreamInterface
     {
-        return new EventStream($this->filterEvents($events));
+        return new EventStream($this->filterEnvelopes($envelopes));
     }
 
     /**
-     * @param DomainEventInterface[] $events
+     * @param DomainEventEnvelope[] $envelopes
      *
-     * @return DomainEventInterface[]
+     * @return DomainEventEnvelope[]
      */
-    private function filterEvents(array $events): array
+    private function filterEnvelopes(array $envelopes): array
     {
         if (null === $this->streamFilter) {
-            return $events;
+            return $envelopes;
         }
 
         $result = [];
-        foreach ($events as $key => $event) {
-            if ($this->streamFilter->isSuitable($event)) {
-                $result[$key] = $event;
+        foreach ($envelopes as $key => $envelope) {
+            if ($this->streamFilter->isSuitable($envelope->event)) {
+                $result[$key] = $envelope;
             }
         }
 

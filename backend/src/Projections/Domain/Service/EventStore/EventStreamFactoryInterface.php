@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace TaskManager\Projections\Domain\Service\EventStore;
 
-use TaskManager\Shared\Domain\Event\DomainEventInterface;
+use TaskManager\Projections\Domain\DTO\DomainEventEnvelope;
 
 interface EventStreamFactoryInterface
 {
     /**
-     * @param DomainEventInterface[] $events
+     * @param DomainEventEnvelope[] $envelopes
      */
-    public function createStream(array $events): EventStreamInterface;
+    public function createStream(array $envelopes): EventStreamInterface;
 }

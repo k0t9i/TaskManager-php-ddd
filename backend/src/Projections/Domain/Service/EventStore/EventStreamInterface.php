@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace TaskManager\Projections\Domain\Service\EventStore;
 
-use TaskManager\Shared\Domain\Event\DomainEventInterface;
+use TaskManager\Projections\Domain\DTO\DomainEventEnvelope;
 
 interface EventStreamInterface
 {
-    public function next(): ?DomainEventInterface;
+    public function next(): ?DomainEventEnvelope;
 
     public function eventCount(): int;
 }

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace TaskManager\Projections\Domain\Service\Projector;
 
-use TaskManager\Shared\Domain\Event\DomainEventInterface;
+use TaskManager\Projections\Domain\DTO\DomainEventEnvelope;
 
 interface ProjectorInterface
 {
-    public function projectWhen(DomainEventInterface $event): void;
+    public function projectWhen(DomainEventEnvelope $envelope): void;
 
     public function priority(): int;
 

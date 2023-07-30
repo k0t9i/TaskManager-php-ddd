@@ -49,8 +49,8 @@ final readonly class Projectionist implements ProjectionistInterface
 
             try {
                 $this->transactionManager->withTransaction(function () use ($streamInfo, $projector) {
-                    while (null !== $event = $streamInfo->stream->next()) {
-                        $projector->projectWhen($event);
+                    while (null !== $envelope = $streamInfo->stream->next()) {
+                        $projector->projectWhen($envelope);
                     }
 
                     $this->positionHandler->storePosition($projector, $streamInfo->lastPosition);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TaskManager\Projections\Domain\Entity;
 
+use TaskManager\Projections\Domain\DTO\DomainEventEnvelope;
 use TaskManager\Shared\Domain\Event\DomainEventInterface;
 use TaskManager\Shared\Domain\Service\DomainEventFactoryInterface;
 use TaskManager\Shared\Domain\ValueObject\DateTime;
@@ -38,16 +39,24 @@ final readonly class Event
     }
 
     /**
-     * @return DomainEventInterface[]
+     * @return DomainEventEnvelope[]
      */
-    public function createDomainEvents(DomainEventFactoryInterface $eventFactory): array
+    public function createEventEnvelope(DomainEventFactoryInterface $eventFactory): array
     {
-        return $eventFactory->create(
+        $domainEvents = $eventFactory->create(
             $this->name,
             $this->aggregateId,
             json_decode($this->body, true),
             $this->performerId,
             $this->occurredOn->getValue()
         );
+
+        $result = [];
+
+        foreach ($domainEvents as $domainEvent) {
+            $result[] = new DomainEventEnvelope($domainEvent, $this->version);
+        }
+
+        return $result;
     }
 }

@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace TaskManager\Projections\Domain\Service\Projector;
 
-use TaskManager\Shared\Domain\Event\DomainEventInterface;
+use TaskManager\Projections\Domain\DTO\DomainEventEnvelope;
 
 abstract class Projector implements ProjectorInterface
 {
     /**
      * @throws \ReflectionException
      */
-    public function projectWhen(DomainEventInterface $event): void
+    public function projectWhen(DomainEventEnvelope $envelope): void
     {
-        $this->invokeSuitableMethods($event);
+        $this->invokeSuitableMethods($envelope);
     }
 
     public function priority(): int
@@ -24,7 +24,7 @@ abstract class Projector implements ProjectorInterface
     /**
      * @throws \ReflectionException
      */
-    private function invokeSuitableMethods(DomainEventInterface $event): void
+    private function invokeSuitableMethods(DomainEventEnvelope $envelope): void
     {
         $reflectionObject = new \ReflectionObject($this);
 
@@ -32,13 +32,18 @@ abstract class Projector implements ProjectorInterface
             if ('projectWhen' === $method->getName()) {
                 continue;
             }
-            if (1 !== $method->getNumberOfParameters()) {
+            $numberOfParameters = $method->getNumberOfParameters();
+            if ($numberOfParameters < 1 || $numberOfParameters > 2) {
                 continue;
             }
-            /** @var \ReflectionNamedType $type */
-            $type = $method->getParameters()[0]->getType();
-            if (is_a($event, $type->getName())) {
-                $method->invoke($this, $event);
+
+            $firstParameterType = $method->getParameters()[0]->getType();
+            if (!($firstParameterType instanceof \ReflectionNamedType)) {
+                continue;
+            }
+
+            if (is_a($envelope->event, $firstParameterType->getName())) {
+                $method->invoke($this, $envelope->event, $envelope->version);
             }
         }
     }
