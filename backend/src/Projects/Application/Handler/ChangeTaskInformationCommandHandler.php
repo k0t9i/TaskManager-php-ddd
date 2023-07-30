@@ -48,7 +48,10 @@ final readonly class ChangeTaskInformationCommandHandler implements CommandHandl
             $currentUser->id
         );
 
-        $newVersion = $this->saver->save($task, (int) $command->version);
-        $this->eventBus->dispatch($task->releaseEvents(), $newVersion);
+        $events = $task->releaseEvents();
+        if (0 !== count($events)) {
+            $newVersion = $this->saver->save($task, (int) $command->version);
+            $this->eventBus->dispatch($events, $newVersion);
+        }
     }
 }

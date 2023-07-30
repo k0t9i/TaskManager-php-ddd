@@ -50,7 +50,10 @@ final readonly class UpdateProfileCommandHandler implements CommandHandlerInterf
             $hashedPassword
         );
 
-        $newVersion = $this->saver->save($user, (int) $command->version);
-        $this->eventBus->dispatch($user->releaseEvents(), $newVersion);
+        $events = $user->releaseEvents();
+        if (0 !== count($events)) {
+            $newVersion = $this->saver->save($user, (int) $command->version);
+            $this->eventBus->dispatch($events, $newVersion);
+        }
     }
 }
