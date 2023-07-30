@@ -13,6 +13,7 @@ use TaskManager\Shared\Application\Service\PasswordHasherInterface;
 use TaskManager\Shared\Domain\Exception\UserDoesNotExistException;
 use TaskManager\Users\Application\Command\UpdateProfileCommand;
 use TaskManager\Users\Application\Handler\UpdateProfileCommandHandler;
+use TaskManager\Users\Application\Service\UserSaverInterface;
 use TaskManager\Users\Domain\Entity\User;
 use TaskManager\Users\Domain\Exception\PasswordAndRepeatPasswordDoNotMatchException;
 use TaskManager\Users\Domain\Repository\UserRepositoryInterface;
@@ -43,14 +44,16 @@ class UpdateProfileCommandHandlerTest extends TestCase
             $this->faker->regexify('.{255}'),
             $this->faker->regexify('.{255}'),
             $password,
-            $password
+            $password,
+            (string) $this->faker->numberBetween()
         );
 
         $this->repeatPasswordCommand = new UpdateProfileCommand(
             $this->command->firstname,
             $this->command->lastname,
             $this->command->password,
-            $this->faker->regexify('.{255}')
+            $this->faker->regexify('.{255}'),
+            (string) $this->faker->numberBetween()
         );
 
         $this->user = new User(
@@ -71,12 +74,17 @@ class UpdateProfileCommandHandlerTest extends TestCase
             ->getMock();
         $repository->method('findById')
             ->willReturn(null);
+        $saver = $this->getMockBuilder(UserSaverInterface::class)
+            ->getMock();
+        $saver->expects(self::never())
+            ->method('save');
         $authenticator = $this->getMockBuilder(AuthenticatorServiceInterface::class)
             ->getMock();
         $authenticator->method('getUserId')
             ->willReturn($id);
         $handler = new UpdateProfileCommandHandler(
             $repository,
+            $saver,
             $this->getMockBuilder(PasswordHasherInterface::class)->getMock(),
             $authenticator,
             $this->getMockBuilder(IntegrationEventBusInterface::class)->getMock(),
@@ -96,12 +104,17 @@ class UpdateProfileCommandHandlerTest extends TestCase
             ->getMock();
         $repository->method('findById')
             ->willReturn($this->user);
+        $saver = $this->getMockBuilder(UserSaverInterface::class)
+            ->getMock();
+        $saver->expects(self::never())
+            ->method('save');
         $authenticator = $this->getMockBuilder(AuthenticatorServiceInterface::class)
             ->getMock();
         $authenticator->method('getUserId')
             ->willReturn($this->faker->uuid());
         $handler = new UpdateProfileCommandHandler(
             $repository,
+            $saver,
             $this->getMockBuilder(PasswordHasherInterface::class)->getMock(),
             $authenticator,
             $this->getMockBuilder(IntegrationEventBusInterface::class)->getMock(),
@@ -122,7 +135,9 @@ class UpdateProfileCommandHandlerTest extends TestCase
             ->method('findById')
             ->with($userId)
             ->willReturn($this->user);
-        $repository->expects(self::once())
+        $saver = $this->getMockBuilder(UserSaverInterface::class)
+            ->getMock();
+        $saver->expects(self::once())
             ->method('save');
         $hasher = $this->getMockBuilder(PasswordHasherInterface::class)
             ->getMock();
@@ -141,6 +156,7 @@ class UpdateProfileCommandHandlerTest extends TestCase
             ->method('dispatch');
         $handler = new UpdateProfileCommandHandler(
             $repository,
+            $saver,
             $hasher,
             $authenticator,
             $eventBus,

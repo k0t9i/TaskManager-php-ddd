@@ -11,6 +11,7 @@ use TaskManager\Shared\Application\Bus\Event\IntegrationEventBusInterface;
 use TaskManager\Shared\Application\Service\PasswordHasherInterface;
 use TaskManager\Users\Application\Command\RegisterCommand;
 use TaskManager\Users\Application\Handler\RegisterCommandHandler;
+use TaskManager\Users\Application\Service\UserSaverInterface;
 use TaskManager\Users\Domain\Entity\User;
 use TaskManager\Users\Domain\Exception\EmailIsAlreadyTakenException;
 use TaskManager\Users\Domain\Exception\PasswordAndRepeatPasswordDoNotMatchException;
@@ -73,6 +74,10 @@ class RegisterCommandHandlerTest extends TestCase
             ->getMock();
         $repository->method('findByEmail')
             ->willReturn($this->user);
+        $saver = $this->getMockBuilder(UserSaverInterface::class)
+            ->getMock();
+        $saver->expects(self::never())
+            ->method('save');
 
         $this->expectException(EmailIsAlreadyTakenException::class);
         $this->expectExceptionMessage(sprintf(
@@ -82,6 +87,7 @@ class RegisterCommandHandlerTest extends TestCase
 
         (new RegisterCommandHandler(
             $repository,
+            $saver,
             $this->getMockBuilder(PasswordHasherInterface::class)->getMock(),
             $this->getMockBuilder(IntegrationEventBusInterface::class)->getMock()
         ))($this->repeatPasswordCommand);
@@ -93,11 +99,16 @@ class RegisterCommandHandlerTest extends TestCase
             ->getMock();
         $repository->method('findByEmail')
             ->willReturn(null);
+        $saver = $this->getMockBuilder(UserSaverInterface::class)
+            ->getMock();
+        $saver->expects(self::never())
+            ->method('save');
 
         $this->expectException(PasswordAndRepeatPasswordDoNotMatchException::class);
 
         (new RegisterCommandHandler(
             $repository,
+            $saver,
             $this->getMockBuilder(PasswordHasherInterface::class)->getMock(),
             $this->getMockBuilder(IntegrationEventBusInterface::class)->getMock()
         ))($this->repeatPasswordCommand);
@@ -110,7 +121,9 @@ class RegisterCommandHandlerTest extends TestCase
         $repository->expects(self::once())
             ->method('findByEmail')
             ->willReturn(null);
-        $repository->expects(self::once())
+        $saver = $this->getMockBuilder(UserSaverInterface::class)
+            ->getMock();
+        $saver->expects(self::once())
             ->method('save');
         $hasher = $this->getMockBuilder(PasswordHasherInterface::class)
             ->getMock();
@@ -125,6 +138,7 @@ class RegisterCommandHandlerTest extends TestCase
 
         (new RegisterCommandHandler(
             $repository,
+            $saver,
             $hasher,
             $eventBus
         ))($this->command);

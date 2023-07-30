@@ -6,8 +6,8 @@ namespace TaskManager\Projects\Application\Handler;
 
 use TaskManager\Projects\Application\Command\CreateProjectCommand;
 use TaskManager\Projects\Application\Service\CurrentUserExtractorInterface;
+use TaskManager\Projects\Application\Service\ProjectSaverInterface;
 use TaskManager\Projects\Domain\Entity\Project;
-use TaskManager\Projects\Domain\Repository\ProjectRepositoryInterface;
 use TaskManager\Projects\Domain\ValueObject\ProjectDescription;
 use TaskManager\Projects\Domain\ValueObject\ProjectFinishDate;
 use TaskManager\Projects\Domain\ValueObject\ProjectId;
@@ -20,7 +20,7 @@ use TaskManager\Shared\Application\Bus\Event\IntegrationEventBusInterface;
 final readonly class CreateProjectCommandHandler implements CommandHandlerInterface
 {
     public function __construct(
-        private ProjectRepositoryInterface $projectRepository,
+        private ProjectSaverInterface $saver,
         private CurrentUserExtractorInterface $userExtractor,
         private IntegrationEventBusInterface $eventBus,
     ) {
@@ -42,7 +42,7 @@ final readonly class CreateProjectCommandHandler implements CommandHandlerInterf
             )
         );
 
-        $this->projectRepository->save($project);
-        $this->eventBus->dispatch($project->releaseEvents());
+        $newVersion = $this->saver->save($project, 0);
+        $this->eventBus->dispatch($project->releaseEvents(), $newVersion);
     }
 }

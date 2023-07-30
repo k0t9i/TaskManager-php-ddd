@@ -7,7 +7,7 @@ namespace TaskManager\Projects\Application\Handler;
 use TaskManager\Projects\Application\Command\CreateTaskCommand;
 use TaskManager\Projects\Application\Service\CurrentUserExtractorInterface;
 use TaskManager\Projects\Application\Service\ProjectFinderInterface;
-use TaskManager\Projects\Domain\Repository\TaskRepositoryInterface;
+use TaskManager\Projects\Application\Service\TaskSaverInterface;
 use TaskManager\Projects\Domain\ValueObject\ProjectId;
 use TaskManager\Projects\Domain\ValueObject\TaskBrief;
 use TaskManager\Projects\Domain\ValueObject\TaskDescription;
@@ -23,7 +23,7 @@ use TaskManager\Shared\Application\Bus\Event\IntegrationEventBusInterface;
 final readonly class CreateTaskCommandHandler implements CommandHandlerInterface
 {
     public function __construct(
-        private TaskRepositoryInterface $repository,
+        private TaskSaverInterface $saver,
         private CurrentUserExtractorInterface $userExtractor,
         private ProjectFinderInterface $finder,
         private IntegrationEventBusInterface $eventBus,
@@ -49,7 +49,7 @@ final readonly class CreateTaskCommandHandler implements CommandHandlerInterface
             )
         );
 
-        $this->repository->save($task);
-        $this->eventBus->dispatch($task->releaseEvents());
+        $newVersion = $this->saver->save($task, 0);
+        $this->eventBus->dispatch($task->releaseEvents(), $newVersion);
     }
 }

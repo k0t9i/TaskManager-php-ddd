@@ -8,6 +8,7 @@ use TaskManager\Shared\Application\Bus\Command\CommandHandlerInterface;
 use TaskManager\Shared\Application\Bus\Event\IntegrationEventBusInterface;
 use TaskManager\Shared\Application\Service\PasswordHasherInterface;
 use TaskManager\Users\Application\Command\RegisterCommand;
+use TaskManager\Users\Application\Service\UserSaverInterface;
 use TaskManager\Users\Domain\Entity\User;
 use TaskManager\Users\Domain\Exception\EmailIsAlreadyTakenException;
 use TaskManager\Users\Domain\Exception\PasswordAndRepeatPasswordDoNotMatchException;
@@ -23,6 +24,7 @@ final readonly class RegisterCommandHandler implements CommandHandlerInterface
 {
     public function __construct(
         private UserRepositoryInterface $repository,
+        private UserSaverInterface $saver,
         private PasswordHasherInterface $passwordHasher,
         private IntegrationEventBusInterface $eventBus
     ) {
@@ -49,7 +51,7 @@ final readonly class RegisterCommandHandler implements CommandHandlerInterface
             )
         );
 
-        $this->repository->save($newUser);
-        $this->eventBus->dispatch(...$newUser->releaseEvents());
+        $newVersion = $this->saver->save($newUser, 0);
+        $this->eventBus->dispatch($newUser->releaseEvents(), $newVersion);
     }
 }
