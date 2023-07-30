@@ -41,7 +41,7 @@ final class ProjectProjector extends Projector
     /**
      * @throws \Exception
      */
-    private function whenProjectCreated(ProjectWasCreatedEvent $event): void
+    private function whenProjectCreated(ProjectWasCreatedEvent $event, ?int $version): void
     {
         $this->unitOfWork->createProjection(ProjectProjection::create(
             $event->getAggregateId(),
@@ -50,14 +50,15 @@ final class ProjectProjector extends Projector
             $event->description,
             $event->finishDate,
             $event->ownerId,
-            $event->status
+            $event->status,
+            $version
         ));
     }
 
     /**
      * @throws \Exception
      */
-    private function whenProjectInformationChanged(ProjectInformationWasChangedEvent $event): void
+    private function whenProjectInformationChanged(ProjectInformationWasChangedEvent $event, ?int $version): void
     {
         $projections = $this->getProjectionsById($event->getAggregateId());
 
@@ -65,7 +66,8 @@ final class ProjectProjector extends Projector
             $projection->changeInformation(
                 $event->name,
                 $event->description,
-                $event->finishDate
+                $event->finishDate,
+                $version
             );
         }
     }

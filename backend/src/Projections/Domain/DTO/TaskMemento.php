@@ -14,7 +14,8 @@ final readonly class TaskMemento
         public string $startDate,
         public string $finishDate,
         public string $ownerId,
-        public int $status
+        public int $status,
+        public ?int $version
     ) {
     }
 }

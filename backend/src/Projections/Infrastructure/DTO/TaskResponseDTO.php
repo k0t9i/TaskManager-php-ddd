@@ -60,6 +60,12 @@ final readonly class TaskResponseDTO
         )]
     )]
     public int $status;
+    #[OA\Property(
+        oneOf: [new OA\Schema(
+            ref: '#components/schemas/version'
+        )]
+    )]
+    public ?int $version;
 
     public function __construct(TaskMemento $memento)
     {
@@ -71,6 +77,7 @@ final readonly class TaskResponseDTO
         $this->finishDate = $memento->finishDate;
         $this->ownerId = $memento->ownerId;
         $this->status = $memento->status;
+        $this->version = $memento->version;
     }
 
     public static function create(TaskProjection $projection): self

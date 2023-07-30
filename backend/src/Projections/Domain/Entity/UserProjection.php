@@ -12,7 +12,8 @@ final class UserProjection
         private readonly string $id,
         private readonly string $email,
         private string $firstname,
-        private string $lastname
+        private string $lastname,
+        private ?int $version
     ) {
     }
 
@@ -30,20 +31,23 @@ final class UserProjection
         string $id,
         string $email,
         string $firstname,
-        string $lastname
+        string $lastname,
+        ?int $version
     ): self {
         return new self(
             $id,
             $email,
             $firstname,
-            $lastname
+            $lastname,
+            $version
         );
     }
 
-    public function changeInformation(string $firstname, string $lastname): void
+    public function changeInformation(string $firstname, string $lastname, ?int $version): void
     {
         $this->firstname = $firstname;
         $this->lastname = $lastname;
+        $this->version = $version;
     }
 
     public function createMemento(): UserMemento
@@ -52,7 +56,8 @@ final class UserProjection
             $this->id,
             $this->email,
             $this->firstname,
-            $this->lastname
+            $this->lastname,
+            $this->version
         );
     }
 

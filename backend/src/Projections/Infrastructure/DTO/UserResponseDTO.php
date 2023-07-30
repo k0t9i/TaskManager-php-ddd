@@ -35,6 +35,12 @@ final readonly class UserResponseDTO
         )]
     )]
     public string $lastname;
+    #[OA\Property(
+        oneOf: [new OA\Schema(
+            ref: '#components/schemas/version'
+        )]
+    )]
+    public ?int $version;
 
     public function __construct(UserMemento $memento)
     {
@@ -42,6 +48,7 @@ final readonly class UserResponseDTO
         $this->email = $memento->email;
         $this->firstname = $memento->firstname;
         $this->lastname = $memento->lastname;
+        $this->version = $memento->version;
     }
 
     public static function create(UserProjection $projection): self

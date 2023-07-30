@@ -13,5 +13,6 @@
         <field name="ownerId" column="owner_id" length="36" />
         <field name="status" type="integer" />
         <field name="projectId" column="project_id" length="36" />
+        <field name="version" type="integer" nullable="true" />
     </entity>
 </doctrine-mapping>

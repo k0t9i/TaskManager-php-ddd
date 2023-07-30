@@ -47,7 +47,7 @@ final class TaskProjector extends Projector
     /**
      * @throws \Exception
      */
-    private function whenTaskCreated(TaskWasCreatedEvent $event): void
+    private function whenTaskCreated(TaskWasCreatedEvent $event, ?int $version): void
     {
         $projectProjection = $this->projectRepository->findById($event->projectId);
         if (null === $projectProjection) {
@@ -63,14 +63,15 @@ final class TaskProjector extends Projector
             $event->finishDate,
             $event->ownerId,
             $event->status,
-            $projectProjection->getId()
+            $projectProjection->getId(),
+            $version
         ));
     }
 
     /**
      * @throws \Exception
      */
-    private function whenTaskInformationChanged(TaskInformationWasChangedEvent $event): void
+    private function whenTaskInformationChanged(TaskInformationWasChangedEvent $event, ?int $version): void
     {
         $projection = $this->getProjectionById($event->getAggregateId());
 
@@ -79,7 +80,8 @@ final class TaskProjector extends Projector
             $event->brief,
             $event->description,
             $event->startDate,
-            $event->finishDate
+            $event->finishDate,
+            $version
         );
     }
 

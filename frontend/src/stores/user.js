@@ -24,6 +24,7 @@ export const useUserStore = defineStore({
                         this.user.email = response.data.email;
                         this.user.firstname = response.data.firstname;
                         this.user.lastname = response.data.lastname;
+                        this.user.version = response.data.version;
                         return response;
                     })
                     .catch((error) => {

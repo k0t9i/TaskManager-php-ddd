@@ -19,7 +19,8 @@ final class TaskProjection implements Hashable
         private DateTime $finishDate,
         private readonly string $ownerId,
         private int $status,
-        private readonly string $projectId
+        private readonly string $projectId,
+        private ?int $version
     ) {
     }
 
@@ -37,7 +38,8 @@ final class TaskProjection implements Hashable
         string $finishDate,
         string $ownerId,
         string $status,
-        string $projectId
+        string $projectId,
+        ?int $version
     ): self {
         return new self(
             $id,
@@ -48,7 +50,8 @@ final class TaskProjection implements Hashable
             new DateTime($finishDate),
             $ownerId,
             (int) $status,
-            $projectId
+            $projectId,
+            $version
         );
     }
 
@@ -57,13 +60,15 @@ final class TaskProjection implements Hashable
         string $brief,
         string $description,
         string $startDate,
-        string $finishDate
+        string $finishDate,
+        ?int $version
     ): void {
         $this->name = $name;
         $this->brief = $brief;
         $this->description = $description;
         $this->startDate = new DateTime($startDate);
         $this->finishDate = new DateTime($finishDate);
+        $this->version = $version;
     }
 
     public function changeStatus(string $status): void
@@ -81,7 +86,8 @@ final class TaskProjection implements Hashable
             $this->startDate->getValue(),
             $this->finishDate->getValue(),
             $this->ownerId,
-            $this->status
+            $this->status,
+            $this->version
         );
     }
 

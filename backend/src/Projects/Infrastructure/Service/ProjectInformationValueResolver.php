@@ -19,7 +19,8 @@ final class ProjectInformationValueResolver extends ValueResolver
         yield new ProjectInformationDTO(
             $attributes['name'] ?? '',
             $attributes['description'] ?? '',
-            $attributes['finishDate'] ?? ''
+            $attributes['finishDate'] ?? '',
+            (string) $attributes['version'] ?? ''
         );
     }
 }

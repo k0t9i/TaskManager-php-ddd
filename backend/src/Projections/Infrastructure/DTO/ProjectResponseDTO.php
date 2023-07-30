@@ -47,6 +47,12 @@ final readonly class ProjectResponseDTO
         example: true
     )]
     public bool $isOwner;
+    #[OA\Property(
+        oneOf: [new OA\Schema(
+            ref: '#components/schemas/version'
+        )]
+    )]
+    public ?int $version;
 
     public function __construct(ProjectMemento $memento)
     {
@@ -56,6 +62,7 @@ final readonly class ProjectResponseDTO
         $this->finishDate = $memento->finishDate;
         $this->status = $memento->status;
         $this->isOwner = $memento->isOwner;
+        $this->version = $memento->version;
     }
 
     public static function create(ProjectProjection $projection): self

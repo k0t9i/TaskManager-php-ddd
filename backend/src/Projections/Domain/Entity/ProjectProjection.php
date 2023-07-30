@@ -17,7 +17,8 @@ final class ProjectProjection implements Hashable
         private string $description,
         private DateTime $finishDate,
         private string $ownerId,
-        private int $status
+        private int $status,
+        private ?int $version
     ) {
     }
 
@@ -52,6 +53,7 @@ final class ProjectProjection implements Hashable
         string $finishDate,
         string $ownerId,
         string $status,
+        ?int $version
     ): self {
         return new self(
             $id,
@@ -61,14 +63,16 @@ final class ProjectProjection implements Hashable
             new DateTime($finishDate),
             $ownerId,
             (int) $status,
+            $version
         );
     }
 
-    public function changeInformation(string $name, string $description, string $finishDate): void
+    public function changeInformation(string $name, string $description, string $finishDate, ?int $version): void
     {
         $this->name = $name;
         $this->description = $description;
         $this->finishDate = new DateTime($finishDate);
+        $this->version = $version;
     }
 
     public function changeOwner(string $ownerId): void
@@ -89,7 +93,8 @@ final class ProjectProjection implements Hashable
             $this->description,
             $this->finishDate->getValue(),
             $this->status,
-            $this->isOwner()
+            $this->isOwner(),
+            $this->version
         );
     }
 

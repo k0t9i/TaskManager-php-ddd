@@ -12,7 +12,8 @@ final readonly class ProjectMemento
         public string $description,
         public string $finishDate,
         public int $status,
-        public bool $isOwner
+        public bool $isOwner,
+        public ?int $version
     ) {
     }
 }

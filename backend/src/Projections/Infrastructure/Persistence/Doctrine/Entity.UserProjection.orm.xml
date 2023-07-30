@@ -8,5 +8,6 @@
         <field name="email" length="4000" />
         <field name="firstname" length="4000" />
         <field name="lastname" length="4000" />
+        <field name="version" type="integer" nullable="true" />
     </entity>
 </doctrine-mapping>

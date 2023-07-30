@@ -10,7 +10,8 @@ final readonly class UserMemento
         public string $id,
         public string $email,
         public string $firstname,
-        public string $lastname
+        public string $lastname,
+        public ?int $version
     ) {
     }
 }
