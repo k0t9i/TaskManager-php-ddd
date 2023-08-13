@@ -16,13 +16,14 @@ final class TaskInformationValueResolver extends ValueResolver
 
     protected function doResolve(array $attributes): iterable
     {
+        $version = isset($attributes['version']) ? (string) $attributes['version'] : '';
         yield new TaskInformationDTO(
             $attributes['name'] ?? '',
             $attributes['brief'] ?? '',
             $attributes['description'] ?? '',
             $attributes['startDate'] ?? '',
             $attributes['finishDate'] ?? '',
-            $attributes['version'] ?? ''
+            $version
         );
     }
 }
