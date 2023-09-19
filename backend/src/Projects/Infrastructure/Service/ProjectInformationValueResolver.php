@@ -16,11 +16,12 @@ final class ProjectInformationValueResolver extends ValueResolver
 
     protected function doResolve(array $attributes): iterable
     {
+        $version = isset($attributes['version']) ? (string) $attributes['version'] : '';
         yield new ProjectInformationDTO(
             $attributes['name'] ?? '',
             $attributes['description'] ?? '',
             $attributes['finishDate'] ?? '',
-            (string) $attributes['version']
+            $version
         );
     }
 }

@@ -16,12 +16,13 @@ final class UserProfileUpdateValueResolver extends ValueResolver
 
     protected function doResolve(array $attributes): iterable
     {
+        $version = isset($attributes['version']) ? (string) $attributes['version'] : '';
         yield new UserProfileUpdateDTO(
             $attributes['firstname'] ?? '',
             $attributes['lastname'] ?? '',
             $attributes['password'] ?? '',
             $attributes['repeatPassword'] ?? '',
-            $attributes['version'] ?? ''
+            $version
         );
     }
 }
