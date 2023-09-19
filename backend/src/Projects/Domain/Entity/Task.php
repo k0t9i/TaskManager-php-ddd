@@ -30,8 +30,8 @@ final class Task extends AggregateRoot
         private readonly ProjectId $projectId,
         private TaskInformation $information,
         private TaskStatus $status,
-        private TaskOwner $owner,
-        private TaskLinkCollection $links
+        private readonly TaskOwner $owner,
+        private readonly TaskLinkCollection $links
     ) {
     }
 

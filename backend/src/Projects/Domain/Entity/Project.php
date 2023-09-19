@@ -47,9 +47,9 @@ final class Project extends AggregateRoot
         private ProjectInformation $information,
         private ProjectStatus $status,
         private ProjectOwner $owner,
-        private ParticipantCollection $participants,
-        private RequestCollection $requests,
-        private ProjectTaskCollection $tasks
+        private readonly ParticipantCollection $participants,
+        private readonly RequestCollection $requests,
+        private readonly ProjectTaskCollection $tasks
     ) {
     }
 

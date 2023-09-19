@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TaskManager\Tests\Users\Application\Handler;
 
 use Faker\Factory;
-use Faker\Generator;
 use PHPUnit\Framework\TestCase;
 use TaskManager\Shared\Application\Bus\Event\IntegrationEventBusInterface;
 use TaskManager\Shared\Application\Service\PasswordHasherInterface;
@@ -25,8 +24,6 @@ use TaskManager\Users\Domain\ValueObject\UserProfile;
 
 class RegisterCommandHandlerTest extends TestCase
 {
-    private Generator $faker;
-
     private User $user;
 
     private RegisterCommand $command;
@@ -36,14 +33,14 @@ class RegisterCommandHandlerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->faker = Factory::create();
+        $faker = Factory::create();
 
-        $password = $this->faker->regexify('.{255}');
+        $password = $faker->regexify('.{255}');
         $this->command = new RegisterCommand(
-            $this->faker->uuid(),
-            $this->faker->email(),
-            $this->faker->regexify('.{255}'),
-            $this->faker->regexify('.{255}'),
+            $faker->uuid(),
+            $faker->email(),
+            $faker->regexify('.{255}'),
+            $faker->regexify('.{255}'),
             $password,
             $password
         );
@@ -54,7 +51,7 @@ class RegisterCommandHandlerTest extends TestCase
             $this->command->firstname,
             $this->command->lastname,
             $this->command->password,
-            $this->faker->regexify('.{255}')
+            $faker->regexify('.{255}')
         );
 
         $this->user = new User(
