@@ -8,10 +8,10 @@ use TaskManager\Projects\Application\Service\ProjectFinderInterface;
 use TaskManager\Projects\Domain\Event\TaskWasCreatedEvent;
 use TaskManager\Projects\Domain\Repository\ProjectRepositoryInterface;
 use TaskManager\Projects\Domain\ValueObject\ProjectId;
-use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
 use TaskManager\Projects\Domain\ValueObject\TaskId;
 use TaskManager\Shared\Application\Bus\Event\DomainEventSubscriberInterface;
 use TaskManager\Shared\Application\Bus\Event\IntegrationEventBusInterface;
+use TaskManager\Shared\Domain\ValueObject\UserId;
 
 final readonly class CreateProjectTaskOnTaskCreated implements DomainEventSubscriberInterface
 {
@@ -28,7 +28,7 @@ final readonly class CreateProjectTaskOnTaskCreated implements DomainEventSubscr
 
         $project->addProjectTask(
             new TaskId($event->getAggregateId()),
-            new ProjectUserId($event->ownerId)
+            new UserId($event->ownerId)
         );
 
         $this->repository->save($project);

@@ -23,7 +23,6 @@ use TaskManager\Projects\Domain\Exception\TaskStartDateIsGreaterThanFinishDateEx
 use TaskManager\Projects\Domain\Exception\UserIsNotTaskOwnerException;
 use TaskManager\Projects\Domain\ValueObject\ActiveTaskStatus;
 use TaskManager\Projects\Domain\ValueObject\ClosedTaskStatus;
-use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
 use TaskManager\Projects\Domain\ValueObject\TaskFinishDate;
 use TaskManager\Projects\Domain\ValueObject\TaskId;
 use TaskManager\Projects\Domain\ValueObject\TaskInformation;
@@ -31,6 +30,7 @@ use TaskManager\Projects\Domain\ValueObject\TaskLink;
 use TaskManager\Projects\Domain\ValueObject\TaskStartDate;
 use TaskManager\Projects\Domain\ValueObject\TaskStatus;
 use TaskManager\Shared\Domain\ValueObject\DateTime;
+use TaskManager\Shared\Domain\ValueObject\UserId;
 
 class TaskTest extends TestCase
 {
@@ -170,7 +170,7 @@ class TaskTest extends TestCase
             ->withStartDate(new TaskStartDate('01-01-2023'))
             ->withFinishDate(new TaskFinishDate('02-01-2023'))
             ->build();
-        $otherUserId = new ProjectUserId($this->faker->uuid());
+        $otherUserId = new UserId($this->faker->uuid());
 
         $this->expectUserIsNotTaskOwnerException($otherUserId->value);
 
@@ -234,7 +234,7 @@ class TaskTest extends TestCase
     public function testChangeStatusByNonOwner(): void
     {
         $builder = new TaskBuilder($this->faker);
-        $otherUserId = new ProjectUserId($this->faker->uuid());
+        $otherUserId = new UserId($this->faker->uuid());
         $task = $builder->build();
 
         $this->expectUserIsNotTaskOwnerException($otherUserId->value);
@@ -244,7 +244,7 @@ class TaskTest extends TestCase
 
     public function testCloseAsNeeded(): void
     {
-        $performerId = new ProjectUserId($this->faker->uuid());
+        $performerId = new UserId($this->faker->uuid());
         $builder = new TaskBuilder($this->faker);
         $task = $builder->build();
 
@@ -265,7 +265,7 @@ class TaskTest extends TestCase
      */
     public function testLimitDates(): void
     {
-        $performerId = new ProjectUserId($this->faker->uuid());
+        $performerId = new UserId($this->faker->uuid());
         $startDate = '01-02-2023';
         $finishDate = '05-02-2023';
         $dateAfter = '10-02-2023';
@@ -399,7 +399,7 @@ class TaskTest extends TestCase
     public function testCreateLinkByNonOwner(): void
     {
         $linkedTaskId = new TaskId($this->faker->uuid());
-        $otherUserId = new ProjectUserId($this->faker->uuid());
+        $otherUserId = new UserId($this->faker->uuid());
         $builder = new TaskBuilder($this->faker);
         $task = $builder->build();
 
@@ -472,7 +472,7 @@ class TaskTest extends TestCase
     {
         $taskId = new TaskId($this->faker->uuid());
         $linkedTaskId = new TaskId($this->faker->uuid());
-        $otherUserId = new ProjectUserId($this->faker->uuid());
+        $otherUserId = new UserId($this->faker->uuid());
         $builder = new TaskBuilder($this->faker);
         $task = $builder
             ->withId($taskId)
@@ -489,7 +489,7 @@ class TaskTest extends TestCase
 
     public function testCreateBackLink(): void
     {
-        $performerId = new ProjectUserId($this->faker->uuid());
+        $performerId = new UserId($this->faker->uuid());
         $linkedTaskId = new TaskId($this->faker->uuid());
         $builder = new TaskBuilder($this->faker);
         $task = $builder->build();
@@ -527,7 +527,7 @@ class TaskTest extends TestCase
             ))
             ->build();
 
-        $task->createBackLink($linkedTaskId, new ProjectUserId($this->faker->uuid()));
+        $task->createBackLink($linkedTaskId, new UserId($this->faker->uuid()));
         $events = $task->releaseEvents();
 
         $this->assertCount(0, $events);
@@ -535,7 +535,7 @@ class TaskTest extends TestCase
 
     public function testDeleteBackLink(): void
     {
-        $performerId = new ProjectUserId($this->faker->uuid());
+        $performerId = new UserId($this->faker->uuid());
         $taskId = new TaskId($this->faker->uuid());
         $linkedTaskId = new TaskId($this->faker->uuid());
         $builder = new TaskBuilder($this->faker);
@@ -570,7 +570,7 @@ class TaskTest extends TestCase
         $builder = new TaskBuilder($this->faker);
         $task = $builder->build();
 
-        $task->deleteBackLink($linkedTaskId, new ProjectUserId($this->faker->uuid()));
+        $task->deleteBackLink($linkedTaskId, new UserId($this->faker->uuid()));
         $events = $task->releaseEvents();
 
         $this->assertCount(0, $events);

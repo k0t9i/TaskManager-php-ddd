@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TaskManager\Projects\Application\Handler;
 
 use TaskManager\Projects\Application\Command\ChangeProjectInformationCommand;
-use TaskManager\Projects\Application\Service\CurrentUserExtractorInterface;
 use TaskManager\Projects\Application\Service\ProjectFinderInterface;
 use TaskManager\Projects\Application\Service\ProjectSaverInterface;
 use TaskManager\Projects\Domain\ValueObject\ProjectDescription;
@@ -15,20 +14,21 @@ use TaskManager\Projects\Domain\ValueObject\ProjectInformation;
 use TaskManager\Projects\Domain\ValueObject\ProjectName;
 use TaskManager\Shared\Application\Bus\Command\CommandHandlerInterface;
 use TaskManager\Shared\Application\Bus\Event\IntegrationEventBusInterface;
+use TaskManager\Shared\Application\Service\AuthenticatorServiceInterface;
 
 final readonly class ChangeProjectInformationCommandHandler implements CommandHandlerInterface
 {
     public function __construct(
         private ProjectSaverInterface $saver,
         private ProjectFinderInterface $finder,
-        private CurrentUserExtractorInterface $userExtractor,
+        private AuthenticatorServiceInterface $authenticator,
         private IntegrationEventBusInterface $eventBus,
     ) {
     }
 
     public function __invoke(ChangeProjectInformationCommand $command): int
     {
-        $currentUser = $this->userExtractor->extract();
+        $authUserId = $this->authenticator->getUserId();
         $project = $this->finder->find(new ProjectId($command->id));
 
         $project->changeInformation(
@@ -37,7 +37,7 @@ final readonly class ChangeProjectInformationCommandHandler implements CommandHa
                 new ProjectDescription($command->description),
                 new ProjectFinishDate($command->finishDate),
             ),
-            $currentUser->id
+            $authUserId
         );
 
         $version = (int) $command->version;

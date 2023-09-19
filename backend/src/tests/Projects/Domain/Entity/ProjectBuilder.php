@@ -20,7 +20,7 @@ use TaskManager\Projects\Domain\ValueObject\ProjectName;
 use TaskManager\Projects\Domain\ValueObject\ProjectOwner;
 use TaskManager\Projects\Domain\ValueObject\ProjectStatus;
 use TaskManager\Projects\Domain\ValueObject\ProjectTask;
-use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
+use TaskManager\Shared\Domain\ValueObject\UserId;
 
 final class ProjectBuilder
 {
@@ -230,7 +230,7 @@ final class ProjectBuilder
             $this->finishDate,
         );
         $this->status = $this->status ?? new ActiveProjectStatus();
-        $this->owner = $this->owner ?? new ProjectOwner(new ProjectUserId($this->faker->uuid()));
+        $this->owner = $this->owner ?? new ProjectOwner(new UserId($this->faker->uuid()));
         $this->participants = $this->participants ?? [];
         $this->requests = $this->requests ?? [];
         $this->tasks = $this->tasks ?? [];

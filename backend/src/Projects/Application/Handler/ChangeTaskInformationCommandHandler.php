@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TaskManager\Projects\Application\Handler;
 
 use TaskManager\Projects\Application\Command\ChangeTaskInformationCommand;
-use TaskManager\Projects\Application\Service\CurrentUserExtractorInterface;
 use TaskManager\Projects\Application\Service\ProjectFinderInterface;
 use TaskManager\Projects\Application\Service\TaskFinderInterface;
 use TaskManager\Projects\Application\Service\TaskSaverInterface;
@@ -18,6 +17,7 @@ use TaskManager\Projects\Domain\ValueObject\TaskName;
 use TaskManager\Projects\Domain\ValueObject\TaskStartDate;
 use TaskManager\Shared\Application\Bus\Command\CommandHandlerInterface;
 use TaskManager\Shared\Application\Bus\Event\IntegrationEventBusInterface;
+use TaskManager\Shared\Application\Service\AuthenticatorServiceInterface;
 
 final readonly class ChangeTaskInformationCommandHandler implements CommandHandlerInterface
 {
@@ -25,14 +25,14 @@ final readonly class ChangeTaskInformationCommandHandler implements CommandHandl
         private TaskSaverInterface $saver,
         private TaskFinderInterface $finder,
         private ProjectFinderInterface $projectFinder,
-        private CurrentUserExtractorInterface $userExtractor,
+        private AuthenticatorServiceInterface $authenticator,
         private IntegrationEventBusInterface $eventBus,
     ) {
     }
 
     public function __invoke(ChangeTaskInformationCommand $command): int
     {
-        $currentUser = $this->userExtractor->extract();
+        $authUserId = $this->authenticator->getUserId();
         $task = $this->finder->find(new TaskId($command->id));
         $project = $this->projectFinder->find($task->getProjectId());
 
@@ -45,7 +45,7 @@ final readonly class ChangeTaskInformationCommandHandler implements CommandHandl
                 new TaskStartDate($command->startDate),
                 new TaskFinishDate($command->finishDate),
             ),
-            $currentUser->id
+            $authUserId
         );
 
         $version = (int) $command->version;

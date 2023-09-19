@@ -8,13 +8,13 @@ use TaskManager\Projects\Domain\Exception\ProjectTaskDoesNotExistException;
 use TaskManager\Projects\Domain\Exception\ProjectUserHasTaskException;
 use TaskManager\Projects\Domain\ValueObject\ProjectId;
 use TaskManager\Projects\Domain\ValueObject\ProjectTask;
-use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
 use TaskManager\Projects\Domain\ValueObject\TaskId;
 use TaskManager\Shared\Domain\Collection\ManagedCollection;
+use TaskManager\Shared\Domain\ValueObject\UserId;
 
 final class ProjectTaskCollection extends ManagedCollection
 {
-    public function ensureUserDoesNotHaveTask(ProjectUserId $userId, ProjectId $projectId): void
+    public function ensureUserDoesNotHaveTask(UserId $userId, ProjectId $projectId): void
     {
         /** @var ProjectTask $task */
         foreach ($this->getItems() as $task) {

@@ -6,25 +6,25 @@ namespace TaskManager\Projects\Domain\Entity;
 
 use TaskManager\Projects\Domain\ValueObject\PendingRequestStatus;
 use TaskManager\Projects\Domain\ValueObject\ProjectId;
-use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
 use TaskManager\Projects\Domain\ValueObject\RequestChangeDate;
 use TaskManager\Projects\Domain\ValueObject\RequestId;
 use TaskManager\Projects\Domain\ValueObject\RequestStatus;
 use TaskManager\Shared\Domain\Equatable;
 use TaskManager\Shared\Domain\Hashable;
+use TaskManager\Shared\Domain\ValueObject\UserId;
 
 final class Request implements Equatable, Hashable
 {
     public function __construct(
         private readonly RequestId $id,
         private readonly ProjectId $projectId,
-        private readonly ProjectUserId $userId,
+        private readonly UserId $userId,
         private RequestStatus $status,
         private RequestChangeDate $changeDate
     ) {
     }
 
-    public static function create(RequestId $id, ProjectId $projectId, ProjectUserId $userId): self
+    public static function create(RequestId $id, ProjectId $projectId, UserId $userId): self
     {
         $status = new PendingRequestStatus();
         $changeDate = new RequestChangeDate();
@@ -39,7 +39,7 @@ final class Request implements Equatable, Hashable
         $this->changeDate = new RequestChangeDate();
     }
 
-    public function isPendingForUser(ProjectUserId $userId): bool
+    public function isPendingForUser(UserId $userId): bool
     {
         return $this->status->isPending() && $this->userId->equals($userId);
     }
@@ -59,7 +59,7 @@ final class Request implements Equatable, Hashable
         return $this->status;
     }
 
-    public function getUserId(): ProjectUserId
+    public function getUserId(): UserId
     {
         return $this->userId;
     }

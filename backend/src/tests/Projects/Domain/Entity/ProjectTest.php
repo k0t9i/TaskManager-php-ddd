@@ -54,7 +54,6 @@ use TaskManager\Projects\Domain\ValueObject\ProjectName;
 use TaskManager\Projects\Domain\ValueObject\ProjectOwner;
 use TaskManager\Projects\Domain\ValueObject\ProjectStatus;
 use TaskManager\Projects\Domain\ValueObject\ProjectTask;
-use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
 use TaskManager\Projects\Domain\ValueObject\RejectedRequestStatus;
 use TaskManager\Projects\Domain\ValueObject\RequestChangeDate;
 use TaskManager\Projects\Domain\ValueObject\RequestId;
@@ -65,6 +64,7 @@ use TaskManager\Projects\Domain\ValueObject\TaskLink;
 use TaskManager\Projects\Domain\ValueObject\TaskOwner;
 use TaskManager\Projects\Domain\ValueObject\TaskStartDate;
 use TaskManager\Projects\Domain\ValueObject\TaskStatus;
+use TaskManager\Shared\Domain\ValueObject\UserId;
 
 class ProjectTest extends TestCase
 {
@@ -105,7 +105,7 @@ class ProjectTest extends TestCase
             new ProjectFinishDate(),
         );
 
-        $ownerId = new ProjectUserId($this->faker->uuid());
+        $ownerId = new UserId($this->faker->uuid());
         $project = $builder
             ->withOwner(new ProjectOwner($ownerId))
             ->withTask(new ProjectTask(
@@ -148,7 +148,7 @@ class ProjectTest extends TestCase
             new ProjectDescription($this->faker->regexify('.{255}')),
             new ProjectFinishDate(),
         );
-        $otherUserId = new ProjectUserId($this->faker->uuid());
+        $otherUserId = new UserId($this->faker->uuid());
         $project = $builder->build();
 
         $this->expectUserIsNotProjectOwnerException($otherUserId);
@@ -176,7 +176,7 @@ class ProjectTest extends TestCase
     public function testCloseProject(): void
     {
         $builder = new ProjectBuilder($this->faker);
-        $ownerId = new ProjectUserId($this->faker->uuid());
+        $ownerId = new UserId($this->faker->uuid());
         $project = $builder
             ->withOwner(new ProjectOwner($ownerId))
             ->withTask(new ProjectTask(
@@ -241,7 +241,7 @@ class ProjectTest extends TestCase
     public function testChangeStatusByNonOwner(): void
     {
         $builder = new ProjectBuilder($this->faker);
-        $otherUserId = new ProjectUserId($this->faker->uuid());
+        $otherUserId = new UserId($this->faker->uuid());
         $project = $builder->build();
 
         $this->expectUserIsNotProjectOwnerException($otherUserId);
@@ -252,8 +252,8 @@ class ProjectTest extends TestCase
     public function testChangeOwner(): void
     {
         $builder = new ProjectBuilder($this->faker);
-        $ownerId = new ProjectUserId($this->faker->uuid());
-        $participantId = new ProjectUserId($this->faker->uuid());
+        $ownerId = new UserId($this->faker->uuid());
+        $participantId = new UserId($this->faker->uuid());
         $project = $builder
             ->withOwner(new ProjectOwner($ownerId))
             ->withParticipant(new Participant(
@@ -294,7 +294,7 @@ class ProjectTest extends TestCase
     public function testChangeOwnerToUserWithPendingRequest(): void
     {
         $builder = new ProjectBuilder($this->faker);
-        $participantId = new ProjectUserId($this->faker->uuid());
+        $participantId = new UserId($this->faker->uuid());
         $project = $builder
             ->withParticipant(new Participant(
                 new ProjectId($this->faker->uuid()),
@@ -355,7 +355,7 @@ class ProjectTest extends TestCase
     public function testChangeOwnerToNonParticipant(): void
     {
         $builder = new ProjectBuilder($this->faker);
-        $otherUserId = new ProjectUserId($this->faker->uuid());
+        $otherUserId = new UserId($this->faker->uuid());
         $project = $builder->build();
 
         $this->expectProjectParticipantDoesNotExistException($otherUserId);
@@ -366,7 +366,7 @@ class ProjectTest extends TestCase
     public function testChangeOwnerByNonOwner(): void
     {
         $builder = new ProjectBuilder($this->faker);
-        $otherUserId = new ProjectUserId($this->faker->uuid());
+        $otherUserId = new UserId($this->faker->uuid());
         $project = $builder->build();
 
         $this->expectUserIsNotProjectOwnerException($otherUserId);
@@ -377,7 +377,7 @@ class ProjectTest extends TestCase
     public function testChangeOwnerInClosedProject(): void
     {
         $builder = new ProjectBuilder($this->faker);
-        $otherUserId = new ProjectUserId($this->faker->uuid());
+        $otherUserId = new UserId($this->faker->uuid());
         $project = $builder
             ->withStatus(new ClosedProjectStatus())
             ->build();
@@ -393,7 +393,7 @@ class ProjectTest extends TestCase
         $project = $builder
             ->withParticipant(new Participant(
                 new ProjectId($this->faker->uuid()),
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->build();
 
@@ -412,11 +412,11 @@ class ProjectTest extends TestCase
     public function testRemoveParticipantByNonOwner(): void
     {
         $builder = new ProjectBuilder($this->faker);
-        $otherUserId = new ProjectUserId($this->faker->uuid());
+        $otherUserId = new UserId($this->faker->uuid());
         $project = $builder
             ->withParticipant(new Participant(
                 new ProjectId($this->faker->uuid()),
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->build();
 
@@ -432,7 +432,7 @@ class ProjectTest extends TestCase
             ->withStatus(new ClosedProjectStatus())
             ->withParticipant(new Participant(
                 new ProjectId($this->faker->uuid()),
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->build();
 
@@ -444,11 +444,11 @@ class ProjectTest extends TestCase
     public function testRemoveNonExistingParticipant(): void
     {
         $builder = new ProjectBuilder($this->faker);
-        $otherUserId = new ProjectUserId($this->faker->uuid());
+        $otherUserId = new UserId($this->faker->uuid());
         $project = $builder
             ->withParticipant(new Participant(
                 new ProjectId($this->faker->uuid()),
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->build();
 
@@ -460,7 +460,7 @@ class ProjectTest extends TestCase
     public function testRemoveParticipantWithTask(): void
     {
         $builder = new ProjectBuilder($this->faker);
-        $participantId = new ProjectUserId($this->faker->uuid());
+        $participantId = new UserId($this->faker->uuid());
         $project = $builder
             ->withParticipant(new Participant(
                 new ProjectId($this->faker->uuid()),
@@ -484,7 +484,7 @@ class ProjectTest extends TestCase
         $project = $builder
             ->withParticipant(new Participant(
                 new ProjectId($this->faker->uuid()),
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->build();
 
@@ -507,7 +507,7 @@ class ProjectTest extends TestCase
             ->withStatus(new ClosedProjectStatus())
             ->withParticipant(new Participant(
                 new ProjectId($this->faker->uuid()),
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->build();
 
@@ -519,11 +519,11 @@ class ProjectTest extends TestCase
     public function testLeaveProjectByNonParticipant(): void
     {
         $builder = new ProjectBuilder($this->faker);
-        $otherUserId = new ProjectUserId($this->faker->uuid());
+        $otherUserId = new UserId($this->faker->uuid());
         $project = $builder
             ->withParticipant(new Participant(
                 new ProjectId($this->faker->uuid()),
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->build();
 
@@ -535,7 +535,7 @@ class ProjectTest extends TestCase
     public function testLeaveProjectWithTask(): void
     {
         $builder = new ProjectBuilder($this->faker);
-        $participantId = new ProjectUserId($this->faker->uuid());
+        $participantId = new UserId($this->faker->uuid());
         $project = $builder
             ->withParticipant(new Participant(
                 new ProjectId($this->faker->uuid()),
@@ -558,7 +558,7 @@ class ProjectTest extends TestCase
         $builder = new ProjectBuilder($this->faker);
         $project = $builder->build();
         $requestId = new RequestId($this->faker->uuid());
-        $userId = new ProjectUserId($this->faker->uuid());
+        $userId = new UserId($this->faker->uuid());
 
         $request = $project->createRequest($requestId, $userId);
         $events = $project->releaseEvents();
@@ -585,7 +585,7 @@ class ProjectTest extends TestCase
             ->withStatus(new ClosedProjectStatus())
             ->build();
         $requestId = new RequestId($this->faker->uuid());
-        $userId = new ProjectUserId($this->faker->uuid());
+        $userId = new UserId($this->faker->uuid());
 
         $this->expectProjectModificationIsNotAllowedException();
 
@@ -609,7 +609,7 @@ class ProjectTest extends TestCase
         $project = $builder
             ->withParticipant(new Participant(
                 new ProjectId($this->faker->uuid()),
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->build();
         $requestId = new RequestId($this->faker->uuid());
@@ -626,7 +626,7 @@ class ProjectTest extends TestCase
             ->withRequest(new Request(
                 new RequestId($this->faker->uuid()),
                 new ProjectId($this->faker->uuid()),
-                new ProjectUserId($this->faker->uuid()),
+                new UserId($this->faker->uuid()),
                 new PendingRequestStatus(),
                 new RequestChangeDate()
             ))
@@ -650,7 +650,7 @@ class ProjectTest extends TestCase
             ->withRequest(new Request(
                 new RequestId($this->faker->uuid()),
                 new ProjectId($this->faker->uuid()),
-                new ProjectUserId($this->faker->uuid()),
+                new UserId($this->faker->uuid()),
                 new PendingRequestStatus(),
                 new RequestChangeDate()
             ))
@@ -685,7 +685,7 @@ class ProjectTest extends TestCase
             ->withRequest(new Request(
                 new RequestId($this->faker->uuid()),
                 new ProjectId($this->faker->uuid()),
-                new ProjectUserId($this->faker->uuid()),
+                new UserId($this->faker->uuid()),
                 new PendingRequestStatus(),
                 new RequestChangeDate()
             ))
@@ -731,7 +731,7 @@ class ProjectTest extends TestCase
             ->withRequest(new Request(
                 new RequestId($this->faker->uuid()),
                 new ProjectId($this->faker->uuid()),
-                new ProjectUserId($this->faker->uuid()),
+                new UserId($this->faker->uuid()),
                 new PendingRequestStatus(),
                 new RequestChangeDate()
             ))
@@ -752,12 +752,12 @@ class ProjectTest extends TestCase
             ->withRequest(new Request(
                 new RequestId($this->faker->uuid()),
                 new ProjectId($this->faker->uuid()),
-                new ProjectUserId($this->faker->uuid()),
+                new UserId($this->faker->uuid()),
                 new PendingRequestStatus(),
                 new RequestChangeDate()
             ))
             ->build();
-        $otherUserId = new ProjectUserId($this->faker->uuid());
+        $otherUserId = new UserId($this->faker->uuid());
 
         $this->expectUserIsNotProjectOwnerException($otherUserId);
 
@@ -774,7 +774,7 @@ class ProjectTest extends TestCase
             ->withRequest(new Request(
                 new RequestId($this->faker->uuid()),
                 new ProjectId($this->faker->uuid()),
-                new ProjectUserId($this->faker->uuid()),
+                new UserId($this->faker->uuid()),
                 new PendingRequestStatus(),
                 new RequestChangeDate()
             ))
@@ -821,7 +821,7 @@ class ProjectTest extends TestCase
         $project = $builder
             ->withParticipant(new Participant(
                 new ProjectId($this->faker->uuid()),
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->withFinishDate(new ProjectFinishDate('31-01-2023'))
             ->build();
@@ -873,7 +873,7 @@ class ProjectTest extends TestCase
             ->withStartDate(new TaskStartDate('01-01-2023'))
             ->withFinishDate(new TaskFinishDate('02-01-2023'))
             ->build();
-        $otherUserId = new ProjectUserId($this->faker->uuid());
+        $otherUserId = new UserId($this->faker->uuid());
 
         $this->expectProjectUserDoesNotExistException($otherUserId);
 
@@ -960,7 +960,7 @@ class ProjectTest extends TestCase
         $project = $builder
             ->withParticipant(new Participant(
                 new ProjectId($this->faker->uuid()),
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->build();
         $taskId = new TaskId($this->faker->uuid());
@@ -985,7 +985,7 @@ class ProjectTest extends TestCase
     {
         $builder = new ProjectBuilder($this->faker);
         $project = $builder->build();
-        $otherUserId = new ProjectUserId($this->faker->uuid());
+        $otherUserId = new UserId($this->faker->uuid());
 
         $this->expectProjectUserDoesNotExistException($otherUserId);
 
@@ -1020,7 +1020,7 @@ class ProjectTest extends TestCase
             ->withTask(new ProjectTask(
                 new ProjectId($this->faker->uuid()),
                 $taskBuilder->getId(),
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->build();
         $newTaskInfoBuilder = new TaskBuilder($this->faker);
@@ -1060,7 +1060,7 @@ class ProjectTest extends TestCase
             ->withTask(new ProjectTask(
                 new ProjectId($this->faker->uuid()),
                 $taskBuilder->getId(),
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->build();
         $newTaskInfoBuilder = new TaskBuilder($this->faker);
@@ -1088,7 +1088,7 @@ class ProjectTest extends TestCase
             ->withTask(new ProjectTask(
                 new ProjectId($this->faker->uuid()),
                 new TaskId($this->faker->uuid()),
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->build();
         $newTaskInfoBuilder = new TaskBuilder($this->faker);
@@ -1116,7 +1116,7 @@ class ProjectTest extends TestCase
             ->withTask(new ProjectTask(
                 new ProjectId($this->faker->uuid()),
                 $task->getId(),
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->build();
         $newTaskInfoBuilder = new TaskBuilder($this->faker);
@@ -1147,7 +1147,7 @@ class ProjectTest extends TestCase
             ->withTask(new ProjectTask(
                 new ProjectId($this->faker->uuid()),
                 $task->getId(),
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->build();
         $newTaskInfoBuilder = new TaskBuilder($this->faker);
@@ -1178,7 +1178,7 @@ class ProjectTest extends TestCase
             ->withTask(new ProjectTask(
                 new ProjectId($this->faker->uuid()),
                 $task->getId(),
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->build();
         $newTaskInfoBuilder = new TaskBuilder($this->faker);
@@ -1186,7 +1186,7 @@ class ProjectTest extends TestCase
             ->withStartDate(new TaskStartDate('01-01-2023'))
             ->withFinishDate(new TaskFinishDate('02-01-2023'))
             ->build();
-        $otherUserId = new ProjectUserId($this->faker->uuid());
+        $otherUserId = new UserId($this->faker->uuid());
 
         $this->expectUserIsNotTaskOwnerException($otherUserId->value);
 
@@ -1208,7 +1208,7 @@ class ProjectTest extends TestCase
             ->withTask(new ProjectTask(
                 new ProjectId($this->faker->uuid()),
                 $taskBuilder->getId(),
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->build();
 
@@ -1236,7 +1236,7 @@ class ProjectTest extends TestCase
             ->withTask(new ProjectTask(
                 new ProjectId($this->faker->uuid()),
                 $taskBuilder->getId(),
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->build();
 
@@ -1256,7 +1256,7 @@ class ProjectTest extends TestCase
             ->withTask(new ProjectTask(
                 new ProjectId($this->faker->uuid()),
                 new TaskId($this->faker->uuid()),
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->build();
 
@@ -1276,10 +1276,10 @@ class ProjectTest extends TestCase
             ->withTask(new ProjectTask(
                 new ProjectId($this->faker->uuid()),
                 $task->getId(),
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->build();
-        $otherUserId = new ProjectUserId($this->faker->uuid());
+        $otherUserId = new UserId($this->faker->uuid());
 
         $this->expectUserIsNotTaskOwnerException($otherUserId->value);
 
@@ -1295,7 +1295,7 @@ class ProjectTest extends TestCase
             ->withTask(new ProjectTask(
                 new ProjectId($this->faker->uuid()),
                 $taskBuilder->getId(),
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->build();
 
@@ -1321,7 +1321,7 @@ class ProjectTest extends TestCase
             ->withTask(new ProjectTask(
                 new ProjectId($this->faker->uuid()),
                 $taskBuilder->getId(),
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->build();
 
@@ -1339,7 +1339,7 @@ class ProjectTest extends TestCase
             ->withTask(new ProjectTask(
                 new ProjectId($this->faker->uuid()),
                 new TaskId($this->faker->uuid()),
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->build();
 
@@ -1357,10 +1357,10 @@ class ProjectTest extends TestCase
             ->withTask(new ProjectTask(
                 new ProjectId($this->faker->uuid()),
                 $task->getId(),
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->build();
-        $otherUserId = new ProjectUserId($this->faker->uuid());
+        $otherUserId = new UserId($this->faker->uuid());
 
         $this->expectUserIsNotTaskOwnerException($otherUserId->value);
 
@@ -1377,12 +1377,12 @@ class ProjectTest extends TestCase
             ->withTask(new ProjectTask(
                 new ProjectId($this->faker->uuid()),
                 $linkedTaskId,
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->withTask(new ProjectTask(
                 new ProjectId($this->faker->uuid()),
                 $taskBuilder->getId(),
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->build();
 
@@ -1409,12 +1409,12 @@ class ProjectTest extends TestCase
             ->withTask(new ProjectTask(
                 new ProjectId($this->faker->uuid()),
                 $linkedTaskId,
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->withTask(new ProjectTask(
                 new ProjectId($this->faker->uuid()),
                 $taskBuilder->getId(),
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->build();
 
@@ -1433,7 +1433,7 @@ class ProjectTest extends TestCase
             ->withTask(new ProjectTask(
                 new ProjectId($this->faker->uuid()),
                 $linkedTaskId,
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->build();
 
@@ -1452,7 +1452,7 @@ class ProjectTest extends TestCase
             ->withTask(new ProjectTask(
                 new ProjectId($this->faker->uuid()),
                 $task->getId(),
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->build();
 
@@ -1471,15 +1471,15 @@ class ProjectTest extends TestCase
             ->withTask(new ProjectTask(
                 new ProjectId($this->faker->uuid()),
                 $linkedTaskId,
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->withTask(new ProjectTask(
                 new ProjectId($this->faker->uuid()),
                 $taskBuilder->getId(),
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->build();
-        $otherUserId = new ProjectUserId($this->faker->uuid());
+        $otherUserId = new UserId($this->faker->uuid());
 
         $this->expectUserIsNotTaskOwnerException($otherUserId->value);
 
@@ -1503,12 +1503,12 @@ class ProjectTest extends TestCase
             ->withTask(new ProjectTask(
                 new ProjectId($this->faker->uuid()),
                 $linkedTaskId,
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->withTask(new ProjectTask(
                 new ProjectId($this->faker->uuid()),
                 $taskBuilder->getId(),
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->build();
 
@@ -1542,12 +1542,12 @@ class ProjectTest extends TestCase
             ->withTask(new ProjectTask(
                 new ProjectId($this->faker->uuid()),
                 $linkedTaskId,
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->withTask(new ProjectTask(
                 new ProjectId($this->faker->uuid()),
                 $taskBuilder->getId(),
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->build();
 
@@ -1573,7 +1573,7 @@ class ProjectTest extends TestCase
             ->withTask(new ProjectTask(
                 new ProjectId($this->faker->uuid()),
                 $linkedTaskId,
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->build();
 
@@ -1599,7 +1599,7 @@ class ProjectTest extends TestCase
             ->withTask(new ProjectTask(
                 new ProjectId($this->faker->uuid()),
                 $task->getId(),
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->build();
 
@@ -1625,15 +1625,15 @@ class ProjectTest extends TestCase
             ->withTask(new ProjectTask(
                 new ProjectId($this->faker->uuid()),
                 $linkedTaskId,
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->withTask(new ProjectTask(
                 new ProjectId($this->faker->uuid()),
                 $taskBuilder->getId(),
-                new ProjectUserId($this->faker->uuid())
+                new UserId($this->faker->uuid())
             ))
             ->build();
-        $otherUserId = new ProjectUserId($this->faker->uuid());
+        $otherUserId = new UserId($this->faker->uuid());
 
         $this->expectUserIsNotTaskOwnerException($otherUserId->value);
 
@@ -1649,7 +1649,7 @@ class ProjectTest extends TestCase
         ));
     }
 
-    private function expectUserIsNotProjectOwnerException(ProjectUserId $userId): void
+    private function expectUserIsNotProjectOwnerException(UserId $userId): void
     {
         $this->expectException(UserIsNotProjectOwnerException::class);
         $this->expectExceptionMessage(sprintf(
@@ -1658,7 +1658,7 @@ class ProjectTest extends TestCase
         ));
     }
 
-    private function expectProjectParticipantDoesNotExistException(ProjectUserId $userId): void
+    private function expectProjectParticipantDoesNotExistException(UserId $userId): void
     {
         $this->expectException(ProjectParticipantDoesNotExistException::class);
         $this->expectExceptionMessage($message = sprintf(
@@ -1667,7 +1667,7 @@ class ProjectTest extends TestCase
         ));
     }
 
-    private function expectUserIsAlreadyProjectOwnerException(ProjectUserId $id): void
+    private function expectUserIsAlreadyProjectOwnerException(UserId $id): void
     {
         $this->expectException(UserIsAlreadyProjectOwnerException::class);
         $this->expectExceptionMessage(sprintf(
@@ -1676,7 +1676,7 @@ class ProjectTest extends TestCase
         ));
     }
 
-    private function expectUserIsAlreadyProjectParticipantException(ProjectUserId $id): void
+    private function expectUserIsAlreadyProjectParticipantException(UserId $id): void
     {
         $this->expectException(UserIsAlreadyProjectParticipantException::class);
         $this->expectExceptionMessage(sprintf(
@@ -1685,7 +1685,7 @@ class ProjectTest extends TestCase
         ));
     }
 
-    private function expectProjectUserHasTaskException(ProjectUserId $userId, ProjectId $projectId): void
+    private function expectProjectUserHasTaskException(UserId $userId, ProjectId $projectId): void
     {
         $this->expectException(ProjectUserHasTaskException::class);
         $this->expectExceptionMessage(sprintf(
@@ -1695,7 +1695,7 @@ class ProjectTest extends TestCase
         ));
     }
 
-    private function expectProjectUserDoesNotExistException(ProjectUserId $userId): void
+    private function expectProjectUserDoesNotExistException(UserId $userId): void
     {
         $this->expectException(ProjectUserDoesNotExistException::class);
         $this->expectExceptionMessage(sprintf(

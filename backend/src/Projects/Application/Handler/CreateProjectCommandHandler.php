@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TaskManager\Projects\Application\Handler;
 
 use TaskManager\Projects\Application\Command\CreateProjectCommand;
-use TaskManager\Projects\Application\Service\CurrentUserExtractorInterface;
 use TaskManager\Projects\Application\Service\ProjectSaverInterface;
 use TaskManager\Projects\Domain\Entity\Project;
 use TaskManager\Projects\Domain\ValueObject\ProjectDescription;
@@ -16,19 +15,20 @@ use TaskManager\Projects\Domain\ValueObject\ProjectName;
 use TaskManager\Projects\Domain\ValueObject\ProjectOwner;
 use TaskManager\Shared\Application\Bus\Command\CommandHandlerInterface;
 use TaskManager\Shared\Application\Bus\Event\IntegrationEventBusInterface;
+use TaskManager\Shared\Application\Service\AuthenticatorServiceInterface;
 
 final readonly class CreateProjectCommandHandler implements CommandHandlerInterface
 {
     public function __construct(
         private ProjectSaverInterface $saver,
-        private CurrentUserExtractorInterface $userExtractor,
+        private AuthenticatorServiceInterface $authenticator,
         private IntegrationEventBusInterface $eventBus,
     ) {
     }
 
     public function __invoke(CreateProjectCommand $command): void
     {
-        $currentUser = $this->userExtractor->extract();
+        $authUserId = $this->authenticator->getUserId();
 
         $project = Project::create(
             new ProjectId($command->id),
@@ -38,7 +38,7 @@ final readonly class CreateProjectCommandHandler implements CommandHandlerInterf
                 new ProjectFinishDate($command->finishDate)
             ),
             new ProjectOwner(
-                $currentUser->id
+                $authUserId
             )
         );
 

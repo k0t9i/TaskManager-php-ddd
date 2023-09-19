@@ -7,19 +7,19 @@ namespace TaskManager\Projects\Domain\Collection;
 use TaskManager\Projects\Domain\Exception\ProjectParticipantDoesNotExistException;
 use TaskManager\Projects\Domain\Exception\UserIsAlreadyProjectParticipantException;
 use TaskManager\Projects\Domain\ValueObject\Participant;
-use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
 use TaskManager\Shared\Domain\Collection\ManagedCollection;
+use TaskManager\Shared\Domain\ValueObject\UserId;
 
 final class ParticipantCollection extends ManagedCollection
 {
-    public function ensureUserIsParticipant(ProjectUserId $userId): void
+    public function ensureUserIsParticipant(UserId $userId): void
     {
         if (!$this->exists($userId->value)) {
             throw new ProjectParticipantDoesNotExistException($userId->value);
         }
     }
 
-    public function ensureUserIsNotParticipant(ProjectUserId $userId): void
+    public function ensureUserIsNotParticipant(UserId $userId): void
     {
         if ($this->exists($userId->value)) {
             throw new UserIsAlreadyProjectParticipantException($userId->value);

@@ -9,7 +9,6 @@ use TaskManager\Projects\Domain\Collection\TaskLinkCollection;
 use TaskManager\Projects\Domain\Entity\Task;
 use TaskManager\Projects\Domain\ValueObject\ActiveTaskStatus;
 use TaskManager\Projects\Domain\ValueObject\ProjectId;
-use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
 use TaskManager\Projects\Domain\ValueObject\TaskBrief;
 use TaskManager\Projects\Domain\ValueObject\TaskDescription;
 use TaskManager\Projects\Domain\ValueObject\TaskFinishDate;
@@ -20,6 +19,7 @@ use TaskManager\Projects\Domain\ValueObject\TaskName;
 use TaskManager\Projects\Domain\ValueObject\TaskOwner;
 use TaskManager\Projects\Domain\ValueObject\TaskStartDate;
 use TaskManager\Projects\Domain\ValueObject\TaskStatus;
+use TaskManager\Shared\Domain\ValueObject\UserId;
 
 final class TaskBuilder
 {
@@ -235,7 +235,7 @@ final class TaskBuilder
             $this->finishDate,
         );
         $this->status = $this->status ?? new ActiveTaskStatus();
-        $this->owner = $this->owner ?? new TaskOwner(new ProjectUserId($this->faker->uuid()));
+        $this->owner = $this->owner ?? new TaskOwner(new UserId($this->faker->uuid()));
         $this->links = $this->links ?? [];
     }
 }

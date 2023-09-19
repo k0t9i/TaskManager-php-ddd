@@ -7,10 +7,10 @@ namespace TaskManager\Projects\Application\Subscriber;
 use TaskManager\Projects\Application\Service\TaskFinderInterface;
 use TaskManager\Projects\Domain\Event\ProjectTaskWasClosedEvent;
 use TaskManager\Projects\Domain\Repository\TaskRepositoryInterface;
-use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
 use TaskManager\Projects\Domain\ValueObject\TaskId;
 use TaskManager\Shared\Application\Bus\Event\DomainEventSubscriberInterface;
 use TaskManager\Shared\Application\Bus\Event\IntegrationEventBusInterface;
+use TaskManager\Shared\Domain\ValueObject\UserId;
 
 final readonly class CloseTaskOnProjectTaskClosed implements DomainEventSubscriberInterface
 {
@@ -25,7 +25,7 @@ final readonly class CloseTaskOnProjectTaskClosed implements DomainEventSubscrib
     {
         $task = $this->finder->find(new TaskId($event->taskId));
 
-        $task->closeAsNeeded(new ProjectUserId($event->getPerformerId()));
+        $task->closeAsNeeded(new UserId($event->getPerformerId()));
 
         $this->repository->save($task);
         $this->eventBus->dispatch($task->releaseEvents());

@@ -30,7 +30,6 @@ use TaskManager\Projects\Domain\ValueObject\ProjectInformation;
 use TaskManager\Projects\Domain\ValueObject\ProjectOwner;
 use TaskManager\Projects\Domain\ValueObject\ProjectStatus;
 use TaskManager\Projects\Domain\ValueObject\ProjectTask;
-use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
 use TaskManager\Projects\Domain\ValueObject\RejectedRequestStatus;
 use TaskManager\Projects\Domain\ValueObject\RequestId;
 use TaskManager\Projects\Domain\ValueObject\RequestStatus;
@@ -39,6 +38,7 @@ use TaskManager\Projects\Domain\ValueObject\TaskInformation;
 use TaskManager\Projects\Domain\ValueObject\TaskOwner;
 use TaskManager\Shared\Domain\Aggregate\AggregateRoot;
 use TaskManager\Shared\Domain\Equatable;
+use TaskManager\Shared\Domain\ValueObject\UserId;
 
 final class Project extends AggregateRoot
 {
@@ -84,7 +84,7 @@ final class Project extends AggregateRoot
 
     public function changeInformation(
         ProjectInformation $information,
-        ProjectUserId $currentUserId
+        UserId $currentUserId
     ): void {
         $this->status->ensureAllowsModification();
         $this->owner->ensureUserIsOwner($currentUserId);
@@ -113,12 +113,12 @@ final class Project extends AggregateRoot
         }
     }
 
-    public function activate(ProjectUserId $currentUserId): void
+    public function activate(UserId $currentUserId): void
     {
         $this->changeStatus(new ActiveProjectStatus(), $currentUserId);
     }
 
-    public function close(ProjectUserId $currentUserId): void
+    public function close(UserId $currentUserId): void
     {
         $this->changeStatus(new ClosedProjectStatus(), $currentUserId);
         /** @var ProjectTask $task */
@@ -131,7 +131,7 @@ final class Project extends AggregateRoot
         }
     }
 
-    public function changeOwner(ProjectOwner $owner, ProjectUserId $currentUserId): void
+    public function changeOwner(ProjectOwner $owner, UserId $currentUserId): void
     {
         $this->status->ensureAllowsModification();
         $this->owner->ensureUserIsOwner($currentUserId);
@@ -171,20 +171,20 @@ final class Project extends AggregateRoot
             && $other->owner->equals($this->owner);
     }
 
-    public function removeParticipant(ProjectUserId $participantId, ProjectUserId $currentUserId): void
+    public function removeParticipant(UserId $participantId, UserId $currentUserId): void
     {
         $this->owner->ensureUserIsOwner($currentUserId);
         $this->tasks->ensureUserDoesNotHaveTask($participantId, $this->id);
         $this->removeParticipantInner($participantId, $currentUserId);
     }
 
-    public function leaveProject(ProjectUserId $participantId): void
+    public function leaveProject(UserId $participantId): void
     {
         $this->tasks->ensureUserDoesNotHaveTask($participantId, $this->id);
         $this->removeParticipantInner($participantId, $participantId);
     }
 
-    public function createRequest(RequestId $id, ProjectUserId $currentUserId): Request
+    public function createRequest(RequestId $id, UserId $currentUserId): Request
     {
         $this->status->ensureAllowsModification();
         $this->owner->ensureUserIsNotOwner($currentUserId);
@@ -207,13 +207,13 @@ final class Project extends AggregateRoot
         return $request;
     }
 
-    public function confirmRequest(RequestId $id, ProjectUserId $currentUserId): void
+    public function confirmRequest(RequestId $id, UserId $currentUserId): void
     {
         $request = $this->changeRequestStatus($id, new ConfirmedRequestStatus(), $currentUserId);
         $this->addParticipant($request->getUserId(), $currentUserId);
     }
 
-    public function rejectRequest(RequestId $id, ProjectUserId $currentUserId): void
+    public function rejectRequest(RequestId $id, UserId $currentUserId): void
     {
         $this->changeRequestStatus($id, new RejectedRequestStatus(), $currentUserId);
     }
@@ -236,7 +236,7 @@ final class Project extends AggregateRoot
     public function changeTaskInformation(
         Task $task,
         TaskInformation $information,
-        ProjectUserId $currentUserId
+        UserId $currentUserId
     ): void {
         $this->status->ensureAllowsModification();
         $this->tasks->ensureProjectTaskExists($task->getId());
@@ -254,7 +254,7 @@ final class Project extends AggregateRoot
         }
     }
 
-    public function activateTask(Task $task, ProjectUserId $currentUserId): void
+    public function activateTask(Task $task, UserId $currentUserId): void
     {
         $this->status->ensureAllowsModification();
         $this->tasks->ensureProjectTaskExists($task->getId());
@@ -268,7 +268,7 @@ final class Project extends AggregateRoot
         }
     }
 
-    public function closeTask(Task $task, ProjectUserId $currentUserId): void
+    public function closeTask(Task $task, UserId $currentUserId): void
     {
         $this->status->ensureAllowsModification();
         $this->tasks->ensureProjectTaskExists($task->getId());
@@ -282,7 +282,7 @@ final class Project extends AggregateRoot
         }
     }
 
-    public function createTaskLink(Task $task, TaskId $linkedTaskId, ProjectUserId $currentUserId): void
+    public function createTaskLink(Task $task, TaskId $linkedTaskId, UserId $currentUserId): void
     {
         $this->status->ensureAllowsModification();
         $this->tasks->ensureProjectTaskExists($task->getId());
@@ -297,7 +297,7 @@ final class Project extends AggregateRoot
         }
     }
 
-    public function deleteTaskLink(Task $task, TaskId $linkedTaskId, ProjectUserId $currentUserId): void
+    public function deleteTaskLink(Task $task, TaskId $linkedTaskId, UserId $currentUserId): void
     {
         $this->status->ensureAllowsModification();
         $this->tasks->ensureProjectTaskExists($task->getId());
@@ -312,7 +312,7 @@ final class Project extends AggregateRoot
         }
     }
 
-    public function addProjectTask(TaskId $taskId, ProjectUserId $userId): void
+    public function addProjectTask(TaskId $taskId, UserId $userId): void
     {
         $this->status->ensureAllowsModification();
         $this->ensureUserIsProjectUser($userId);
@@ -336,7 +336,7 @@ final class Project extends AggregateRoot
         return $this->id;
     }
 
-    private function changeStatus(ProjectStatus $status, ProjectUserId $currentUserId): void
+    private function changeStatus(ProjectStatus $status, UserId $currentUserId): void
     {
         $this->status->ensureCanBeChangedTo($status);
         $this->owner->ensureUserIsOwner($currentUserId);
@@ -350,7 +350,7 @@ final class Project extends AggregateRoot
         ));
     }
 
-    private function removeParticipantInner(ProjectUserId $participantId, ProjectUserId $performerId): void
+    private function removeParticipantInner(UserId $participantId, UserId $performerId): void
     {
         $this->status->ensureAllowsModification();
         $this->participants->ensureUserIsParticipant($participantId);
@@ -367,7 +367,7 @@ final class Project extends AggregateRoot
     private function changeRequestStatus(
         RequestId $id,
         RequestStatus $status,
-        ProjectUserId $currentUserId
+        UserId $currentUserId
     ): Request {
         $this->status->ensureAllowsModification();
         $this->owner->ensureUserIsOwner($currentUserId);
@@ -391,7 +391,7 @@ final class Project extends AggregateRoot
         return $request;
     }
 
-    private function addParticipant(ProjectUserId $participantId, ProjectUserId $currentUserId): void
+    private function addParticipant(UserId $participantId, UserId $currentUserId): void
     {
         $this->participants->addOrUpdateElement(new Participant(
             $this->id,
@@ -405,7 +405,7 @@ final class Project extends AggregateRoot
         ));
     }
 
-    private function ensureUserIsProjectUser(ProjectUserId $userId): void
+    private function ensureUserIsProjectUser(UserId $userId): void
     {
         if (!$this->owner->userIsOwner($userId) && !$this->participants->exists($userId->value)) {
             throw new ProjectUserDoesNotExistException($userId->value);

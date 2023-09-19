@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace TaskManager\Projects\Application\Handler;
 
 use TaskManager\Projects\Application\Command\CreateTaskCommand;
-use TaskManager\Projects\Application\Service\CurrentUserExtractorInterface;
 use TaskManager\Projects\Application\Service\ProjectFinderInterface;
 use TaskManager\Projects\Application\Service\TaskSaverInterface;
 use TaskManager\Projects\Domain\ValueObject\ProjectId;
@@ -19,12 +18,13 @@ use TaskManager\Projects\Domain\ValueObject\TaskOwner;
 use TaskManager\Projects\Domain\ValueObject\TaskStartDate;
 use TaskManager\Shared\Application\Bus\Command\CommandHandlerInterface;
 use TaskManager\Shared\Application\Bus\Event\IntegrationEventBusInterface;
+use TaskManager\Shared\Application\Service\AuthenticatorServiceInterface;
 
 final readonly class CreateTaskCommandHandler implements CommandHandlerInterface
 {
     public function __construct(
         private TaskSaverInterface $saver,
-        private CurrentUserExtractorInterface $userExtractor,
+        private AuthenticatorServiceInterface $authenticator,
         private ProjectFinderInterface $finder,
         private IntegrationEventBusInterface $eventBus,
     ) {
@@ -32,7 +32,7 @@ final readonly class CreateTaskCommandHandler implements CommandHandlerInterface
 
     public function __invoke(CreateTaskCommand $command): void
     {
-        $currentUser = $this->userExtractor->extract();
+        $authUserId = $this->authenticator->getUserId();
         $project = $this->finder->find(new ProjectId($command->projectId));
 
         $task = $project->createTask(
@@ -45,7 +45,7 @@ final readonly class CreateTaskCommandHandler implements CommandHandlerInterface
                 new TaskFinishDate($command->finishDate)
             ),
             new TaskOwner(
-                $currentUser->id
+                $authUserId
             )
         );
 

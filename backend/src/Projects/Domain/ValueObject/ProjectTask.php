@@ -6,13 +6,14 @@ namespace TaskManager\Projects\Domain\ValueObject;
 
 use TaskManager\Shared\Domain\Equatable;
 use TaskManager\Shared\Domain\Hashable;
+use TaskManager\Shared\Domain\ValueObject\UserId;
 
 final readonly class ProjectTask implements Equatable, Hashable
 {
     public function __construct(
         public ProjectId $projectId,
         public TaskId $taskId,
-        public ProjectUserId $userId
+        public UserId $userId
     ) {
     }
 

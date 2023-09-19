@@ -13,7 +13,6 @@ use TaskManager\Projects\Domain\Event\TaskWasCreatedEvent;
 use TaskManager\Projects\Domain\ValueObject\ActiveTaskStatus;
 use TaskManager\Projects\Domain\ValueObject\ClosedTaskStatus;
 use TaskManager\Projects\Domain\ValueObject\ProjectId;
-use TaskManager\Projects\Domain\ValueObject\ProjectUserId;
 use TaskManager\Projects\Domain\ValueObject\TaskId;
 use TaskManager\Projects\Domain\ValueObject\TaskInformation;
 use TaskManager\Projects\Domain\ValueObject\TaskLink;
@@ -22,6 +21,7 @@ use TaskManager\Projects\Domain\ValueObject\TaskStatus;
 use TaskManager\Shared\Domain\Aggregate\AggregateRoot;
 use TaskManager\Shared\Domain\Equatable;
 use TaskManager\Shared\Domain\ValueObject\DateTime;
+use TaskManager\Shared\Domain\ValueObject\UserId;
 
 final class Task extends AggregateRoot
 {
@@ -74,7 +74,7 @@ final class Task extends AggregateRoot
 
     public function changeInformation(
         TaskInformation $information,
-        ProjectUserId $currentUserId
+        UserId $currentUserId
     ): void {
         $this->status->ensureAllowsModification();
 
@@ -98,19 +98,19 @@ final class Task extends AggregateRoot
         $this->owner->ensureUserIsOwner($currentUserId);
     }
 
-    public function activate(ProjectUserId $currentUserId): void
+    public function activate(UserId $currentUserId): void
     {
         $this->changeStatus(new ActiveTaskStatus(), $currentUserId);
     }
 
-    public function close(ProjectUserId $currentUserId): void
+    public function close(UserId $currentUserId): void
     {
         $this->changeStatus(new ClosedTaskStatus(), $currentUserId);
     }
 
     public function createLink(
         TaskId $linkedTaskId,
-        ProjectUserId $currentUserId
+        UserId $currentUserId
     ): void {
         $this->status->ensureAllowsModification();
 
@@ -131,7 +131,7 @@ final class Task extends AggregateRoot
 
     public function deleteLink(
         TaskId $linkedTaskId,
-        ProjectUserId $currentUserId
+        UserId $currentUserId
     ): void {
         $this->status->ensureAllowsModification();
 
@@ -150,7 +150,7 @@ final class Task extends AggregateRoot
         $this->owner->ensureUserIsOwner($currentUserId);
     }
 
-    public function closeAsNeeded(ProjectUserId $performerId): void
+    public function closeAsNeeded(UserId $performerId): void
     {
         if (!$this->status->isClosed()) {
             $status = new ClosedTaskStatus();
@@ -169,7 +169,7 @@ final class Task extends AggregateRoot
         $this->isDraft = false;
     }
 
-    public function limitDates(DateTime $date, ProjectUserId $performerId): void
+    public function limitDates(DateTime $date, UserId $performerId): void
     {
         $information = $this->information->limitDates($date);
 
@@ -187,7 +187,7 @@ final class Task extends AggregateRoot
         }
     }
 
-    public function createBackLink(TaskId $linkedTaskId, ProjectUserId $performerId): void
+    public function createBackLink(TaskId $linkedTaskId, UserId $performerId): void
     {
         $link = new TaskLink($this->id, $linkedTaskId);
 
@@ -201,7 +201,7 @@ final class Task extends AggregateRoot
         }
     }
 
-    public function deleteBackLink(TaskId $linkedTaskId, ProjectUserId $performerId): void
+    public function deleteBackLink(TaskId $linkedTaskId, UserId $performerId): void
     {
         $link = new TaskLink($this->id, $linkedTaskId);
 
@@ -230,7 +230,7 @@ final class Task extends AggregateRoot
         $this->isDraft = true;
     }
 
-    private function changeStatus(TaskStatus $status, ProjectUserId $currentUserId): void
+    private function changeStatus(TaskStatus $status, UserId $currentUserId): void
     {
         $this->status->ensureCanBeChangedTo($status);
 
