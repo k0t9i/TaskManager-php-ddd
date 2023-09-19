@@ -9,6 +9,5 @@
         <embedded name="information" class="TaskManager\Projects\Domain\ValueObject\TaskInformation" use-column-prefix="false" />
         <field name="status" type="task_status" />
         <embedded name="owner" class="TaskManager\Projects\Domain\ValueObject\TaskOwner" use-column-prefix="false" />
-        <field name="isDraft" column="is_draft" type="boolean" />
     </entity>
 </doctrine-mapping>

@@ -25,8 +25,6 @@ use TaskManager\Shared\Domain\ValueObject\UserId;
 
 final class Task extends AggregateRoot
 {
-    private bool $isDraft = false;
-
     private function __construct(
         private readonly TaskId $id,
         private readonly ProjectId $projectId,
@@ -54,7 +52,6 @@ final class Task extends AggregateRoot
             $owner,
             new TaskLinkCollection()
         );
-        $task->markAsDraft();
 
         $task->registerEvent(new TaskWasCreatedEvent(
             $id->value,
@@ -164,11 +161,6 @@ final class Task extends AggregateRoot
         }
     }
 
-    public function undraft(): void
-    {
-        $this->isDraft = false;
-    }
-
     public function limitDates(DateTime $date, UserId $performerId): void
     {
         $information = $this->information->limitDates($date);
@@ -225,11 +217,6 @@ final class Task extends AggregateRoot
         return $this->projectId;
     }
 
-    private function markAsDraft(): void
-    {
-        $this->isDraft = true;
-    }
-
     private function changeStatus(TaskStatus $status, UserId $currentUserId): void
     {
         $this->status->ensureCanBeChangedTo($status);
@@ -253,7 +240,6 @@ final class Task extends AggregateRoot
             && $other->projectId->equals($this->projectId)
             && $other->information->equals($this->information)
             && $other->status->equals($this->status)
-            && $other->owner->equals($this->owner)
-            && $other->isDraft === $this->isDraft;
+            && $other->owner->equals($this->owner);
     }
 }
