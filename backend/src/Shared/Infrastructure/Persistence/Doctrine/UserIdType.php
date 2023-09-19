@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace TaskManager\Users\Infrastructure\Persistence\Doctrine;
+namespace TaskManager\Shared\Infrastructure\Persistence\Doctrine;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\StringType;
-use TaskManager\Users\Domain\ValueObject\UserId;
+use TaskManager\Shared\Domain\ValueObject\UserId;
 
 final class UserIdType extends StringType
 {

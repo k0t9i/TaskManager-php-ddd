@@ -6,10 +6,10 @@ namespace TaskManager\Users\Infrastructure\Repository;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectRepository;
+use TaskManager\Shared\Domain\ValueObject\UserId;
 use TaskManager\Users\Domain\Entity\User;
 use TaskManager\Users\Domain\Repository\UserRepositoryInterface;
 use TaskManager\Users\Domain\ValueObject\UserEmail;
-use TaskManager\Users\Domain\ValueObject\UserId;
 
 final readonly class DoctrineUserRepository implements UserRepositoryInterface
 {

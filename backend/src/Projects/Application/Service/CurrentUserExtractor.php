@@ -20,7 +20,7 @@ final readonly class CurrentUserExtractor implements CurrentUserExtractorInterfa
 
     public function extract(): ProjectUser
     {
-        $projectUserId = new ProjectUserId($this->authenticator->getUserId());
+        $projectUserId = new ProjectUserId($this->authenticator->getUserId()->value);
         $projectUser = $this->repository->findById($projectUserId);
 
         if (null === $projectUser) {

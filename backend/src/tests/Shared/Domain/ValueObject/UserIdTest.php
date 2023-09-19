@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace TaskManager\Tests\Users\Domain\ValueObject;
+namespace TaskManager\Tests\Shared\Domain\ValueObject;
 
 use Faker\Factory;
 use Faker\Generator;
 use PHPUnit\Framework\TestCase;
 use TaskManager\Shared\Domain\Equatable;
 use TaskManager\Shared\Domain\Exception\InvalidArgumentException;
+use TaskManager\Shared\Domain\ValueObject\UserId;
 use TaskManager\Users\Domain\ValueObject\UserFirstname;
-use TaskManager\Users\Domain\ValueObject\UserId;
 
 class UserIdTest extends TestCase
 {

@@ -6,11 +6,11 @@ namespace TaskManager\Users\Domain\Entity;
 
 use TaskManager\Shared\Domain\Aggregate\AggregateRoot;
 use TaskManager\Shared\Domain\Equatable;
+use TaskManager\Shared\Domain\ValueObject\UserId;
 use TaskManager\Users\Domain\Event\UserProfileWasChangedEvent;
 use TaskManager\Users\Domain\Event\UserWasCreatedEvent;
 use TaskManager\Users\Domain\ValueObject\UserEmail;
 use TaskManager\Users\Domain\ValueObject\UserFirstname;
-use TaskManager\Users\Domain\ValueObject\UserId;
 use TaskManager\Users\Domain\ValueObject\UserLastname;
 use TaskManager\Users\Domain\ValueObject\UserPassword;
 use TaskManager\Users\Domain\ValueObject\UserProfile;

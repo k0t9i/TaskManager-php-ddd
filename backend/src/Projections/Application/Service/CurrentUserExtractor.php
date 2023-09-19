@@ -20,10 +20,10 @@ final readonly class CurrentUserExtractor implements CurrentUserExtractorInterfa
     public function extract(): UserProjection
     {
         $userId = $this->authenticator->getUserId();
-        $user = $this->repository->findById($userId);
+        $user = $this->repository->findById($userId->value);
 
         if (null === $user) {
-            throw new UserDoesNotExistException($userId);
+            throw new UserDoesNotExistException($userId->value);
         }
 
         return $user;

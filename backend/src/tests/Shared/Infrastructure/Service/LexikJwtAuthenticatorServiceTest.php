@@ -32,7 +32,7 @@ class LexikJwtAuthenticatorServiceTest extends TestCase
         $idClaim = $this->faker->regexify('[a-zA-Z]{50}');
         $token = $this->faker->regexify('.{255}');
         $path = 'abc';
-        $userId = $this->faker->regexify('.{255}');
+        $userId = $this->faker->uuid();
         $payload = [
             $idClaim => $userId,
         ];
@@ -65,13 +65,13 @@ class LexikJwtAuthenticatorServiceTest extends TestCase
 
         $service->onKernelController($event);
 
-        $this->assertEquals($userId, $service->getUserId());
+        $this->assertEquals($userId, $service->getUserId()->value);
     }
 
     public function testGetToken(): void
     {
         $path = 'abc';
-        $userId = $this->faker->regexify('.{255}');
+        $userId = $this->faker->uuid();
         $symfonyUser = new SymfonyUser($userId);
         $token = $this->faker->regexify('.{255}');
         $tokenManager = $this->getMockBuilder(JWTTokenManagerInterface::class)

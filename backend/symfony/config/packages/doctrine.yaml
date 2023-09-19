@@ -10,8 +10,8 @@ doctrine:
         platform_service: TaskManager\Shared\Infrastructure\Persistence\Doctrine\CustomPostgreSQLPlatform
         types:
             tm_datetime: TaskManager\Shared\Infrastructure\Persistence\Doctrine\DateTimeType
+            user_id: TaskManager\Shared\Infrastructure\Persistence\Doctrine\UserIdType
 
-            user_id: TaskManager\Users\Infrastructure\Persistence\Doctrine\UserIdType
             user_email: TaskManager\Users\Infrastructure\Persistence\Doctrine\UserEmailType
             user_firstname: TaskManager\Users\Infrastructure\Persistence\Doctrine\UserFirstnameType
             user_lastname: TaskManager\Users\Infrastructure\Persistence\Doctrine\UserLastnameType

@@ -9,6 +9,7 @@ use Faker\Generator;
 use PHPUnit\Framework\TestCase;
 use TaskManager\Shared\Application\Bus\Event\IntegrationEventBusInterface;
 use TaskManager\Shared\Application\Service\PasswordHasherInterface;
+use TaskManager\Shared\Domain\ValueObject\UserId;
 use TaskManager\Users\Application\Command\RegisterCommand;
 use TaskManager\Users\Application\Handler\RegisterCommandHandler;
 use TaskManager\Users\Application\Service\UserSaverInterface;
@@ -18,7 +19,6 @@ use TaskManager\Users\Domain\Exception\PasswordAndRepeatPasswordDoNotMatchExcept
 use TaskManager\Users\Domain\Repository\UserRepositoryInterface;
 use TaskManager\Users\Domain\ValueObject\UserEmail;
 use TaskManager\Users\Domain\ValueObject\UserFirstname;
-use TaskManager\Users\Domain\ValueObject\UserId;
 use TaskManager\Users\Domain\ValueObject\UserLastname;
 use TaskManager\Users\Domain\ValueObject\UserPassword;
 use TaskManager\Users\Domain\ValueObject\UserProfile;

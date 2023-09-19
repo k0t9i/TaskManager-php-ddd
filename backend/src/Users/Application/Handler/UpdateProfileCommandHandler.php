@@ -14,7 +14,6 @@ use TaskManager\Users\Application\Service\UserSaverInterface;
 use TaskManager\Users\Domain\Exception\PasswordAndRepeatPasswordDoNotMatchException;
 use TaskManager\Users\Domain\Repository\UserRepositoryInterface;
 use TaskManager\Users\Domain\ValueObject\UserFirstname;
-use TaskManager\Users\Domain\ValueObject\UserId;
 use TaskManager\Users\Domain\ValueObject\UserLastname;
 use TaskManager\Users\Domain\ValueObject\UserPassword;
 
@@ -31,7 +30,7 @@ final readonly class UpdateProfileCommandHandler implements CommandHandlerInterf
 
     public function __invoke(UpdateProfileCommand $command): int
     {
-        $userId = new UserId($this->authenticator->getUserId());
+        $userId = $this->authenticator->getUserId();
         $user = $this->repository->findById($userId);
         if (null === $user) {
             throw new UserDoesNotExistException($userId->value);

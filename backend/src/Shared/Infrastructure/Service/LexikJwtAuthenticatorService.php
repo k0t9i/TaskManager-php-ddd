@@ -13,6 +13,7 @@ use Symfony\Component\HttpKernel\Event\KernelEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use TaskManager\Shared\Application\Service\AuthenticatorServiceInterface;
 use TaskManager\Shared\Domain\Exception\AuthenticationException;
+use TaskManager\Shared\Domain\ValueObject\UserId;
 use TaskManager\Shared\Infrastructure\ValueObject\SymfonyUser;
 
 final class LexikJwtAuthenticatorService implements AuthenticatorServiceInterface, EventSubscriberInterface
@@ -23,14 +24,14 @@ final class LexikJwtAuthenticatorService implements AuthenticatorServiceInterfac
     public function __construct(
         private readonly JWTTokenManagerInterface $tokenManager,
         private readonly TokenExtractorInterface $tokenExtractor,
-        private string $path
+        private readonly string $path
     ) {
         $this->configurePathRegexp();
     }
 
-    public function getUserId(): string
+    public function getUserId(): UserId
     {
-        return $this->userId;
+        return new UserId($this->userId);
     }
 
     public function getToken(string $id): string
